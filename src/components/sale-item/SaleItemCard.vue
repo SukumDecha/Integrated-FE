@@ -40,22 +40,11 @@ defineProps({
     type: String,
     default: 'emerald',
   },
+  id: {
+    type: Number,
+    required: true,
+  },
 })
-
-// const isAddingToCart = ref(false)
-
-// const handleAddToCart = async () => {
-//   isAddingToCart.value = true
-//   try {
-//     // Simulate async cart addition
-//     await new Promise((resolve) => setTimeout(resolve, 1000))
-//     console.log(`Added ${props.brand} ${props.model} to cart`)
-//   } catch (error) {
-//     console.error('Failed to add to cart:', error)
-//   } finally {
-//     isAddingToCart.value = false
-//   }
-// }
 </script>
 
 <style scoped>
@@ -80,7 +69,8 @@ defineProps({
     </div>
   </div>
 
-  <div
+  <router-link
+    :to="`/sale-items/${id}`"
     v-else
     class="itbms-row w-full bg-white rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow h-full flex flex-col"
   >
@@ -141,5 +131,5 @@ defineProps({
         </router-link>
       </div>
     </div>
-  </div>
+  </router-link>
 </template>

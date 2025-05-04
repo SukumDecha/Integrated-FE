@@ -1,7 +1,37 @@
+<script setup>
+import { reactive, onMounted } from 'vue'
+import XNavbar from '@/components/layout/XNavbar.vue'
+import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
+import SaleItemCard from '@/components/sale-item/SaleItemCard.vue'
+import { SaleItemService } from '@/services'
+
+const products = reactive([])
+
+const breadcrumbs = [
+  { text: 'Home', path: '/' },
+  { text: 'Sale Items', active: true },
+]
+
+const fetchProducts = async () => {
+  const response = await SaleItemService.getAllSaleItems()
+
+  if (response.error) {
+    console.error('Error fetching products:', response.error)
+    return
+  }
+
+  products.push(...response.data)
+}
+
+onMounted(() => {
+  fetchProducts()
+})
+</script>
+
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- Navbar -->
-    <XNavbar :brand-name="storeName" :cart-count="cartCount" />
+    <XNavbar />
 
     <!-- Featured Products -->
     <div class="bg-white">
@@ -20,7 +50,8 @@
             <SaleItemCard
               v-for="product in products"
               :key="product.id"
-              :brand="product.brand"
+              :id="product.id"
+              :brand="product.brandName"
               :model="product.model"
               :ramGb="product.ramGb"
               :storageGb="product.storageGb"
@@ -39,35 +70,3 @@
     <Footer :company-name="storeName" />
   </div>
 </template>
-
-<script setup>
-import { reactive, ref, onMounted } from 'vue'
-import XNavbar from '@/components/layout/XNavbar.vue'
-import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
-import SaleItemCard from '@/components/sale-item/SaleItemCard.vue'
-import SaleItemService from '@/services/sale-item.service'
-
-// Store data
-const storeName = ref('GreenCart')
-const cartCount = ref(3)
-
-const products = reactive([])
-
-const breadcrumbs = [
-  { text: 'Home', to: '/' },
-  { text: 'Sale Items', active: true },
-]
-
-const fetchProducts = async () => {
-  try {
-    const allItems = await SaleItemService.getAllSaleItems()
-    products.push(...allItems)
-  } catch (error) {
-    console.error('Error fetching products:', error)
-  }
-}
-
-onMounted(() => {
-  fetchProducts()
-})
-</script>
