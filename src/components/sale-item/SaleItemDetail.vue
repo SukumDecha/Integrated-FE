@@ -4,13 +4,8 @@
     <p class="text-lg text-gray-500">Loading...</p>
   </div>
 
-  <!-- Error -->
-  <div v-if="error" class="text-center py-10">
-    <p class="text-lg text-red-500">{{ error }}</p>
-  </div>
-
   <!-- Product not found -->
-  <div v-if="product" class="text-center py-10 bg-green-100">
+  <div v-if="error" class="text-center py-10 bg-green-100">
     <p class="text-lg text-gray-500 itbms-message">The requested sale item does not exist.</p>
     <XButton
       class="mt-4 itbms-button"
@@ -30,7 +25,7 @@
         <!-- Main Image -->
         <div class="mb-4 border rounded-lg overflow-hidden">
           <img
-            :src="product.image || 'https://placehold.co/600x600/e6e6e6/52525b?text=Product+Image'"
+            :src="'/assets/sale-item/shopping.webp'"
             :alt="product.model"
             class="w-full h-auto object-contain"
           />
@@ -94,7 +89,7 @@
 
         <div class="grid grid-cols-3 items-center">
           <span class="text-gray-600">Storage :</span>
-          <span class="col-span-2 itbms">{{ displayOrDash(product.storageGb) }} </span>
+          <span class="col-span-2 itbms-storageGb">{{ displayOrDash(product.storageGb) }} </span>
           <span class="itbms-storageGb-unit">GB</span>
         </div>
 
@@ -126,6 +121,9 @@ import { defineProps } from 'vue'
 import { formatPrice } from '@/utils/TextUtils'
 import XButton from '@/components/common/XButton.vue'
 import { displayOrDash } from '@/utils/TextUtils'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // Define the props to receive the product and loading/error states
 const props = defineProps({
@@ -143,8 +141,10 @@ const props = defineProps({
   },
 })
 
-// Method to add the product to the cart (optional implementation)
-const addToCart = () => {
-  console.log('Adding product to cart:', props.product)
-}
+setTimeout(() => {
+  if (props.error) {
+    router.push({ name: 'sale-items-gallery' })
+  }
+}, 1500)
+
 </script>

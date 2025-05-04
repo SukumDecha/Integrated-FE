@@ -5,7 +5,7 @@
         <div class="flex items-center">
           <div class="flex-shrink-0 flex items-center">
             <ShoppingBag class="h-8 w-8 text-emerald-600" />
-            <span class="ml-2 text-xl font-bold text-emerald-800">{{ brandName }}</span>
+            <span class="ml-2 text-xl font-bold text-emerald-800">Green Cart</span>
           </div>
           <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
             <a
@@ -42,7 +42,7 @@
               v-if="cartCount > 0"
               class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-emerald-600 rounded-full"
             >
-              {{ cartCount }}
+              {{ 0 }}
             </span>
           </button>
         </div>
@@ -104,10 +104,6 @@
 import { ref, defineProps } from 'vue'
 
 defineProps({
-  brandName: {
-    type: String,
-    default: 'GreenCart',
-  },
   navItems: {
     type: Array,
     default: () => [

@@ -1,5 +1,4 @@
 export class BaseResponse {
-
     constructor() {
       this._message = ""
       this._data = null

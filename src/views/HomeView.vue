@@ -45,7 +45,7 @@ import { onMounted, ref } from 'vue'
 import XNavbar from '@/components/layout/XNavbar.vue'
 import HeroSection from '@/components/home/HeroSection.vue'
 import SaleItemCard from '@/components/sale-item/SaleItemCard.vue'
-import SaleItemService from '@/services/sale-item.service'
+import { SaleItemService } from '@/services'
 
 // Store data
 const storeName = ref('GreenCart')
@@ -57,8 +57,9 @@ const error = ref(null)
 const fetchProducts = async () => {
   loading.value = true
   try {
-    const data = await SaleItemService.getAllSaleItems()
-    products.value = data
+    const response = await SaleItemService.getAllSaleItems()
+    products.value = response.data
+    console.log("Fetched products:", response.data)
   } catch (error) {
     console.error('Error fetching products:', error)
     error.value = 'Failed to load products. Please try again.'

@@ -1,3 +1,26 @@
+<script setup>
+import { defineProps } from 'vue'
+import { Home as HomeIcon, ChevronRight as ChevronRightIcon } from 'lucide-vue-next'
+
+defineProps({
+  items: {
+    type: Array,
+    required: true,
+    validator: (items) => {
+      return items.every((item) => item.text !== undefined)
+    },
+  },
+  showHomeIcon: {
+    type: Boolean,
+    default: true,
+  },
+  separator: {
+    type: [String, Object],
+    default: 'chevron',
+  },
+})
+</script>
+
 <template>
   <nav aria-label="Breadcrumb" class="w-full">
     <ol class="flex flex-wrap items-center text-base md:text-lg">
@@ -20,8 +43,8 @@
 
         <!-- Item with link -->
         <router-link
-          v-if="!item.active && item.to"
-          :to="item.to"
+          v-if="!item.active && item.path"
+          :to="item.path"
           class="hover:text-emerald-600 transition-colors"
           :class="{ 'text-emerald-600': index === 0 && !showHomeIcon }"
         >
@@ -49,26 +72,3 @@
     </ol>
   </nav>
 </template>
-
-<script setup>
-import { defineProps } from 'vue'
-import { Home as HomeIcon, ChevronRight as ChevronRightIcon } from 'lucide-vue-next'
-
-defineProps({
-  items: {
-    type: Array,
-    required: true,
-    validator: (items) => {
-      return items.every((item) => item.text !== undefined)
-    },
-  },
-  showHomeIcon: {
-    type: Boolean,
-    default: true,
-  },
-  separator: {
-    type: [String, Object],
-    default: 'chevron',
-  },
-})
-</script>

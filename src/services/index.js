@@ -1,3 +1,5 @@
-import { SaleItemService } from './saleItem.service.js';
+import  SaleItemService  from './sale-item.service.js';
 
-export { SaleItemService }
+export {
+    SaleItemService
+}
