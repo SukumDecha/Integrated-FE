@@ -4,8 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "cp .env.local .env && vite",
+    "build": "cp .env.local .env && vite build",
+    "build:uat": "cat .env.uat && vite build --mode uat",
+    "build:prod": "cat .env.prod && vite build --mode production",
+
     "preview": "vite preview",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
