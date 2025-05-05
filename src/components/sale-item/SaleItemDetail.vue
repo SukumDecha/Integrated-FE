@@ -84,7 +84,7 @@
           <span class="col-span-2 itbms-screenSizeInch"
             >{{ displayOrDash(product.screenSizeInch) }}
           </span>
-          <span class="itbms-screenSizeInch-unit">inches</span>
+          <span class="itbms-screenSizeInch-unit">Inches</span>
         </div>
 
         <div class="grid grid-cols-3 items-center">
