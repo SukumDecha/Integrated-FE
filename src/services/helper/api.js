@@ -1,13 +1,11 @@
 import { getErrorMessage } from "@/utils/ErrorUtils";
 import { BaseResponse, BaseResponseMessage } from "../models/api.response";
 
-
 const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`
 
 const httpHeaders = {
     'Content-Type': 'application/json',
-  };
-
+};
   
 const request = async (url, method, payload) => {
    const response = new BaseResponse()

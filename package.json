@@ -8,7 +8,6 @@
     "build": "cp .env.local .env && vite build",
     "build:uat": "cat .env.uat && vite build --mode uat",
     "build:prod": "cat .env.prod && vite build --mode production",
-
     "preview": "vite preview",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",

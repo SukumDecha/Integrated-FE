@@ -18,7 +18,17 @@ const router = createRouter({
       path: '/sale-items/:id',
       name: 'sale-item-detail',
       component: () => import('../views/sale-items/SaleItemDetailView.vue'),
-    }
+    },
+    {
+      path: '/sale-items/add',
+      name: 'sale-item-add',
+      component: () => import('../views/sale-items/AddSaleItemView.vue'),
+    },
+    {
+      path: '/sale-items/:id/edit',
+      name: 'sale-item-edit',
+      component: () => import('../views/sale-items/EditSaleItemView.vue'),
+    },
   ],
 })
 
