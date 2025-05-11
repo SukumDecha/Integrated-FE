@@ -129,6 +129,7 @@ defineProps({
       { name: 'Sign out', href: '#' },
     ],
   },
+  cartCount: Number,
 })
 
 const isOpen = ref(false)

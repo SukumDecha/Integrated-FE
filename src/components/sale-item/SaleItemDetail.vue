@@ -1,150 +1,147 @@
 <template>
-  <!-- Loading -->
-  <div v-if="loading" class="text-center py-10">
-    <p class="text-lg text-gray-500">Loading...</p>
-  </div>
+  <div class="min-h-screen flex flex-col">
+    <XNavbar />
 
-  <!-- Product not found -->
-  <div v-if="error" class="text-center py-10 bg-green-100">
-    <p class="text-lg text-gray-500 itbms-message">The requested sale item does not exist.</p>
-    <XButton
-      class="mt-4 itbms-button"
-      @click="$router.push({ name: 'sale-items-gallery' })"
-      variant="primary"
-      size="lg"
-    >
-      ok
-    </XButton>
-  </div>
+    <XLayout class="space-y-6">
+      <XBreadcrumb :items="breadcrumbs" />
 
-  <!-- Product Detail Card -->
-  <div v-else class="rounded-lg overflow-hidden">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <!-- Product Images -->
-      <div>
-        <!-- Main Image -->
-        <div class="mb-4 border rounded-lg overflow-hidden">
-          <img
-            :src="'/assets/sale-item/shopping.webp'"
-            :alt="product.model"
-            class="w-full h-auto object-contain"
-          />
+      <div class="p-6 bg-white rounded-xl shadow space-y-6 max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-2xl font-bold">
+            {{ modeTitle }}
+          </h2>
+          <button
+            @click="$router.back()"
+            class="text-sm text-blue-600 underline itbms-back-button"
+          >
+            Back
+          </button>
         </div>
 
-        <!-- Thumbnails -->
-        <div class="grid grid-cols-4 gap-2">
-          <div
-            v-for="i in 4"
-            :key="i"
-            class="border rounded-lg overflow-hidden cursor-pointer hover:border-emerald-500"
-          >
-            <img
-              :src="product.image || 'https://placehold.co/150x150/e6e6e6/52525b?text=Thumbnail'"
-              :alt="`${product.model} thumbnail ${i}`"
-              class="w-full h-auto object-contain"
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Left: Image -->
+          <div>
+            <div class="border rounded-lg overflow-hidden">
+              <img
+                :src="'/assets/sale-item/shopping.webp'"
+                alt="product image"
+                class="w-full object-contain"
+              />
+            </div>
+            <div class="grid grid-cols-4 gap-2 mt-4">
+              <img
+                v-for="i in 4"
+                :key="i"
+                :src="'/assets/sale-item/shopping.webp'"
+                alt="thumbnail"
+                class="w-full h-auto border rounded-lg"
+              />
+            </div>
+          </div>
+
+          <!-- Right: Form/Detail -->
+          <div>
+            <SaleItemForm
+              v-if="mode !== 'detail'"
+              :initial-data="product"
+              :is-edit-mode="mode === 'edit'"
+              :on-submit="onSubmit"
+              @cancel="$emit('cancel')"
             />
+            <template v-else>
+              <!-- Detail Mode: Read-only -->
+              <div class="space-y-4 itbms-row">
+                <div class="field">
+                  <span class="label">Brand:</span>
+                  <span class="itbms-brand">{{ product.brandName }}</span>
+                </div>
+                <div class="field">
+                  <span class="label">Model:</span>
+                  <span class="itbms-model">{{ product.model }}</span>
+                </div>
+                <div class="field">
+                  <span class="label">Price:</span>
+                  <span class="itbms-price">{{ formatPrice(product.price) }}</span>
+                  <span class="itbms-price-unit">Baht</span>
+                </div>
+                <div class="field">
+                  <span class="label">Description:</span>
+                  <span class="itbms-description">{{ product.description }}</span>
+                </div>
+                <div class="field">
+                  <span class="label">RAM:</span>
+                  <span class="itbms-ramGb">{{ product.ramGb ?? '-' }}</span>
+                  <span class="itbms-ramGb-unit">GB</span>
+                </div>
+                <div class="field">
+                  <span class="label">Screen Size:</span>
+                  <span class="itbms-screenSizeInch">{{ product.screenSizeInch ?? '-' }}</span>
+                  <span class="itbms-screenSizeInch-unit">Inches</span>
+                </div>
+                <div class="field">
+                  <span class="label">Storage:</span>
+                  <span class="itbms-storageGb">{{ product.storageGb ?? '-' }}</span>
+                  <span class="itbms-storageGb-unit">GB</span>
+                </div>
+                <div class="field">
+                  <span class="label">Color:</span>
+                  <span class="itbms-color">{{ product.color ?? '-' }}</span>
+                </div>
+                <div class="field">
+                  <span class="label">Quantity:</span>
+                  <span class="itbms-quantity">{{ product.quantity }}</span>
+                  <span class="itbms-quantity-unit">units</span>
+                </div>
+              </div>
+            </template>
           </div>
         </div>
       </div>
-
-      <!-- Product Info -->
-
-      <div class="space-y-4 itbms-row">
-        <div class="grid grid-cols-3 items-center">
-          <span class="text-gray-600">Brand :</span>
-          <span class="col-span-2 font-medium itbms-brand">{{ product.brandName }}</span>
-        </div>
-
-        <div class="grid grid-cols-3 items-center">
-          <span class="text-gray-600">Model :</span>
-          <span class="col-span-2 font-medium itbms-model">{{ product.model }}</span>
-        </div>
-
-        <div class="grid grid-cols-3 items-center">
-          <span class="text-gray-600">Price :</span>
-          <span class="col-span-2 font-medium text-emerald-600 itbms-price">{{
-            formatPrice(product.price)
-          }}</span>
-          <span class="text-gray-600 itbms-price-unit">Baht</span>
-        </div>
-
-        <div class="grid grid-cols-3 items-start">
-          <span class="text-gray-600">Description:</span>
-          <span class="col-span-2 itbms-description">{{ product.description }}</span>
-        </div>
-
-        <div class="grid grid-cols-3 items-center">
-          <span class="text-gray-600">Ram :</span>
-          <span class="col-span-2 itbms-ramGb">{{ displayOrDash(product.ramGb) }} </span>
-          <span class="itbms-ramGb-unit">GB</span>
-        </div>
-
-        <div class="grid grid-cols-3 items-center">
-          <span class="text-gray-600">Screen Size :</span>
-          <span class="col-span-2 itbms-screenSizeInch"
-            >{{ displayOrDash(product.screenSizeInch) }}
-          </span>
-          <span class="itbms-screenSizeInch-unit">Inches</span>
-        </div>
-
-        <div class="grid grid-cols-3 items-center">
-          <span class="text-gray-600">Storage :</span>
-          <span class="col-span-2 itbms-storageGb">{{ displayOrDash(product.storageGb) }} </span>
-          <span class="itbms-storageGb-unit">GB</span>
-        </div>
-
-        <div class="grid grid-cols-3 items-center">
-          <span class="text-gray-600">Color :</span>
-          <span class="col-span-2 itbms-color">{{ displayOrDash(product.color) }}</span>
-        </div>
-
-        <div class="grid grid-cols-3 items-center">
-          <span class="text-gray-600">Available quantity :</span>
-          <span class="col-span-2 itbms-quantity">{{ product.quantity }}</span>
-          <span class="itbms-quantity-unit">units</span>
-        </div>
-
-        <!-- Add to Cart Button -->
-        <div class="pt-6">
-          <XButton @click="addToCart" full-width>
-            <ShoppingCart class="w-5 h-5 mr-2" />
-            Add to Cart
-          </XButton>
-        </div>
-      </div>
-    </div>
+    </XLayout>
   </div>
 </template>
 
 <script setup>
-import { defineProps } from 'vue'
+import { defineProps, defineEmits } from 'vue'
+import SaleItemForm from './SaleItemForm.vue'
+import XNavbar from '@/components/layout/XNavbar.vue'
+import XLayout from '@/components/layout/XLayout.vue'
+import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import { formatPrice } from '@/utils/TextUtils'
-import XButton from '@/components/common/XButton.vue'
-import { displayOrDash } from '@/utils/TextUtils'
-import { useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
-const router = useRouter()
+defineEmits(['cancel'])
 
-// Define the props to receive the product and loading/error states
 const props = defineProps({
-  product: {
-    type: Object,
-    required: true,
-  },
-  loading: {
-    type: Boolean,
-    required: true,
-  },
-  error: {
+  product: Object,
+  mode: {
     type: String,
-    default: null,
+    default: 'detail' // 'add' | 'edit' | 'detail'
   },
+  onSubmit: Function
 })
 
-setTimeout(() => {
-  if (props.error) {
-    router.push({ name: 'sale-items-gallery' })
-  }
-}, 1500)
+const route = useRoute()
+const productId = route.params.id
 
+const breadcrumbs = [
+  { text: 'Home', path: '/' },
+  { text: 'Sale Items', path: '/sale-items' },
+  { text: 'Detail', path: `/sale-items/${productId}` }
+]
+
+const modeTitle = {
+  add: 'Add New Sale Item',
+  edit: 'Edit Sale Item',
+  detail: 'Sale Item Detail'
+}[props.mode]
 </script>
+
+<style scoped lang="postcss">
+.field {
+  @apply flex justify-between items-center border-b py-2 text-gray-700;
+}
+.label {
+  @apply font-medium text-gray-600;
+}
+</style>
