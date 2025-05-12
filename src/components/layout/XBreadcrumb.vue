@@ -44,9 +44,12 @@ defineProps({
         <!-- Item with link -->
         <router-link
           v-if="!item.active && item.path"
-          :to="item.path"
-          class="hover:text-emerald-600 transition-colors"
-          :class="{ 'text-emerald-600': index === 0 && !showHomeIcon }"
+          :to="index === 0 ? '/sale-items' : item.path"
+          :class="[
+            'hover:text-emerald-600 transition-colors',
+            index === 0 ? 'itbms-home-button' : '',
+            index === 0 && !showHomeIcon ? 'text-emerald-600' : '',
+          ]"
         >
           {{ item.text }}
         </router-link>

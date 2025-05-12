@@ -12,7 +12,7 @@
           toast.type === 'warn' && 'bg-yellow-400 text-black'
         ]"
       >
-        <span>{{ toast.message }}</span>
+        <span class="itbms-message">{{ toast.message }}</span>
         <button
           class="ml-4 text-sm opacity-70 hover:opacity-100"
           @click="remove(toast.id)"

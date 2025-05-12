@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToastStore } from '@/stores/toast.store'
 import XNavbar from '@/components/layout/XNavbar.vue'
@@ -29,13 +29,16 @@ const fetchProducts = async () => {
 
 onMounted(async () => {
   await fetchProducts()
+})
+
+watchEffect(() => {
   if (route.query.toast === 'created') {
-    setTimeout(() => {
-      toast.add({ message: 'Sale item added successfully', type: 'success' })
-      router.replace({ query: {} })
-    }, 0)
+    toast.add({ message: 'The sale item has been successfully added.', type: 'success' })
+
+    router.replace({ query: {} })
   }
 })
+
 </script>
 
 <template>
@@ -48,10 +51,9 @@ onMounted(async () => {
           <XBreadcrumb :items="breadcrumbs" />
           <button
             @click="$router.push('/sale-items/add')"
-            class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700"
-            data-testid="itbms-sale-item-add"
+            class="itbms-sale-item-add bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700"
           >
-            Add 
+            Add Sale Item
           </button>
         </div>
 
