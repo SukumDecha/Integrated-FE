@@ -5,8 +5,8 @@ import XToast from './components/common/XToast.vue';
 
 <template>
   <main>
-    <XToast />
     <RouterView />
+    <XToast />
   </main>
 </template>
 

@@ -28,7 +28,7 @@ const handleUpdate = async (data) => {
     toast.add({ message: 'Failed to update item', type: 'error' })
     throw new Error('Backend error')
   } else {
-    toast.add({ message: 'Sale item updated successfully', type: 'success' })
+    toast.add({ message: 'The sale item has been updated.', type: 'success' })
     router.push(`/sale-items/${productId}`)
   }
 }

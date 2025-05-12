@@ -10,10 +10,7 @@
           <h2 class="text-2xl font-bold">
             {{ modeTitle }}
           </h2>
-          <button
-            @click="$router.back()"
-            class="text-sm text-blue-600 underline itbms-back-button"
-          >
+          <button @click="$router.back()" class="text-sm text-blue-600 underline itbms-back-button">
             Back
           </button>
         </div>
@@ -92,6 +89,20 @@
                   <span class="itbms-quantity">{{ product.quantity }}</span>
                   <span class="itbms-quantity-unit">units</span>
                 </div>
+                <div class="flex justify-end gap-4 mt-4">
+                  <button
+                    class="bg-gray-200 text-gray-800 px-4 py-2 rounded itbms-edit-button"
+                    @click="router.push(`/sale-items/${product.id}/edit`)"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    class="bg-red-600 text-white px-4 py-2 rounded itbms-delete-button"
+                    @click="showConfirm = true"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </template>
           </div>
@@ -99,16 +110,44 @@
       </div>
     </XLayout>
   </div>
+  <teleport to="body">
+    <div
+      v-if="showConfirm"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full text-center">
+        <h2 class="text-lg font-bold mb-4">Delete Confirmation</h2>
+        <p class="itbms-message mb-6">Do you want to delete this sale item?</p>
+        <div class="flex justify-center gap-4">
+          <button
+            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded itbms-cancel-button"
+            @click="showConfirm = false"
+          >
+            Cancel
+          </button>
+          <button
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded itbms-confirm-button"
+            @click="deleteProduct()"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  </teleport>
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue'
+import { defineProps, defineEmits, ref } from 'vue'
 import SaleItemForm from './SaleItemForm.vue'
 import XNavbar from '@/components/layout/XNavbar.vue'
 import XLayout from '@/components/layout/XLayout.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import { formatPrice } from '@/utils/TextUtils'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+
+import { useToastStore } from '@/stores/toast.store'
+import { SaleItemService } from '@/services'
 
 defineEmits(['cancel'])
 
@@ -116,25 +155,45 @@ const props = defineProps({
   product: Object,
   mode: {
     type: String,
-    default: 'detail' // 'add' | 'edit' | 'detail'
+    default: 'detail', // 'add' | 'edit' | 'detail'
   },
-  onSubmit: Function
+  onSubmit: Function,
 })
 
 const route = useRoute()
+const router = useRouter()
 const productId = route.params.id
+const toast = useToastStore()
+const showConfirm = ref(false)
 
 const breadcrumbs = [
   { text: 'Home', path: '/' },
   { text: 'Sale Items', path: '/sale-items' },
-  { text: 'Detail', path: `/sale-items/${productId}` }
+  { text: 'Detail', path: `/sale-items/${productId}` },
 ]
 
 const modeTitle = {
   add: 'Add New Sale Item',
   edit: 'Edit Sale Item',
-  detail: 'Sale Item Detail'
+  detail: 'Sale Item Detail',
 }[props.mode]
+
+const deleteProduct = async () => {
+  showConfirm.value = false
+  if (!productId) {
+    toast.add({ message: 'Invalid product ID', type: 'error' })
+    return
+  }
+  const res = await SaleItemService.deleteSaleItem(productId)
+  if (res.error) {
+    console.log(res);
+    toast.add({ message: 'The requested sale item does not exist.', type: 'error' })
+    router.push('/sale-items')
+  } else {
+    toast.add({ message: 'The sale item has been deleted.', type: 'success' })
+    router.push('/sale-items')
+  }
+}
 </script>
 
 <style scoped lang="postcss">
