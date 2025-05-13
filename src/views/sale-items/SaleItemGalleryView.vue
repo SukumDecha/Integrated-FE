@@ -38,7 +38,6 @@ watchEffect(() => {
     router.replace({ query: {} })
   }
 })
-
 </script>
 
 <template>

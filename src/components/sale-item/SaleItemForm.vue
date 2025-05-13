@@ -1,24 +1,34 @@
 <template>
-  <form @submit.prevent="handleSave" class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="form-group">
-        <label class="form-label">แบรนด์ <span class="text-red-500">*</span></label>
+  <form @submit.prevent="handleSave" class="space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="form-label">Brand <span class="text-red-500">*</span></label>
         <select
           v-model="form.brandId"
-          class="input itbms-color border-2 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
+          class="input itbms-brand border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all flex items-center"
         >
-          <option disabled value="">เลือกแบรนด์</option>
+          <option disabled value="">Select a brand</option>
           <option v-for="b in brands" :key="b.id" :value="b.id">{{ b.name }}</option>
         </select>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">รุ่น <span class="text-red-500">*</span></label>
+      <div>
+        <label class="form-label">Model <span class="text-red-500">*</span></label>
         <input
           v-model="form.model"
-          class="input itbms-color border-2 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="เช่น iPhone 14 Pro Max"
+          class="input itbms-model border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
+          placeholder="Model"
         />
+      </div>
+
+      <div>
+        <label class="form-label">Price (฿) <span class="text-red-500">*</span></label>
+        <input
+          type="number"
+          v-model.number="form.price"
+          class="input itbms-price border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
+          placeholder="e.g. 29900"
+        />>>>>>> Stashed changes />
       </div>
 
       <div class="form-group">
@@ -36,8 +46,8 @@
         <input
           type="number"
           v-model.number="form.quantity"
-          class="input itbms-color border-2 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="เช่น 5"
+          class="input itbms-quantity border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
+          placeholder="e.g. 10"
           @focus="handleChange('quantity')"
         />
       </div>
@@ -47,8 +57,8 @@
         <input
           type="number"
           v-model.number="form.ramGb"
-          class="input itbms-color border-2 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="เช่น 6"
+          class="input itbms-ramGb border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
+          placeholder="e.g. 8"
         />
       </div>
 
@@ -68,19 +78,31 @@
         <input
           type="number"
           v-model.number="form.storageGb"
-          class="input itbms-color border-2 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="เช่น 512"
+          class="input itbms-storageGb border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
+          placeholder="e.g. 128"
         />
       </div>
 
       <div class="form-group">
         <label class="form-label">สี</label>
         <input
-          v-model="form.color"
-          class="input itbms-color border-2 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="เช่น Space Black"
+          type="number"
+          step="0.01"
+          v-model.number="form.screenSizeInch"
+          class="input itbms-screenSizeInch border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
+          placeholder="e.g. 6.7"
         />
       </div>
+
+      <div>
+        <label class="form-label">Color</label>
+        <input
+          v-model="form.color"
+          class="input itbms-color border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
+          placeholder="e.g. Midnight Black"
+        />
+      </div>
+      >>>>>>> Stashed changes
     </div>
 
     <div class="mt-6">
@@ -88,26 +110,26 @@
       <textarea
         v-model="form.description"
         rows="3"
-        class="input itbms-color border-2 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-        placeholder="คำอธิบายสั้นๆ เกี่ยวกับสินค้า"
+        class="input itbms-description block w-full border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
+        placeholder="Short description of the product"
       ></textarea>
     </div>
 
     <div class="flex gap-4 justify-end mt-8">
       <button
-        type="button"
-        class="btn-secondary itbms-cancel-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
-        @click="emit('cancel')"
+        type="submit"
+        class="btn-primary itbms-save-button bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+        :disabled="isSaving || !isFormValid || !isChanged"
       >
         cancel
       </button>
 
       <button
-        type="submit"
-        class="btn-primary itbms-save-button bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-        :disabled="isSaving || !isFormValid || !isChanged"
+        type="button"
+        class="btn-secondary itbms-cancel-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+        @click="emit('cancel')"
       >
-        {{ isSaving ? 'save...' : 'save' }}
+        Cancel >>>>>>> Stashed changes
       </button>
     </div>
   </form>
