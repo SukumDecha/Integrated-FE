@@ -1,135 +1,97 @@
 <template>
-  <form @submit.prevent="handleSave" class="space-y-4">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label class="form-label">Brand <span class="text-red-500">*</span></label>
-        <select
-          v-model="form.brandId"
-          class="input itbms-brand border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all flex items-center"
-        >
-          <option disabled value="">Select a brand</option>
-          <option v-for="b in brands" :key="b.id" :value="b.id">{{ b.name }}</option>
-        </select>
-      </div>
+  <form @submit.prevent="handleSave" class="form-grid">
+    <XSelector
+      v-model="form.brandId"
+      class="itbms-brand"
+      label="Brand"
+      :required="true"
+      :options="brands.map((b) => ({ value: b.id, label: b.name }))"
+      placeholder="Select a brand"
+      :disabled="isDetail"
+    />
 
-      <div>
-        <label class="form-label">Model <span class="text-red-500">*</span></label>
-        <input
-          v-model="form.model"
-          class="input itbms-model border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="Model"
-        />
-      </div>
+    <XInput
+      v-model="form.model"
+      class="itbms-model"
+      label="Model"
+      placeholder="e.g. iPhone 14 Pro"
+      :required="true"
+      :disabled="isDetail"
+    />
 
-      <div>
-        <label class="form-label">Price (฿) <span class="text-red-500">*</span></label>
-        <input
-          type="number"
-          v-model.number="form.price"
-          class="input itbms-price border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="e.g. 29900"
-        />>>>>>> Stashed changes />
-      </div>
+    <XInput
+      v-model="form.price"
+      class="itbms-price"
+      label="Price (฿)"
+      type="number"
+      placeholder="e.g. 42900"
+      :required="true"
+      :disabled="isDetail"
+    />
 
-      <div class="form-group">
-        <label class="form-label">ราคา (฿) <span class="text-red-500">*</span></label>
-        <input
-          type="number"
-          v-model.number="form.price"
-          class="input itbms-color border-2 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="เช่น 42900"
-        />
-      </div>
+    <XInput
+      v-model="form.quantity"
+      class="itbms-quantity"
+      label="Quantity"
+      :required="true"
+      type="number"
+      placeholder="e.g. 10"
+      @focus="handleChange('quantity')"
+    />
 
-      <div class="form-group">
-        <label class="form-label">จำนวน <span class="text-red-500">*</span></label>
-        <input
-          type="number"
-          v-model.number="form.quantity"
-          class="input itbms-quantity border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="e.g. 10"
-          @focus="handleChange('quantity')"
-        />
-      </div>
+    <XInput
+      v-model="form.ramGb"
+      class="itbms-ramGb"
+      label="RAM (GB)"
+      type="number"
+      placeholder="e.g. 8"
+    />
 
-      <div class="form-group">
-        <label class="form-label">RAM (GB)</label>
-        <input
-          type="number"
-          v-model.number="form.ramGb"
-          class="input itbms-ramGb border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="e.g. 8"
-        />
-      </div>
+    <XInput
+      v-model="form.screenSizeInch"
+      class="itbms-screenSizeInch"
+      label="Screen Size (Inch)"
+      type="number"
+      :step="0.1"
+      placeholder="e.g. 6.7"
+    />
 
-      <div class="form-group">
-        <label class="form-label">ขนาดหน้าจอ (นิ้ว)</label>
-        <input
-          type="number"
-          step="0.1"
-          v-model.number="form.screenSizeInch"
-          class="input itbms-color border-2 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="เช่น 6.7"
-        />
-      </div>
+    <XInput
+      v-model="form.storageGb"
+      class="itbms-storageGb"
+      label="Storage (GB)"
+      type="number"
+      placeholder="e.g. 128"
+    />
 
-      <div class="form-group">
-        <label class="form-label">พื้นที่จัดเก็บ (GB)</label>
-        <input
-          type="number"
-          v-model.number="form.storageGb"
-          class="input itbms-storageGb border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="e.g. 128"
-        />
-      </div>
+    <XInput
+      v-model="form.color"
+      class="itbms-color"
+      label="Color"
+      placeholder="e.g. Midnight Purple"
+    />
 
-      <div class="form-group">
-        <label class="form-label">สี</label>
-        <input
-          type="number"
-          step="0.01"
-          v-model.number="form.screenSizeInch"
-          class="input itbms-screenSizeInch border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="e.g. 6.7"
-        />
-      </div>
-
-      <div>
-        <label class="form-label">Color</label>
-        <input
-          v-model="form.color"
-          class="input itbms-color border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-          placeholder="e.g. Midnight Black"
-        />
-      </div>
-      >>>>>>> Stashed changes
-    </div>
-
-    <div class="mt-6">
-      <label class="form-label">รายละเอียด <span class="text-red-500">*</span></label>
-      <textarea
-        v-model="form.description"
-        rows="3"
-        class="input itbms-description block w-full border-1 border-black focus:ring focus:ring-blue-200 focus:border-blue-500 transition-all"
-        placeholder="Short description of the product"
-      ></textarea>
-    </div>
+    <XInput
+      v-model="form.description"
+      class="itbms-description"
+      label="Description"
+      type="textarea"
+      placeholder="Short description"
+      :required="true"
+      :disabled="isDetail"
+    />
 
     <div class="flex gap-4 justify-end mt-8">
       <button
         type="submit"
-        class="btn-primary itbms-save-button bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+        class="btn-primary itbms-save-button"
         :disabled="isSaving || !isFormValid || !isChanged"
       >
-        cancel
+        Save
       </button>
 
-      <button
-        type="button"
-        class="btn-secondary itbms-cancel-button bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
-        @click="emit('cancel')"
-      >
-        Cancel >>>>>>> Stashed changes
+      <button type="button" class="btn-secondary itbms-cancel-button" @click="emit('cancel')">
+        Cancel
       </button>
     </div>
   </form>
@@ -139,6 +101,8 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import { useToastStore } from '@/stores/toast.store'
 import { BrandService } from '@/services'
+import XInput from '@/components/common/form/XInput.vue'
+import XSelector from '@/components/common/form/XSelector.vue'
 
 const props = defineProps({
   initialData: Object,
@@ -295,20 +259,13 @@ const isChanged = computed(() => {
 })
 </script>
 
-<style scoped lang="postcss">
-.form-group {
-  @apply mb-1;
-}
-.input {
-  @apply w-full px-4 py-3 border-2 border-black rounded-lg text-gray-700;
-}
-.form-label {
-  @apply block text-sm font-medium text-gray-700 mb-1.5;
-}
-.btn-primary {
-  @apply bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium;
-}
-.btn-secondary {
-  @apply bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 transition-all font-medium;
+<style scoped>
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 2fr)); /* ปรับให้แต่ละคอลัมน์มีขนาดขั้นต่ำ และขยายได้ */
+  gap: 10px; /* เพิ่มระยะห่างระหว่างช่อง */
+  max-width: none;
+  margin: 0 auto;
 }
 </style>
+
