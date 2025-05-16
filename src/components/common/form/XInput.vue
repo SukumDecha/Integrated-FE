@@ -13,6 +13,7 @@
     :class="inputClass"
     :step="step"
     :rows="rows"
+    v-bind="$attrs"
     @input="handleInput"
   />
 </template>
@@ -55,10 +56,16 @@ const emit = defineEmits(['update:modelValue'])
 const inputTag = computed(() => (props.type === 'textarea' ? 'textarea' : 'input'))
 
 const handleInput = (e) => {
-  const value =
-    props.type === 'number' ? +e.target.value : e.target.value
-  emit('update:modelValue', value)
-}
+  const rawValue = e.target.value;
+  let processedValue = rawValue;
+
+  if (props.type === 'number') {
+    const numericValue = +rawValue;
+    processedValue = isNaN(numericValue) || numericValue < 1 ? null : numericValue;
+  }
+
+  emit('update:modelValue', processedValue);
+};
 
 const inputClass = computed(() => `input ${props.class}`)
 </script>

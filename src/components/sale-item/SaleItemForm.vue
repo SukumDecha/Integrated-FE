@@ -7,7 +7,6 @@
       :required="true"
       :options="brands.map((b) => ({ value: b.id, label: b.name }))"
       placeholder="Select a brand"
-      :disabled="isDetail"
     />
 
     <XInput
@@ -16,7 +15,6 @@
       label="Model"
       placeholder="e.g. iPhone 14 Pro"
       :required="true"
-      :disabled="isDetail"
     />
 
     <XInput
@@ -26,7 +24,6 @@
       type="number"
       placeholder="e.g. 42900"
       :required="true"
-      :disabled="isDetail"
     />
 
     <XInput
@@ -36,7 +33,6 @@
       :required="true"
       type="number"
       placeholder="e.g. 10"
-      @focus="handleChange('quantity')"
     />
 
     <XInput
@@ -78,14 +74,13 @@
       type="textarea"
       placeholder="Short description"
       :required="true"
-      :disabled="isDetail"
     />
 
     <div class="flex gap-4 justify-end mt-8">
       <button
         type="submit"
         class="btn-primary itbms-save-button"
-        :disabled="isSaving || !isFormValid || !isChanged"
+        :disabled="!isFormValid || !isChanged"
       >
         Save
       </button>
@@ -151,7 +146,7 @@ watch(
         screenSizeInch: val.screenSizeInch ?? null,
         storageGb: val.storageGb ?? null,
         color: val.color ?? '',
-        quantity: val.quantity ?? 1,
+        quantity: val.quantity ?? null,
       }
     }
   },
@@ -181,23 +176,17 @@ const validate = () => {
   }
   if (form.value.price == null || form.value.price < 0) errors.push('Price must be 0 or more')
   if (!form.value.description?.trim()) errors.push('Description is required')
-  if (form.value.quantity == null || form.value.quantity < 1)
-    errors.push('Quantity must be at least 1')
-
-  // Optional validations
-  // if (form.value.ramGb != null && form.value.ramGb < 1) errors.push('RAM must be at least 1')
-  // if (form.value.storageGb != null && form.value.storageGb < 1)
-  //   errors.push('Storage must be at least 1')
+  
   if (
     form.value.screenSizeInch != null &&
     (form.value.screenSizeInch < 0 || form.value.screenSizeInch > 99.99)
   )
-    errors.push('Screen size must be 0 - 99.99')
+    errors.push('Screen size must be 0 - 99.99', form.value.screenSizeInch)
   if (form.value.ramGb !== null && form.value.ramGb !== '' && form.value.ramGb < 1)
-    errors.push('RAM must be at least 1')
+    errors.push('RAM must be at least 1', form.value.ramGb)
 
   if (form.value.storageGb !== null && form.value.storageGb !== '' && form.value.storageGb < 1)
-    errors.push('Storage must be at least 1')
+    errors.push('Storage must be at least 1', form.value.storageGb)
 
   return errors
 }
@@ -230,12 +219,6 @@ const handleSave = async () => {
     console.error(err)
   } finally {
     isSaving.value = false
-  }
-}
-
-const handleChange = (field) => {
-  if (field === 'quantity') {
-    form.value.quantity = null
   }
 }
 
