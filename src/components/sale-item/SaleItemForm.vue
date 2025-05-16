@@ -1,94 +1,88 @@
 <template>
-  <form @submit.prevent="handleSave" class="space-y-4">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label class="form-label">Brand <span class="text-red-500">*</span></label>
-        <select v-model="form.brandId" class="input itbms-brand">
-          <option disabled value="">Select a brand</option>
-          <option v-for="b in brands" :key="b.id" :value="b.id">{{ b.name }}</option>
-        </select>
-      </div>
+  <form @submit.prevent="handleSave" class="form-grid">
+    <XSelector
+      v-model="form.brandId"
+      class="itbms-brand"
+      label="Brand"
+      :required="true"
+      :options="brands.map((b) => ({ value: b.id, label: b.name }))"
+      placeholder="Select a brand"
+    />
 
-      <div>
-        <label class="form-label">Model <span class="text-red-500">*</span></label>
-        <input v-model="form.model" class="input itbms-model" placeholder="Model" />
-      </div>
+    <XInput
+      v-model="form.model"
+      class="itbms-model"
+      label="Model"
+      placeholder="e.g. iPhone 14 Pro"
+      :required="true"
+    />
 
-      <div>
-        <label class="form-label">Price (฿) <span class="text-red-500">*</span></label>
-        <input
-          type="number"
-          v-model.number="form.price"
-          class="input itbms-price"
-          placeholder="e.g. 29900"
-        />
-      </div>
+    <XInput
+      v-model="form.price"
+      class="itbms-price"
+      label="Price (฿)"
+      type="number"
+      placeholder="e.g. 42900"
+      :required="true"
+    />
 
-      <div>
-        <label class="form-label">Quantity <span class="text-red-500">*</span></label>
-        <input
-          type="number"
-          v-model.number="form.quantity"
-          class="input itbms-quantity"
-          placeholder="e.g. 10"
-          @focus="handleChange('quantity')"
-        />
-      </div>
+    <XInput
+      v-model="form.quantity"
+      class="itbms-quantity"
+      label="Quantity"
+      :required="true"
+      type="number"
+      placeholder="e.g. 10"
+    />
 
-      <div>
-        <label class="form-label">RAM (GB)</label>
-        <input
-          type="number"
-          v-model.number="form.ramGb"
-          class="input itbms-ramGb"
-          placeholder="e.g. 8"
-        />
-      </div>
+    <XInput
+      v-model="form.ramGb"
+      class="itbms-ramGb"
+      label="RAM (GB)"
+      type="number"
+      placeholder="e.g. 8"
+    />
 
-      <div>
-        <label class="form-label">Storage (GB)</label>
-        <input
-          type="number"
-          v-model.number="form.storageGb"
-          class="input itbms-storageGb"
-          placeholder="e.g. 128"
-        />
-      </div>
+    <XInput
+      v-model="form.screenSizeInch"
+      class="itbms-screenSizeInch"
+      label="Screen Size (Inch)"
+      type="number"
+      :step="0.1"
+      placeholder="e.g. 6.7"
+    />
 
-      <div>
-        <label class="form-label">Screen Size (inches)</label>
-        <input
-          type="number"
-          step="0.01"
-          v-model.number="form.screenSizeInch"
-          class="input itbms-screenSizeInch"
-          placeholder="e.g. 6.7"
-        />
-      </div>
+    <XInput
+      v-model="form.storageGb"
+      class="itbms-storageGb"
+      label="Storage (GB)"
+      type="number"
+      placeholder="e.g. 128"
+    />
 
-      <div>
-        <label class="form-label">Color</label>
-        <input v-model="form.color" class="input itbms-color" placeholder="e.g. Midnight Black" />
-      </div>
-    </div>
+    <XInput
+      v-model="form.color"
+      class="itbms-color"
+      label="Color"
+      placeholder="e.g. Midnight Purple"
+    />
 
-    <div>
-      <label class="form-label">Description <span class="text-red-500">*</span></label>
-      <textarea
-        v-model="form.description"
-        rows="3"
-        class="input itbms-description"
-        placeholder="Short description of the product"
-      ></textarea>
-    </div>
+    <XInput
+      v-model="form.description"
+      class="itbms-description"
+      label="Description"
+      type="textarea"
+      placeholder="Short description"
+      :required="true"
+    />
 
-    <div class="flex gap-2 justify-end pt-4">
+    <div class="flex gap-4 justify-end mt-8">
       <button
         type="submit"
         class="btn-primary itbms-save-button"
-        :disabled="isSaving || !isFormValid || !isChanged"
+        :disabled="!isFormValid || !isChanged"
       >
-        {{ isSaving ? 'Saving...' : 'Save' }}
+        Save
       </button>
 
       <button type="button" class="btn-secondary itbms-cancel-button" @click="emit('cancel')">
@@ -102,6 +96,8 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import { useToastStore } from '@/stores/toast.store'
 import { BrandService } from '@/services'
+import XInput from '@/components/common/form/XInput.vue'
+import XSelector from '@/components/common/form/XSelector.vue'
 
 const props = defineProps({
   initialData: Object,
@@ -150,7 +146,7 @@ watch(
         screenSizeInch: val.screenSizeInch ?? null,
         storageGb: val.storageGb ?? null,
         color: val.color ?? '',
-        quantity: val.quantity ?? 1,
+        quantity: val.quantity ?? null,
       }
     }
   },
@@ -180,23 +176,17 @@ const validate = () => {
   }
   if (form.value.price == null || form.value.price < 0) errors.push('Price must be 0 or more')
   if (!form.value.description?.trim()) errors.push('Description is required')
-  if (form.value.quantity == null || form.value.quantity < 1)
-    errors.push('Quantity must be at least 1')
-
-  // Optional validations
-  // if (form.value.ramGb != null && form.value.ramGb < 1) errors.push('RAM must be at least 1')
-    // if (form.value.storageGb != null && form.value.storageGb < 1)
-  //   errors.push('Storage must be at least 1')
+  
   if (
     form.value.screenSizeInch != null &&
     (form.value.screenSizeInch < 0 || form.value.screenSizeInch > 99.99)
   )
-    errors.push('Screen size must be 0 - 99.99')
+    errors.push('Screen size must be 0 - 99.99', form.value.screenSizeInch)
   if (form.value.ramGb !== null && form.value.ramGb !== '' && form.value.ramGb < 1)
-    errors.push('RAM must be at least 1')
+    errors.push('RAM must be at least 1', form.value.ramGb)
 
   if (form.value.storageGb !== null && form.value.storageGb !== '' && form.value.storageGb < 1)
-    errors.push('Storage must be at least 1')
+    errors.push('Storage must be at least 1', form.value.storageGb)
 
   return errors
 }
@@ -232,12 +222,6 @@ const handleSave = async () => {
   }
 }
 
-const handleChange = (field) => {
-  if (field === 'quantity') {
-    form.value.quantity = null
-  }
-}
-
 const isChanged = computed(() => {
   if (!props.isEditMode || !props.initialData) return true // always enabled in Add
 
@@ -258,17 +242,13 @@ const isChanged = computed(() => {
 })
 </script>
 
-<style scoped lang="postcss">
-.input {
-  @apply w-full px-4 py-2 border border-gray-300 rounded;
-}
-.form-label {
-  @apply block text-sm font-medium text-gray-700 mb-1;
-}
-.btn-primary {
-  @apply bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 disabled:opacity-50;
-}
-.btn-secondary {
-  @apply border border-gray-400 text-gray-600 px-4 py-2 rounded hover:bg-gray-100;
+<style scoped>
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 2fr)); /* ปรับให้แต่ละคอลัมน์มีขนาดขั้นต่ำ และขยายได้ */
+  gap: 10px; /* เพิ่มระยะห่างระหว่างช่อง */
+  max-width: none;
+  margin: 0 auto;
 }
 </style>
+

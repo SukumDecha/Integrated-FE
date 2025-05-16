@@ -38,7 +38,6 @@ watchEffect(() => {
     router.replace({ query: {} })
   }
 })
-
 </script>
 
 <template>
@@ -51,7 +50,7 @@ watchEffect(() => {
           <XBreadcrumb :items="breadcrumbs" />
           <button
             @click="$router.push('/sale-items/add')"
-            class="itbms-sale-item-add bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700"
+            class="itbms-sale-item-add bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 whitespace-nowrap"
           >
             Add Sale Item
           </button>

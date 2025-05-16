@@ -10,8 +10,12 @@
           <h2 class="text-2xl font-bold">
             {{ modeTitle }}
           </h2>
-          <button @click="$router.back()" class="text-sm text-blue-600 underline itbms-back-button">
-            Back
+
+          <button
+            @click="$router.back()"
+            class="px-4 py-2 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50 transition itbms-back-button"
+          >
+            ← Back
           </button>
         </div>
 
@@ -49,55 +53,55 @@
               <!-- Detail Mode: Read-only -->
               <div class="space-y-4 itbms-row">
                 <div class="field">
-                  <span class="label">Brand:</span>
+                  <span class="label">Brand : </span>
                   <span class="itbms-brand">{{ product.brandName }}</span>
                 </div>
                 <div class="field">
-                  <span class="label">Model:</span>
+                  <span class="label">Model : </span>
                   <span class="itbms-model">{{ product.model }}</span>
                 </div>
                 <div class="field">
-                  <span class="label">Price:</span>
+                  <span class="label">Price : </span>
                   <span class="itbms-price">{{ formatPrice(product.price) }}</span>
-                  <span class="itbms-price-unit">Baht</span>
+                  <span class="itbms-price-unit"> Baht</span>
                 </div>
                 <div class="field">
-                  <span class="label">Description:</span>
+                  <span class="label">Description : </span>
                   <span class="itbms-description">{{ product.description }}</span>
                 </div>
                 <div class="field">
-                  <span class="label">RAM:</span>
+                  <span class="label">RAM : </span>
                   <span class="itbms-ramGb">{{ product.ramGb ?? '-' }}</span>
-                  <span class="itbms-ramGb-unit">GB</span>
+                  <span class="itbms-ramGb-unit"> GB</span>
                 </div>
                 <div class="field">
-                  <span class="label">Screen Size:</span>
+                  <span class="label">Screen Size : </span>
                   <span class="itbms-screenSizeInch">{{ product.screenSizeInch ?? '-' }}</span>
-                  <span class="itbms-screenSizeInch-unit">Inches</span>
+                  <span class="itbms-screenSizeInch-unit"> Inches</span>
                 </div>
                 <div class="field">
-                  <span class="label">Storage:</span>
+                  <span class="label">Storage : </span>
                   <span class="itbms-storageGb">{{ product.storageGb ?? '-' }}</span>
-                  <span class="itbms-storageGb-unit">GB</span>
+                  <span class="itbms-storageGb-unit"> GB</span>
                 </div>
                 <div class="field">
-                  <span class="label">Color:</span>
+                  <span class="label">Color : </span>
                   <span class="itbms-color">{{ product.color ?? '-' }}</span>
                 </div>
                 <div class="field">
-                  <span class="label">Quantity:</span>
+                  <span class="label">Quantity : </span>
                   <span class="itbms-quantity">{{ product.quantity }}</span>
-                  <span class="itbms-quantity-unit">units</span>
+                  <span class="itbms-quantity-unit"> units</span>
                 </div>
                 <div class="flex justify-end gap-4 mt-4">
                   <button
-                    class="bg-gray-200 text-gray-800 px-4 py-2 rounded itbms-edit-button"
+                    class="border border-blue-600 text-blue-600 px-4 py-2 rounded hover:bg-blue-200 itbms-edit-button"
                     @click="router.push(`/sale-items/${product.id}/edit`)"
                   >
                     Edit
                   </button>
                   <button
-                    class="bg-red-600 text-white px-4 py-2 rounded itbms-delete-button"
+                    class="border border-blue-600 text-blue-600 px-4 py-2 rounded hover:bg-blue-200 itbms-delete-button"
                     @click="showConfirm = true"
                   >
                     Delete
@@ -186,7 +190,7 @@ const deleteProduct = async () => {
   }
   const res = await SaleItemService.deleteSaleItem(productId)
   if (res.error) {
-    console.log(res);
+    console.log(res)
     toast.add({ message: 'The requested sale item does not exist.', type: 'error' })
     router.push('/sale-items')
   } else {
