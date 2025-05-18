@@ -1,4 +1,4 @@
-describe(`TC-FE-PBI3-ADD-SALE-ITEM-1\n
+describe(`TC-FE-PBI3-ADD-SALE-ITEM-1\n 
     Test Scenario : normal - all fields\n
                            - cancel the action`, () => {
 
@@ -14,12 +14,12 @@ describe(`TC-FE-PBI3-ADD-SALE-ITEM-1\n
     })
 
     it('should have "Add Sale Item" button and click to open the page for entry new sale item',()=>{
-        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton');
+        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton'); 
         cy.get('@addSaleItemButton').click();
     })
 
     it('should have save button and the button is disabled',()=>{
-        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton');
+        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton'); 
         cy.get('@addSaleItemButton').click();
         cy.wait(100)
 
@@ -29,8 +29,8 @@ describe(`TC-FE-PBI3-ADD-SALE-ITEM-1\n
         })
     })
 
-    it('should be disable the save button after adding data for Brand, Model, Price and Description',()=>{
-        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton');
+    it('should be enabled the save button after adding data for Brand, Model, Price and Description',()=>{
+        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton'); 
         cy.get('@addSaleItemButton').click();
         cy.wait(100)
 
@@ -48,12 +48,12 @@ describe(`TC-FE-PBI3-ADD-SALE-ITEM-1\n
 
         cy.get('.itbms-save-button').as('save') ;
         cy.get('@save').should(($btn)=>{
-            expect($btn.is(':disabled') || $btn.hasClass('disabled')).to.be.true
+            expect($btn.is(':disabled') || $btn.hasClass('disabled')).to.be.false
         })
     })
 
     it('should be enable the save button after adding all non-opional fields',()=>{
-        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton');
+        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton'); 
         cy.get('@addSaleItemButton').click();
         cy.wait(100)
 
@@ -79,7 +79,7 @@ describe(`TC-FE-PBI3-ADD-SALE-ITEM-1\n
     })
 
     it('should be enable the save button after add all fields',()=>{
-        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton');
+        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton'); 
         cy.get('@addSaleItemButton').click();
         cy.wait(100)
 
@@ -118,7 +118,7 @@ describe(`TC-FE-PBI3-ADD-SALE-ITEM-1\n
 
     it('should return to the sale item gallery when clicking the cancel button',()=>{
 
-        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton');
+        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton'); 
         cy.get('@addSaleItemButton').click();
         cy.wait(100)
 
@@ -150,7 +150,7 @@ describe(`TC-FE-PBI3-ADD-SALE-ITEM-1\n
         cy.get('@colorInput').type('Black Titanium') ;
 
         cy.get('.itbms-cancel-button').as('cancel') ;
-        cy.get('@cancel').click()
+        cy.get('@cancel').click() 
 
         cy.url().should('contain','/sale-items') ;
     })

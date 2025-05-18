@@ -12,22 +12,27 @@ const router = createRouter({
     {
       path: '/sale-items',
       name: 'sale-items-gallery',
-      component: () => import('../views/sale-items/SaleItemGalleryView.vue'),
+      component: () => import('../views/sale-item/SaleItemGalleryView.vue'),
     },
     {
       path: '/sale-items/:id',
       name: 'sale-item-detail',
-      component: () => import('../views/sale-items/SaleItemDetailView.vue'),
+      component: () => import('../views/sale-item/SaleItemDetailView.vue'),
     },
     {
       path: '/sale-items/add',
       name: 'sale-item-add',
-      component: () => import('../views/sale-items/AddSaleItemView.vue'),
+      component: () => import('../views/sale-item/SaleItemAddView.vue'),
     },
     {
       path: '/sale-items/:id/edit',
       name: 'sale-item-edit',
-      component: () => import('../views/sale-items/EditSaleItemView.vue'),
+      component: () => import('../views/sale-item/SaleItemEditView.vue'),
+    },
+    {
+      path: '/sale-items/list',
+      name: 'sale-item-list',
+      component: () => import('../views/sale-item/SaleItemListView.vue'),
     },
   ],
 })

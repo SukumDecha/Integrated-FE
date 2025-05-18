@@ -1,9 +1,12 @@
-<script setup>
+\<script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToastStore } from '@/stores/toast.store'
 import { SaleItemService } from '@/services'
 import SaleItemDetail from '@/components/sale-item/SaleItemDetail.vue'
+import XLayout from '@/components/layout/XLayout.vue'
+import XNavbar from '@/components/layout/XNavbar.vue'
+import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -11,6 +14,12 @@ const toast = useToastStore()
 
 const saleItem = ref(null)
 const productId = route.params.id
+
+const breadcrumbs = [
+  { text: 'Home', path: '/' },
+  { text: 'Sale Items', path: '/sale-items' },
+  { text: `Edit #${productId}`, active: true },
+]
 
 const fetchItem = async () => {
   const res = await SaleItemService.getSaleItemById(productId)
@@ -37,11 +46,18 @@ onMounted(fetchItem)
 </script>
 
 <template>
-  <SaleItemDetail
-    v-if="saleItem"
-    :product="saleItem"
-    mode="edit"
-    :onSubmit="handleUpdate"
-    @cancel="$router.back()"
-  />
+  <div class="min-h-screen flex flex-col">
+    <XNavbar />
+    <XLayout class="space-y-6">
+      <XBreadcrumb :items="breadcrumbs" />
+
+      <SaleItemDetail
+        v-if="saleItem"
+        :product="saleItem"
+        mode="edit"
+        :onSubmit="handleUpdate"
+        @cancel="$router.back()"
+      />
+    </XLayout>
+  </div>
 </template>

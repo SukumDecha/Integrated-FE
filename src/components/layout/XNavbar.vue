@@ -1,3 +1,41 @@
+
+<script setup>
+import { Menu, Search, ShoppingBag, ShoppingCart, User, X } from 'lucide-vue-next';
+import { ref, defineProps } from 'vue'
+import XButton from '@/components/common/XButton.vue'
+
+defineProps({
+  navItems: {
+    type: Array,
+    default: () => [
+      { name: 'Home', href: '#', active: true },
+      { name: 'Shop', href: '#', active: false },
+      { name: 'Categories', href: '#', active: false },
+      { name: 'About', href: '#', active: false },
+    ],
+  },
+  userName: {
+    type: String,
+    default: '',
+  },
+  userEmail: {
+    type: String,
+    default: '',
+  },
+  userMenuItems: {
+    type: Array,
+    default: () => [
+      { name: 'Your Profile', href: '#' },
+      { name: 'Settings', href: '#' },
+      { name: 'Sign out', href: '#' },
+    ],
+  },
+  cartCount: Number,
+})
+
+const isOpen = ref(false)
+</script>
+
 <template>
   <nav class="bg-white shadow-sm sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -47,90 +85,60 @@
           </button>
         </div>
         <div class="-mr-2 flex items-center sm:hidden">
-          <button
-            @click="isOpen = !isOpen"
-            class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-emerald-500"
-          >
+          <XButton  @click="isOpen = !isOpen">
             <Menu v-if="!isOpen" class="block h-6 w-6" />
             <X v-else class="block h-6 w-6" />
-          </button>
+          </XButton>
         </div>
       </div>
     </div>
 
     <!-- Mobile menu -->
-    <div v-if="isOpen" class="sm:hidden">
-      <div class="pt-2 pb-3 space-y-1">
-        <a
-          v-for="(item, index) in navItems"
-          :key="index"
-          :href="item.href"
-          :class="[
-            item.active
-              ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
-              : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-emerald-300 hover:text-gray-700',
-            'block pl-3 pr-4 py-2 border-l-4 text-base font-medium',
-          ]"
-        >
-          {{ item.name }}
-        </a>
-      </div>
-      <div class="pt-4 pb-3 border-t border-gray-200">
-        <div class="flex items-center px-4">
-          <div class="flex-shrink-0">
-            <User class="h-10 w-10 text-gray-400" />
-          </div>
-          <div class="ml-3">
-            <div class="text-base font-medium text-gray-800">{{ userName || 'Guest User' }}</div>
-            <div class="text-sm font-medium text-gray-500">{{ userEmail || 'Sign in' }}</div>
-          </div>
-        </div>
-        <div class="mt-3 space-y-1">
+    <transition name="slide-down">
+      <div v-show="isOpen" class="sm:hidden overflow-hidden">
+        <div class="pt-2 pb-3 space-y-1">
           <a
-            v-for="(item, index) in userMenuItems"
+            v-for="(item, index) in navItems"
             :key="index"
             :href="item.href"
-            class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+            :class="[
+              item.active
+                ? 'bg-emerald-50 border-emerald-500 text-emerald-700'
+                : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-emerald-300 hover:text-gray-700',
+              'block pl-3 pr-4 py-2 border-l-4 text-base font-medium',
+            ]"
           >
             {{ item.name }}
           </a>
         </div>
       </div>
-    </div>
+    </transition>
   </nav>
 </template>
 
-<script setup>
-import { ref, defineProps } from 'vue'
+<style scoped>
+  /* Define your transition styles */
+  .slide-down-enter-active,
+  .slide-down-leave-active {
+    transition: all 0.5s ease-in-out; /* Match your duration */
+    overflow: hidden; /* Prevent content from jumping */
+  }
 
-defineProps({
-  navItems: {
-    type: Array,
-    default: () => [
-      { name: 'Home', href: '#', active: true },
-      { name: 'Shop', href: '#', active: false },
-      { name: 'Categories', href: '#', active: false },
-      { name: 'About', href: '#', active: false },
-    ],
-  },
-  userName: {
-    type: String,
-    default: '',
-  },
-  userEmail: {
-    type: String,
-    default: '',
-  },
-  userMenuItems: {
-    type: Array,
-    default: () => [
-      { name: 'Your Profile', href: '#' },
-      { name: 'Settings', href: '#' },
-      { name: 'Sign out', href: '#' },
-    ],
-  },
-  cartCount: Number,
-})
+  .slide-down-enter-from,
+  .slide-down-leave-to {
+    opacity: 0;
+    transform: translateY(-10px); /* Example: slide down from top */
+    /* You might also want to transition height */
+    height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
 
-const isOpen = ref(false)
-</script>
+  .slide-down-enter-to,
+  .slide-down-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+    /* Ensure height and padding return to their normal values */
+    /* You might need to dynamically calculate height if it's not fixed */
+  }
+</style>
