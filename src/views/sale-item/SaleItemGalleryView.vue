@@ -5,8 +5,10 @@ import { useToastStore } from '@/stores/toast.store'
 import XNavbar from '@/components/layout/XNavbar.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import SaleItemCard from '@/components/sale-item/SaleItemCard.vue'
-import { SaleItemService } from '@/services'
 import XFooter from '@/components/layout/XFooter.vue'
+import XButton from '@/components/common/XButton.vue'
+import { SaleItemService } from '@/services'
+import { PlusIcon } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -48,12 +50,11 @@ watchEffect(() => {
       <div class="max-w-7xl mx-auto py-8 px-4 space-y-6">
         <div class="flex justify-between items-center">
           <XBreadcrumb :items="breadcrumbs" />
-          <button
-            @click="$router.push('/sale-items/add')"
-            class="itbms-sale-item-add bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 whitespace-nowrap"
-          >
+
+          <XButton @click="$router.push('/sale-items/add')">
+            <PlusIcon class="h-5 w-5 mr-2" />
             Add Sale Item
-          </button>
+          </XButton>
         </div>
 
         <div class="space-y-2">

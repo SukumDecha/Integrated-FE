@@ -50,7 +50,7 @@ const props = defineProps({
     type: String,
     default: 'primary',
     validator: (value) =>
-      ['primary', 'secondary', 'outline', 'ghost', 'link', 'danger'].includes(value),
+      ['primary', 'secondary', 'outline', 'ghost', 'link', 'danger', 'info'].includes(value),
   },
 
   // Button sizes
@@ -140,6 +140,8 @@ const variantClasses = computed(() => {
       return 'bg-transparent text-emerald-600 hover:underline shadow-none px-0 py-0'
     case 'danger':
       return 'bg-red-600 text-white hover:bg-red-700 shadow-sm'
+    case 'info':
+      return 'bg-white border border-gray-300 rounded-lg hover:bg-gray-200'
     default:
       return 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm'
   }

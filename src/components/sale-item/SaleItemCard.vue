@@ -1,6 +1,6 @@
 <script setup>
-// import { ref } from 'vue'
-import { displayOrDash, formatPrice } from '@/utils/TextUtils'
+import XButton from '@/components/common/XButton.vue'
+import { displayOrDash, formatPrice } from '@/utils/TextUtils';
 import { EyeIcon } from 'lucide-vue-next'
 
 defineProps({
@@ -122,12 +122,13 @@ defineProps({
       <div class="mt-6">
         <router-link
           :to="`/sale-items/${id}`"
-          class="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-base font-medium rounded-lg shadow-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
+        <XButton>
           <span class="flex items-center">
             <EyeIcon class="mr-2 h-5 w-5" />
             View Details
           </span>
+        </XButton>
         </router-link>
       </div>
     </div>
