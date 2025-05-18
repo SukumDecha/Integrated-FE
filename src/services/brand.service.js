@@ -21,6 +21,9 @@ const BrandService = {
 
   async deleteBrand(id) {
     return await remove(`${BASE_URL}/${id}`)
+  },
+  async getBrandList() {
+    return await remove(`${BASE_URL}/list`)
   }
 }
 

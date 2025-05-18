@@ -34,6 +34,16 @@ const router = createRouter({
       name: 'sale-item-list',
       component: () => import('../views/sale-item/SaleItemListView.vue'),
     },
+    {
+      path: '/brands',
+      name: 'brand-list',
+      component: () => import('../views/brand/BrandListView.vue'),
+    },
+    {
+      path: '/brands/:id/edit',
+      name: 'brand-edit',
+      component: () => import('../views/brand/BrandEditView.vue'),
+    },
   ],
 })
 
