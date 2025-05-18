@@ -1,4 +1,4 @@
-import { get, post, put, remove } from './helper/api'; 
+import { get, post, put, remove } from './helper/api';
 
 const BASE_URL = '/v1/sale-items';
 
@@ -21,6 +21,10 @@ const SaleItemService = {
 
   async deleteSaleItem(id) {
     return await remove(`${BASE_URL}/${id}`); // เผื่อใช้ Delete
+  },
+
+  async getSaleItemList() {
+    return await get(`${BASE_URL}/list`) 
   }
 };
 

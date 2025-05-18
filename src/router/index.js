@@ -29,6 +29,11 @@ const router = createRouter({
       name: 'sale-item-edit',
       component: () => import('../views/sale-items/EditSaleItemView.vue'),
     },
+    {
+      path: '/sale-items/list',
+      name: 'sale-item-list',
+      component: () => import('../views/sale-items/SaleItemListView.vue'),
+    },
   ],
 })
 
