@@ -59,7 +59,6 @@ const fetchProducts = async () => {
   try {
     const response = await SaleItemService.getAllSaleItems()
     products.value = response.data
-    console.log("Fetched products:", response.data)
   } catch (error) {
     console.error('Error fetching products:', error)
     error.value = 'Failed to load products. Please try again.'

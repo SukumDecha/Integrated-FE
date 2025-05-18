@@ -32,7 +32,7 @@ const request = async (url, method, payload) => {
     }
     return response.build()
   } catch (err) {
-    console.error()
+    console.error(getErrorMessage(err))
 
     response.error(getErrorMessage(err))
     return response.build()
