@@ -30,7 +30,7 @@
 <script setup>
 import XButton from './XButton.vue'
 
-const props = defineProps({
+defineProps({
   modelValue: Boolean,
   title: {
     type: String,
