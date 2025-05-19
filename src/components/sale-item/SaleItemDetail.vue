@@ -27,11 +27,11 @@
                 class="w-full h-full object-contain"
               />
             </div>
-            
+
             <!-- Thumbnails -->
             <div class="grid grid-cols-4 gap-3 mt-4">
-              <div 
-                v-for="i in 4" 
+              <div
+                v-for="i in 4"
                 :key="i"
                 class="aspect-square bg-white border border-gray-200 rounded-md overflow-hidden cursor-pointer hover:border-gray-400 transition-colors"
               >
@@ -53,14 +53,14 @@
               :on-submit="onSubmit"
               @cancel="$emit('cancel')"
             />
-            
+
             <div v-else class="space-y-6">
               <!-- Product title section -->
               <div class="space-y-1">
                 <h2 class="text-2xl font-bold text-gray-800 itbms-model">{{ product.model }}</h2>
                 <p class="text-lg text-gray-600 itbms-brand">{{ product.brandName }}</p>
               </div>
-              
+
               <!-- Price section -->
               <div class="bg-gray-50 rounded-lg p-4">
                 <div class="flex items-baseline">
@@ -74,13 +74,13 @@
                   </span>
                 </div>
               </div>
-              
+
               <!-- Description -->
               <div>
                 <h3 class="text-sm font-medium text-gray-700 mb-2">Description</h3>
                 <p class="text-gray-700 itbms-description">{{ product.description }}</p>
               </div>
-              
+
               <!-- Specifications -->
               <div>
                 <h3 class="text-sm font-medium text-gray-700 mb-3">Specifications</h3>
@@ -112,7 +112,7 @@
                   </div>
                 </div>
               </div>
-              
+
               <!-- Action buttons -->
               <div class="pt-4 border-t border-gray-100 flex gap-3 justify-end">
                 <XButton
