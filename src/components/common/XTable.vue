@@ -12,12 +12,18 @@
           </th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-200">
-        <tr v-for="(row, rowIndex) in paginatedData" :key="row.id || rowIndex" class="hover:bg-gray-50">
+
+      <!-- ✅ ถ้ามีข้อมูล -->
+      <tbody v-if="paginatedData.length > 0" class="divide-y divide-gray-200">
+        <tr
+          v-for="(row, rowIndex) in paginatedData"
+          :key="row.id || rowIndex"
+          class="itbms-row hover:bg-gray-50"
+        >
           <td
             v-for="col in columns"
             :key="col.key || col.dataIndex"
-            class="px-4 py-2 text-sm text-gray-800"
+            :class="['px-4 py-2 text-sm text-gray-800', col.key]"
           >
             <slot
               v-if="$slots[col.key]"
@@ -31,9 +37,19 @@
           </td>
         </tr>
       </tbody>
+      <tbody v-else>
+        <tr>
+          <td
+            :colspan="columns.length"
+            class="text-center text-gray-500 py-8 text-sm"
+          >
+            {{ emptyText }}
+          </td>
+        </tr>
+      </tbody>
     </table>
 
-    <!-- Built-in Pagination -->
+    <!-- ✅ Pagination -->
     <div v-if="pagination" class="flex justify-end items-center gap-2 mt-4">
       <button
         class="px-3 py-1 rounded bg-gray-200 text-sm"
@@ -62,8 +78,11 @@ const props = defineProps({
   data: { type: Array, required: true },
   pagination: {
     type: Object,
-    default: null // Only show pagination if this is passed
-    // Structure: { currentPage, pageSize, total (optional) }
+    default: null // Optional pagination
+  },
+  emptyText: {
+    type: String,
+    default: 'No data'
   }
 });
 
