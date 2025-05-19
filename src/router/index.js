@@ -44,6 +44,11 @@ const router = createRouter({
       name: 'brand-edit',
       component: () => import('../views/brand/BrandEditView.vue'),
     },
+     {
+      path: '/brands/add',
+      name: 'brand-add',
+      component: () => import('../views/brand/BrandAddView.vue'),
+    },
   ],
 })
 

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "cp .env.local .env && vite",
+    "dev": "copy .env.local .env && vite",
     "build": "cp .env.local .env && vite build",
     "build:uat": "cat .env.uat && vite build --mode uat -- --base /ssa1/",
     "build:prod": "cat .env.prod && vite build --mode production",

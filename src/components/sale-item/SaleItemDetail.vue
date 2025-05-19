@@ -164,7 +164,8 @@ const props = defineProps({
     type: String,
     default: 'detail',
   },
-  onSubmit: Function,
+  
+  : Function,
 })
 
 const route = useRoute()
