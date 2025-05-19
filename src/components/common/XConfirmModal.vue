@@ -7,7 +7,7 @@
     >
       <div class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full text-center">
         <h2 class="text-lg font-bold mb-4">{{ title }}</h2>
-        <p class="mb-6">{{ message }}</p>
+        <p class="itbms-message mb-6">{{ message }}</p>
         <div class="flex justify-center gap-4">
           <XButton
             :label="cancelLabel"
