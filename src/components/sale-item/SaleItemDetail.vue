@@ -1,3 +1,4 @@
+<!-- SaleItemDetail.vue -->
 <template>
   <div class="min-h-screen bg-gray-50 py-8 px-4">
     <div class="max-w-5xl mx-auto">
@@ -20,18 +21,20 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
           <!-- Left: Image Gallery -->
           <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
-            <div class="aspect-square bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center">
+            <div
+              class="aspect-square bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center"
+            >
               <img
                 :src="'/assets/sale-item/shopping.webp'"
                 alt="Product image"
                 class="w-full h-full object-contain"
               />
             </div>
-            
+
             <!-- Thumbnails -->
             <div class="grid grid-cols-4 gap-3 mt-4">
-              <div 
-                v-for="i in 4" 
+              <div
+                v-for="i in 4"
                 :key="i"
                 class="aspect-square bg-white border border-gray-200 rounded-md overflow-hidden cursor-pointer hover:border-gray-400 transition-colors"
               >
@@ -44,8 +47,8 @@
             </div>
           </div>
 
-          <!-- Right: Product Details -->
-          <div class="p-6">
+          <!-- ✅ Right: Product Details (ใส่ itbms-row ตรงนี้) -->
+          <div class="p-6 itbms-row">
             <SaleItemForm
               v-if="mode !== 'detail'"
               :initial-data="product"
@@ -53,18 +56,20 @@
               :on-submit="onSubmit"
               @cancel="$emit('cancel')"
             />
-            
+
             <div v-else class="space-y-6">
               <!-- Product title section -->
               <div class="space-y-1">
                 <h2 class="text-2xl font-bold text-gray-800 itbms-model">{{ product.model }}</h2>
                 <p class="text-lg text-gray-600 itbms-brand">{{ product.brandName }}</p>
               </div>
-              
+
               <!-- Price section -->
               <div class="bg-gray-50 rounded-lg p-4">
                 <div class="flex items-baseline">
-                  <span class="text-3xl font-bold text-gray-900 itbms-price">{{ formatPrice(product.price) }}</span>
+                  <span class="text-3xl font-bold text-gray-900 itbms-price">{{
+                    formatPrice(product.price)
+                  }}</span>
                   <span class="ml-2 text-gray-600 itbms-price-unit">Baht</span>
                 </div>
                 <div class="mt-2 flex items-center">
@@ -74,13 +79,13 @@
                   </span>
                 </div>
               </div>
-              
+
               <!-- Description -->
               <div>
                 <h3 class="text-sm font-medium text-gray-700 mb-2">Description</h3>
                 <p class="text-gray-700 itbms-description">{{ product.description }}</p>
               </div>
-              
+
               <!-- Specifications -->
               <div>
                 <h3 class="text-sm font-medium text-gray-700 mb-3">Specifications</h3>
@@ -108,11 +113,13 @@
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-500">Color</span>
-                    <span class="font-medium text-gray-800 itbms-color">{{ product.color ?? '-' }}</span>
+                    <span class="font-medium text-gray-800 itbms-color">{{
+                      product.color ?? '-'
+                    }}</span>
                   </div>
                 </div>
               </div>
-              
+
               <!-- Action buttons -->
               <div class="pt-4 border-t border-gray-100 flex gap-3 justify-end">
                 <XButton
@@ -187,10 +194,15 @@ const deleteProduct = async () => {
   }
   const res = await SaleItemService.deleteSaleItem(productId)
   if (res.error) {
-    toast.add({ message: 'The requested sale item does not exist.', type: 'error' })
+    toast.add({
+      message: 'The requested sale item does not exist.',
+      type: 'error' })
     router.push('/sale-items')
   } else {
-    toast.add({ message: 'The sale item has been deleted.', type: 'success' })
+    toast.add({
+      message: 'The sale item has been deleted.',
+      type: 'success'
+    })
     router.push('/sale-items')
   }
 }

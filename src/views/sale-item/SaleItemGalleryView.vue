@@ -51,7 +51,9 @@ watchEffect(() => {
         <div class="flex justify-between items-center">
           <XBreadcrumb :items="breadcrumbs" />
 
-          <XButton @click="$router.push('/sale-items/add')">
+          <XButton
+          class-name="itbms-sale-item-add"
+          @click="$router.push('/sale-items/add')">
             <PlusIcon class="h-5 w-5 mr-2" />
             Add Sale Item
           </XButton>

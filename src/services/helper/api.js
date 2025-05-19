@@ -23,17 +23,26 @@ const request = async (url, method, payload) => {
     const res = await fetch(`${BASE_URL}${url}`, httpOptions)
 
     if (!res.ok) {
-      throw new Error(`HTTP error! Status: ${res.status}`)
+      // 🔥 อ่าน message จาก body หากมี
+      let errorMessage = `HTTP error! Status: ${res.status}`
+      try {
+        const body = await res.json()
+        if (body?.message) {
+          errorMessage = body.message
+        }
+      } catch (_) {}
+
+      throw new Error(errorMessage)
     }
 
     if (method !== 'DELETE') {
       const item = await res.json()
       response.data(item).message(BaseResponseMessage.Success)
     }
+
     return response.build()
   } catch (err) {
     console.error(getErrorMessage(err))
-
     response.error(getErrorMessage(err))
     return response.build()
   }

@@ -22,7 +22,7 @@ const handleSubmit = async (data) => {
     toast.add({ message: 'Failed to save item', type: 'error' })
     throw new Error('Backend error')
   } else {
-    router.push({ path: '/sale-items', query: { toast: 'created' } })
+    router.push({ path: '/sale-items/list', query: { toast: 'created' } })
   }
 }
 </script>

@@ -1,46 +1,84 @@
 <script setup>
-import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useToastStore } from '@/stores/toast.store'
 import { BrandService } from '@/services'
-import SaleItemDetail from '@/components/sale-item/SaleItemDetail.vue'
+import { useToastStore } from '@/stores/toast.store'
+import BrandForm from '@/components/brand/BrandForm.vue'
+import XLayout from '@/components/layout/XLayout.vue'
+import XNavbar from '@/components/layout/XNavbar.vue'
+import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
+import { onMounted, ref } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToastStore()
 
-const saleItem = ref(null)
-const productId = route.params.id
+const brandId = route.params.id
+const brand = ref({})
+
+const breadcrumbs = [
+  { text: 'Sale Item List', path: '/sale-items/list' },
+  { text: 'Brand List', path: '/brands' },
+  { text: `Edit #${brandId}`, active: true },
+]
 
 const fetchBrand = async () => {
-  const res = await BrandService.getSaleItemById(productId)
-  if (res.error) {
-    toast.add({ message: 'Failed to load brand', type: 'error' })
+  const res = await BrandService.getBrandById(brandId)
+
+  const errorMessage = typeof res.error?.message === 'string' ? res.error.message : ''
+
+  const isNotFound = errorMessage.includes('404')
+
+  if (isNotFound) {
+    toast.add({
+      message: 'The brand does not exist.',
+      type: 'error'
+    })
     router.push('/brands')
+    return
+  }
+
+  if (res.error) {
+    toast.add({
+      message: 'Failed to fetch brand',
+      type: 'error'
+    })
+    router.push('/brands')
+    return
+  }
+
+  brand.value = res.data
+}
+
+
+
+const handleSubmit = async (data) => {
+  const res = await BrandService.updateBrand(brandId, data)
+  if (res.error) {
+    toast.add({ message: 'Failed to save item', type: 'error' })
+    throw new Error('Backend error')
   } else {
-    saleItem.value = res.data
+    router.push({ path: '/brands', query: { toast: 'edited' } }) // ✅ Redirect พร้อม toast
   }
 }
 
-const handleUpdate = async (data) => {
-  const res = await BrandService.updateSaleItem(productId, data)
-  if (res.error) {
-    toast.add({ message: 'Failed to update item', type: 'error' })
-  } else {
-    toast.add({ message: 'The brand has been updated.', type: 'success' })
-    router.push(`/sale-items/${productId}`)
-  }
+const handleCancel = () => {
+  router.push({ path: '/brands' })
 }
 
 onMounted(fetchBrand)
 </script>
 
 <template>
-  <SaleItemDetail
-    v-if="saleItem"
-    mode="edit"
-    :product="saleItem"
-    :onSubmit="handleUpdate"
-    @cancel="$router.back()"
-  />
+  <div class="min-h-screen flex flex-col">
+    <XNavbar />
+    <XLayout class="space-y-6">
+      <XBreadcrumb :items="breadcrumbs" />
+      <BrandForm
+        :initialData="brand"
+        :isEditMode="true"
+        :onSubmit="handleSubmit"
+        :onCancel="handleCancel"
+      />
+    </XLayout>
+  </div>
 </template>
