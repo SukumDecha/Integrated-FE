@@ -38,12 +38,12 @@ const handleSubmit = async (data) => {
     throw new Error('Backend error')
   } else {
     toast.add({ message: 'The brand has been created.', type: 'success' })
-    router.push({ path: '/sale-items/list' })
+    router.push({ path: '/brands' })
   }
 }
 
 const handleCancel = () => {
-  router.push('/sale-items/list')
+  router.push({ path: '/brands' })
 }
 
 </script>
