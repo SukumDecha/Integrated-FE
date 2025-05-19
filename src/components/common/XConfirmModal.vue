@@ -1,4 +1,3 @@
-<!-- src/components/common/XConfirmModal.vue -->
 <template>
   <teleport to="body">
     <div
@@ -16,6 +15,7 @@
             @click="emitCancel"
           />
           <XButton
+            v-if="showConfirm"
             :label="confirmLabel"
             variant="primary"
             className="itbms-confirm-button"
@@ -47,6 +47,10 @@ defineProps({
   cancelLabel: {
     type: String,
     default: 'Cancel',
+  },
+  showConfirm: {
+    type: Boolean,
+    default: true,
   },
 })
 

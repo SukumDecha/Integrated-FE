@@ -6,7 +6,11 @@
           <th
             v-for="col in columns"
             :key="col.key || col.dataIndex"
-            class="px-4 py-2 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider"
+            :class="[
+              'px-4 py-2 text-sm font-semibold text-gray-700 uppercase tracking-wider',
+              getAlignmentClass(col.align)
+            ]"
+            :style="getWidthStyle(col.width)"
           >
             {{ col.title }}
           </th>
@@ -23,13 +27,19 @@
           <td
             v-for="col in columns"
             :key="col.key || col.dataIndex"
-            :class="['px-4 py-2 text-sm text-gray-800', col.key]"
+            :class="[
+              'px-4 py-2 text-sm text-gray-800',
+              getAlignmentClass(col.align),
+              col.key
+            ]"
+            :style="getWidthStyle(col.width)"
           >
             <slot
               v-if="$slots[col.key]"
               :name="col.key"
               :record="row"
               :index="rowIndex"
+              :style="getWidthStyle(col.width)"
             />
             <span v-else>
               {{ row[col.dataIndex] }}
@@ -110,6 +120,22 @@ function changePage(page) {
     ...props.pagination,
     currentPage: page
   });
+}
+
+function getAlignmentClass(align) {
+  switch (align) {
+    case 'right':
+      return 'ml-auto text-right';
+    case 'center':
+      return 'mx-auto text-center';
+    case 'left':
+    default:
+      return 'mr-auto text-left';
+  }
+}
+
+function getWidthStyle(width) {
+  return width ? { width } : {};
 }
 
 watch(

@@ -28,9 +28,7 @@
         <XTable
           :columns="columns"
           :data="saleItems"
-          :pagination="pagination"
           emptyText="No sale item"
-          @update:pagination="onPaginate"
         >
           <!-- Format ราคาด้วย comma -->
           <template #itbms-price="{ record }">
@@ -57,14 +55,14 @@
             <div class="flex space-x-2">
               <XButton
                 size="sm"
-                variant="link"
+                variant="outline"
                 className="itbms-edit-button"
                 label="Edit"
                 @click="editSaleItem(record.id)"
               />
               <XButton
                 size="sm"
-                variant="link"
+                variant="danger"
                 className="itbms-delete-button"
                 label="Delete"
                 @click="askDeleteItem(record)"
@@ -78,15 +76,15 @@
     <XConfirmModal
       v-model="showConfirm"
       title="Delete Sale Item"
-      :message="`Are you sure you want to delete item ${itemToDelete?.model || ''}?`"
+      :message="`Do you want to delete this sale item?`"
       @confirm="confirmDeleteItem"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, watchEffect } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import XNavbar from '@/components/layout/XNavbar.vue'
 import XLayout from '@/components/layout/XLayout.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
@@ -95,9 +93,11 @@ import XTable from '@/components/common/XTable.vue'
 import XConfirmModal from '@/components/common/XConfirmModal.vue'
 import { SaleItemService } from '@/services'
 import { formatPrice, displayOrDash } from '@/utils/TextUtils'
+import { useToastStore } from '@/stores/toast.store'
 
 const router = useRouter()
-
+const route = useRoute()
+const toast = useToastStore()
 const saleItems = ref([])
 const itemToDelete = ref(null)
 const showConfirm = ref(false)
@@ -118,11 +118,11 @@ const columns = [
   { title: 'Actions', key: 'actions', dataIndex: 'actions' },
 ]
 
-const pagination = ref({
-  currentPage: 1,
-  pageSize: 20,
-  total: 0,
-})
+// const pagination = ref({
+//   currentPage: 1,
+//   pageSize: 100,
+//   total: 0,
+// })
 
 onMounted(async () => {
   const response = await SaleItemService.getSaleItemList()
@@ -131,12 +131,20 @@ onMounted(async () => {
     return
   }
   saleItems.value = response.data
-  pagination.value.total = saleItems.value.length
+  // pagination.value.total = saleItems.value.length
 })
 
-function onPaginate(newPageInfo) {
-  pagination.value = newPageInfo
-}
+watchEffect(() => {
+  if (route.query.toast === 'created') {
+    toast.add({ message: 'The sale item has been successfully added.', type: 'success' })
+
+    router.replace({ query: {} })
+  }
+})
+
+// function onPaginate(newPageInfo) {
+//   pagination.value = newPageInfo
+// }
 
 function editSaleItem(id) {
   router.push(`/sale-items/${id}/edit`)
@@ -147,15 +155,27 @@ function askDeleteItem(item) {
   showConfirm.value = true
 }
 
-function confirmDeleteItem() {
+async function confirmDeleteItem() {
   if (!itemToDelete.value) return
-  const index = saleItems.value.findIndex((i) => i.id === itemToDelete.value.id)
-  if (index !== -1) {
-    saleItems.value.splice(index, 1)
-    pagination.value.total = saleItems.value.length
+
+  const id = itemToDelete.value.id
+
+  const res = await SaleItemService.deleteSaleItem(id)
+
+  if (res.error) {
+    toast.add({ message: 'Failed to delete sale item.', type: 'error' })
+    return
   }
+
+  saleItems.value = saleItems.value.filter((item) => item.id !== id)
+  // pagination.value.total = saleItems.value.length
+
+  toast.add({ message: 'The sale item has been deleted.', type: 'success' })
+
   itemToDelete.value = null
+  showConfirm.value = false
 }
+
 function onAdd() {
   router.push('/sale-items/add')
 }

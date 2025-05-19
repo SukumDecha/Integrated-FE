@@ -13,6 +13,7 @@ const router = useRouter()
 const toast = useToastStore()
 
 const brandId = route.params.id
+const brand = ref({})
 
 const breadcrumbs = [
   { text: 'Sale Item List', path: '/sale-items/list' },
@@ -20,16 +21,35 @@ const breadcrumbs = [
   { text: `Edit #${brandId}`, active: true },
 ]
 
-const brand = ref({})
-
 const fetchBrand = async () => {
   const res = await BrandService.getBrandById(brandId)
-    if (res.error) {
-      toast.add({ message: 'Failed to fetch brand', type: 'error' })
-    } else {
-      brand.value = res.data
-    }
+
+  const errorMessage = typeof res.error?.message === 'string' ? res.error.message : ''
+
+  const isNotFound = errorMessage.includes('404')
+
+  if (isNotFound) {
+    toast.add({
+      message: 'The brand does not exist.',
+      type: 'error'
+    })
+    router.push('/brands')
+    return
+  }
+
+  if (res.error) {
+    toast.add({
+      message: 'Failed to fetch brand',
+      type: 'error'
+    })
+    router.push('/brands')
+    return
+  }
+
+  brand.value = res.data
 }
+
+
 
 const handleSubmit = async (data) => {
   const res = await BrandService.updateBrand(brandId, data)
@@ -37,8 +57,7 @@ const handleSubmit = async (data) => {
     toast.add({ message: 'Failed to save item', type: 'error' })
     throw new Error('Backend error')
   } else {
-    toast.add({ message: 'The brand has been edited.', type: 'success' })
-    router.push({ path: '/brands' })
+    router.push({ path: '/brands', query: { toast: 'edited' } }) // ✅ Redirect พร้อม toast
   }
 }
 
@@ -54,10 +73,9 @@ onMounted(fetchBrand)
     <XNavbar />
     <XLayout class="space-y-6">
       <XBreadcrumb :items="breadcrumbs" />
-
       <BrandForm
         :initialData="brand"
-        :isEditMode="false"
+        :isEditMode="true"
         :onSubmit="handleSubmit"
         :onCancel="handleCancel"
       />
