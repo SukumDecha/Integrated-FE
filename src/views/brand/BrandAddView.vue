@@ -5,10 +5,9 @@
       <XBreadcrumb :items="breadcrumbs" />
 
       <BrandForm
-        :product="{}"
-        mode="add"
+        :isEditMode="false"
         :onSubmit="handleSubmit"
-        @cancel="$router.push('/sale-items')"
+        :onCancel="handleCancel"
       />
     </XLayout>
   </div>
@@ -16,9 +15,9 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { BrandService, SaleItemService } from '@/services'
+import { BrandService } from '@/services'
 import { useToastStore } from '@/stores/toast.store'
-import BrandForm from '@/components/common/form/BrandForm.vue'
+import BrandForm from '@/components/brand/BrandForm.vue'
 import XLayout from '@/components/layout/XLayout.vue'
 import XNavbar from '@/components/layout/XNavbar.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
@@ -38,9 +37,15 @@ const handleSubmit = async (data) => {
     toast.add({ message: 'Failed to save item', type: 'error' })
     throw new Error('Backend error')
   } else {
-    router.push({ path: '/sale-items', query: { toast: 'created' } })
+    toast.add({ message: 'The brand has been created.', type: 'success' })
+    router.push({ path: '/sale-items/list' })
   }
 }
+
+const handleCancel = () => {
+  router.push('/sale-items/list')
+}
+
 </script>
 
 

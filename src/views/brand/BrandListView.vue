@@ -113,7 +113,7 @@ function goToAdd() {
 }
 
 function editBrand(id) {
-  router.push(`/brands/${id}`)
+  router.push(`/brands/${id}/edit`)
 }
 
 function askDeleteBrand(brand) {

@@ -1,5 +1,4 @@
 <template>
-
       <div class="itbms-manage-brand space-y-4 p-4 bg-white rounded-lg shadow">
         <XInput
           v-model="form.name"
@@ -27,21 +26,26 @@
         />
 
         <div class="flex gap-2 pt-4">
-          <XButton label="Save" class="itbms-save-button" variant="primary" @click="handleSave"/>
+          <XButton
+           label="Save" 
+           class="itbms-save-button" 
+           variant="primary" 
+           @click="handleSave"
+           :disabled="!isFormValid || !isChanged"
+          />
           <XButton
             label="Cancel"
             class="itbms-cancel-button"
             variant="secondary"
-            @click="$router.push('/sale-items')"
+            @click="props.onCancel"
           />
         </div>
       </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useToastStore } from '@/stores/toast.store'
-import { BrandService } from '@/services'
 import XInput from '@/components/common/form/XInput.vue'
 import XButton from '@/components/common/XButton.vue'
 import XToggle from '@/components/common/XToggle.vue'
@@ -49,10 +53,14 @@ import XToggle from '@/components/common/XToggle.vue'
 
 const props = defineProps({
   initialData: Object,
-  isEditMode: Boolean,
+  isEditMode: {
+    type: Boolean,
+    default: false,
+  },
   onSubmit: Function,
+  onCancel: Function,
 })
-const emit = defineEmits(['cancel'])
+
 const toast = useToastStore()
 
 const form = ref({
@@ -61,23 +69,6 @@ const form = ref({
     isActive: true,
     countryOfOrigin: ''
 })
-
-const breadcrumbs = [
-  { text: 'Sale Item List', path: '/sale-items/list' },
-  { text: 'Brand List', path: '/brands' },
-  { text: 'New Brand', active: true },
-]
-
-const isSaving = ref(false)
-
-const fetchBrands = async () => {
-  const res = await BrandService.getAllBrands()
-  if (res.error) {
-    toast.add({ message: 'Failed to load brands', type: 'error' })
-  } 
-}
-
-onMounted(fetchBrands)
 
 watch(
   () => [props.initialData],
@@ -94,22 +85,21 @@ watch(
   { immediate: true },
 )
 
-const findBrandIdByName = (name) => {
-  const found = brands.value.find((b) => b.name === name)
-  return found?.id ?? ''
-}
+const isSaving = ref(false)
 
 const isFormValid = computed(() => {
   const result = validate()
   console.log('🔍 validate result:', result)
-  return validate().length === 0
+  return result.length === 0
 })
 
 const validate = () => {
   const errors = []
 
-  // Required fields
-  if (!form.value.name) errors.push('name is required')
+  if (!form.value.name) {
+    errors.push('Name is required')
+  } 
+  
   return errors
 }
 
@@ -131,14 +121,7 @@ const handleSave = async () => {
   console.log('🔍 Saving payload:', payload)
 
   isSaving.value = true
-  try {
-    await props.onSubmit(payload)
-  } catch (err) {
-    toast.add({ message: 'Failed to save item', type: 'error' })
-    console.error(err)
-  } finally {
-    isSaving.value = false
-  }
+  await props.onSubmit(payload)
 }
 
 const isChanged = computed(() => {
@@ -148,7 +131,7 @@ const isChanged = computed(() => {
   const initial = props.initialData
 
   return (
-    findBrandIdByName(initial.name) !== current.name ||
+    initial.name !== current.name ||
     initial.websiteUrl !== current.websiteUrl ||
     initial.isActive !== current.isActive ||
     initial.countryOfOrigin !== current.countryOfOrigin
