@@ -1,3 +1,4 @@
+<!-- SaleItemDetail.vue -->
 <template>
   <div class="min-h-screen bg-gray-50 py-8 px-4">
     <div class="max-w-5xl mx-auto">
@@ -20,7 +21,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
           <!-- Left: Image Gallery -->
           <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
-            <div class="aspect-square bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center">
+            <div
+              class="aspect-square bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center"
+            >
               <img
                 :src="'/assets/sale-item/shopping.webp'"
                 alt="Product image"
@@ -44,8 +47,8 @@
             </div>
           </div>
 
-          <!-- Right: Product Details -->
-          <div class="p-6">
+          <!-- ✅ Right: Product Details (ใส่ itbms-row ตรงนี้) -->
+          <div class="p-6 itbms-row">
             <SaleItemForm
               v-if="mode !== 'detail'"
               :initial-data="product"
@@ -64,7 +67,9 @@
               <!-- Price section -->
               <div class="bg-gray-50 rounded-lg p-4">
                 <div class="flex items-baseline">
-                  <span class="text-3xl font-bold text-gray-900 itbms-price">{{ formatPrice(product.price) }}</span>
+                  <span class="text-3xl font-bold text-gray-900 itbms-price">{{
+                    formatPrice(product.price)
+                  }}</span>
                   <span class="ml-2 text-gray-600 itbms-price-unit">Baht</span>
                 </div>
                 <div class="mt-2 flex items-center">
@@ -108,7 +113,9 @@
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-500">Color</span>
-                    <span class="font-medium text-gray-800 itbms-color">{{ product.color ?? '-' }}</span>
+                    <span class="font-medium text-gray-800 itbms-color">{{
+                      product.color ?? '-'
+                    }}</span>
                   </div>
                 </div>
               </div>
