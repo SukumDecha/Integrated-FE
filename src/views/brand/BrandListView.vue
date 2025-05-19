@@ -80,9 +80,6 @@ const breadcrumbs = [
 const columns = [
   { title: 'ID', key: 'itbms-id', dataIndex: 'id' },
   { title: 'Name', key: 'itbms-name', dataIndex: 'name' },
-  { title: 'Country', key: 'itbms-countryOfOrigin', dataIndex: 'countryOfOrigin' },
-  { title: 'Website', key: 'itbms-websiteUrl', dataIndex: 'websiteUrl' },
-  { title: 'Status', key: 'itbms-isActive', dataIndex: 'isActive' },
   { title: 'Actions', key: 'actions', dataIndex: 'actions' },
 ]
 
