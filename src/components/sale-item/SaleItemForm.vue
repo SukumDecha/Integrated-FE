@@ -77,17 +77,21 @@
     />
 
     <div class="flex gap-4 justify-end mt-8">
-      <button
+      <XButton
         type="submit"
-        class="btn-primary itbms-save-button"
+        class="itbms-save-button"
         :disabled="!isFormValid || !isChanged"
       >
         Save
-      </button>
+    </XButton>
 
-      <button type="button" class="btn-secondary itbms-cancel-button" @click="emit('cancel')">
+
+      <XButton
+        variant="danger"
+        class="itbms-cancel-button"
+        @click="emit('cancel')">
         Cancel
-      </button>
+      </XButton>
     </div>
   </form>
 </template>
@@ -98,12 +102,14 @@ import { useToastStore } from '@/stores/toast.store'
 import { BrandService } from '@/services'
 import XInput from '@/components/common/form/XInput.vue'
 import XSelector from '@/components/common/form/XSelector.vue'
+import XButton from '../common/XButton.vue'
 
 const props = defineProps({
   initialData: Object,
   isEditMode: Boolean,
   onSubmit: Function,
 })
+
 const emit = defineEmits(['cancel'])
 const toast = useToastStore()
 
@@ -176,7 +182,7 @@ const validate = () => {
   }
   if (form.value.price == null || form.value.price < 0) errors.push('Price must be 0 or more')
   if (!form.value.description?.trim()) errors.push('Description is required')
-  
+
   if (
     form.value.screenSizeInch != null &&
     (form.value.screenSizeInch < 0 || form.value.screenSizeInch > 99.99)

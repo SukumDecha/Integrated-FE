@@ -194,10 +194,15 @@ const deleteProduct = async () => {
   }
   const res = await SaleItemService.deleteSaleItem(productId)
   if (res.error) {
-    toast.add({ message: 'The requested sale item does not exist.', type: 'error' })
+    toast.add({
+      message: 'The requested sale item does not exist.',
+      type: 'error' })
     router.push('/sale-items')
   } else {
-    toast.add({ message: 'The sale item has been deleted.', type: 'success' })
+    toast.add({
+      message: 'The sale item has been deleted.',
+      type: 'success'
+    })
     router.push('/sale-items')
   }
 }
