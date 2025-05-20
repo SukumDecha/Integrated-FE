@@ -7,7 +7,7 @@
     "dev": "cp .env.local .env && vite",
     "build": "cp .env.local .env && vite build",
     "build:uat": "cat .env.uat && vite build --mode uat -- --base /ssa1/",
-    "build:prod": "cat .env.prod && vite build --mode production",
+    "build:prod": "cat .env.prod && vite build --mode production -- --base /ssa1/",
     "preview": "vite preview",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
