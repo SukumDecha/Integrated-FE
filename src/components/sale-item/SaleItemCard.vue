@@ -3,6 +3,8 @@ import XButton from '@/components/common/XButton.vue'
 import { displayOrDash, formatPrice } from '@/utils/TextUtils';
 import { EyeIcon } from 'lucide-vue-next'
 
+const fallbackImageUrl = new URL('/assets/sale-item/shopping.webp', import.meta.url).pathname
+
 defineProps({
   isLoading: {
     type: Boolean,
@@ -77,7 +79,7 @@ defineProps({
     <!-- Image Section -->
     <div class="relative w-full h-64 overflow-hidden">
       <img
-        :src="imageUrl || '/assets/sale-item/shopping.webp'"
+        :src="imageUrl || fallbackImageUrl"
         :alt="`${brand} ${model} product image`"
         class="w-full h-full object-cover object-center rounded-t-xl"
       />

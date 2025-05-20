@@ -25,7 +25,7 @@
               class="aspect-square bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center"
             >
               <img
-                :src="'/assets/sale-item/shopping.webp'"
+                :src="imageUrl"
                 alt="Product image"
                 class="w-full h-full object-contain"
               />
@@ -39,7 +39,7 @@
                 class="aspect-square bg-white border border-gray-200 rounded-md overflow-hidden cursor-pointer hover:border-gray-400 transition-colors"
               >
                 <img
-                  :src="'/assets/sale-item/shopping.webp'"
+                  :src="imageUrl"
                   alt="Thumbnail"
                   class="w-full h-full object-cover"
                 />
@@ -162,6 +162,8 @@ import SaleItemForm from './SaleItemForm.vue'
 import XButton from '@/components/common/XButton.vue'
 import XConfirmModal from '@/components/common/XConfirmModal.vue'
 import { ArrowLeft } from 'lucide-vue-next'
+
+const imageUrl = new URL('/assets/sale-item/shopping.webp', import.meta.url).pathname
 
 defineEmits(['cancel'])
 
