@@ -80,11 +80,11 @@
       <XButton
         type="submit"
         class="itbms-save-button"
+        :loading="isSaving"
         :disabled="!isFormValid || !isChanged"
       >
         Save
     </XButton>
-
 
       <XButton
         variant="danger"

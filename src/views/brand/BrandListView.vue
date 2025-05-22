@@ -7,7 +7,7 @@ import XFooter from '@/components/layout/XFooter.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import XTable from '@/components/common/XTable.vue'
 import XButton from '@/components/common/XButton.vue'
-import XConfirmModal from '@/components/common/XConfirmModal.vue'
+import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { BrandService } from '@/services'
 import { useToastStore } from '@/stores/toast.store'
 

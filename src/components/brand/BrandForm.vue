@@ -3,7 +3,7 @@ import { ref, watch, computed } from 'vue'
 import { useToastStore } from '@/stores/toast.store'
 import XInput from '@/components/common/form/XInput.vue'
 import XButton from '@/components/common/XButton.vue'
-import XToggle from '@/components/common/XToggle.vue'
+import XToggle from '@/components/common/form/XToggle.vue'
 
 const props = defineProps({
   initialData: {
@@ -117,6 +117,7 @@ const handleSave = async () => {
         label="Cancel"
         class="itbms-cancel-button"
         variant="secondary"
+        :loading="isSaving"
         @click="props.onCancel"
       />
     </div>

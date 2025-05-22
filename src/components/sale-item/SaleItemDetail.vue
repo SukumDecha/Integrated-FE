@@ -160,7 +160,7 @@ import { formatPrice } from '@/utils/TextUtils'
 
 import SaleItemForm from './SaleItemForm.vue'
 import XButton from '@/components/common/XButton.vue'
-import XConfirmModal from '@/components/common/XConfirmModal.vue'
+import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { ArrowLeft } from 'lucide-vue-next'
 
 const imageUrl = new URL('/assets/sale-item/shopping.webp', import.meta.url).pathname
