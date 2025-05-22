@@ -28,6 +28,9 @@
         <XTable
           :columns="columns"
           :data="saleItems"
+          :pagination="pagination"
+          :pageSizeOptions="[5, 10, 25, 50]"
+          @change="onPaginate"
           emptyText="No sale item"
         >
           <!-- Format ราคาด้วย comma -->
@@ -90,7 +93,7 @@ import XLayout from '@/components/layout/XLayout.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import XButton from '@/components/common/XButton.vue'
 import XTable from '@/components/common/XTable.vue'
-import XConfirmModal from '@/components/common/XConfirmModal.vue'
+import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { SaleItemService } from '@/services'
 import { formatPrice, displayOrDash } from '@/utils/TextUtils'
 import { useToastStore } from '@/stores/toast.store'
@@ -118,11 +121,11 @@ const columns = [
   { title: 'Actions', key: 'actions', dataIndex: 'actions' },
 ]
 
-// const pagination = ref({
-//   currentPage: 1,
-//   pageSize: 100,
-//   total: 0,
-// })
+const pagination = ref({
+  currentPage: 1,
+  pageSize: 5,
+  total: 0,
+})
 
 onMounted(async () => {
   const response = await SaleItemService.getSaleItemList()
@@ -131,7 +134,7 @@ onMounted(async () => {
     return
   }
   saleItems.value = response.data
-  // pagination.value.total = saleItems.value.length
+  pagination.value.total = saleItems.value.length
 })
 
 watchEffect(() => {
@@ -142,9 +145,11 @@ watchEffect(() => {
   }
 })
 
-// function onPaginate(newPageInfo) {
-//   pagination.value = newPageInfo
-// }
+function onPaginate(newPageInfo) {
+  pagination.value = newPageInfo
+
+  // TODO: Implement pagination logic here
+}
 
 function editSaleItem(id) {
   router.push(`/sale-items/${id}/edit`)
@@ -168,7 +173,7 @@ async function confirmDeleteItem() {
   }
 
   saleItems.value = saleItems.value.filter((item) => item.id !== id)
-  // pagination.value.total = saleItems.value.length
+  pagination.value.total = saleItems.value.length
 
   toast.add({ message: 'The sale item has been deleted.', type: 'success' })
 

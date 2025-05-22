@@ -6,7 +6,7 @@
       sizeClasses,
       variantClasses,
       fullWidth ? 'w-full' : '',
-      disabled || loading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer',
+      'disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500  disabled:border-[#d9d9d9] disabled:border disabled:opacity-60',
       className,
     ]"
     :disabled="disabled || loading"
