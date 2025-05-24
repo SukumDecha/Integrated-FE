@@ -97,7 +97,6 @@ import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { SaleItemService } from '@/services'
 import { formatPrice, displayOrDash } from '@/utils/TextUtils'
 import { useToastStore } from '@/stores/toast.store'
-import { parseSearchParams } from '@/utils/SearchParamsUtils'
 
 const router = useRouter()
 const route = useRoute()

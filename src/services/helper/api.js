@@ -8,7 +8,14 @@ const httpHeaders = {
   'Content-Type': 'application/json',
 }
 
-const request = async (url, method, payload, options) => {
+const request = async (
+  url,
+  method,
+  payload,
+  options = {
+    isPaginated: false,
+  }
+) => {
   const { isPaginated = false } = options;
 
   const httpOptions = {

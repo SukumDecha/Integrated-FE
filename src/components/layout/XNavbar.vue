@@ -9,28 +9,15 @@ defineProps({
     type: Array,
     default: () => [
       { name: 'Home', href: '#', active: true },
-      { name: 'Shop', href: '#', active: false },
-      { name: 'Categories', href: '#', active: false },
-      { name: 'About', href: '#', active: false },
+      { name: 'Shop', href: '/sale-items', active: false },
+      { name: 'Manage Sale Items', href: '/sale-items/list', active: false },
+      { name: 'Manage Brands', href: '/brands', active: false },
     ],
   },
-  userName: {
-    type: String,
-    default: '',
+  cartCount: {
+    type: Number,
+    default: 0,
   },
-  userEmail: {
-    type: String,
-    default: '',
-  },
-  userMenuItems: {
-    type: Array,
-    default: () => [
-      { name: 'Your Profile', href: '#' },
-      { name: 'Settings', href: '#' },
-      { name: 'Sign out', href: '#' },
-    ],
-  },
-  cartCount: Number,
 })
 
 const isOpen = ref(false)
