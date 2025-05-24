@@ -86,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watchEffect } from 'vue'
+import { ref, onMounted, watchEffect, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import XNavbar from '@/components/layout/XNavbar.vue'
 import XLayout from '@/components/layout/XLayout.vue'
@@ -97,6 +97,7 @@ import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { SaleItemService } from '@/services'
 import { formatPrice, displayOrDash } from '@/utils/TextUtils'
 import { useToastStore } from '@/stores/toast.store'
+import { parseSearchParams } from '@/utils/SearchParamsUtils'
 
 const router = useRouter()
 const route = useRoute()
@@ -127,14 +128,34 @@ const pagination = ref({
   total: 0,
 })
 
-onMounted(async () => {
-  const response = await SaleItemService.getSaleItemList()
-  if (response.error) {
-    console.error('Error fetching Sale Items:', response.error)
-    return
+const filterOptions = ref({
+  filteredBrands: undefined,
+  sortField: 'createdOn', // 'brand.name' or 'null'
+  sortOrder: 'desc', // 'asc', 'desc', or null
+})
+
+const searchParamsObj = computed(() => {
+  return {
+    page: pagination.value.currentPage - 1,
+    size: pagination.value.pageSize,
+    sortField: filterOptions.value.sortField,
+    sortDirection: filterOptions.value.sortOrder,
+    filterBrands: filterOptions.value.filteredBrands,
   }
-  saleItems.value = response.data
-  pagination.value.total = saleItems.value.length
+})
+
+onMounted(async () => {
+  if (route.query) {
+    const parsedParams = route.query
+
+    pagination.value.currentPage = parseInt(parsedParams.page) || 1
+    pagination.value.pageSize = parseInt(parsedParams.size) || 5
+    filterOptions.value.sortField = parsedParams.sortField || 'createdOn'
+    filterOptions.value.sortOrder = parsedParams.sortDirection || 'desc'
+    filterOptions.value.filteredBrands = parsedParams.filterBrands
+      ? parsedParams.filterBrands.split(',')
+      : undefined
+  }
 })
 
 watchEffect(() => {
@@ -145,10 +166,33 @@ watchEffect(() => {
   }
 })
 
+watchEffect(async () => {
+  const response = await SaleItemService.getSaleItemListPaginated({
+    ...searchParamsObj.value,
+  })
+
+  if (response.error) {
+    console.error('Error fetching Sale Items with filters:', response.error)
+    return
+  }
+
+  saleItems.value = response.data
+  pagination.value.total = response.pagination.totalItems
+
+  router.replace({
+    query: {
+      ...route.query,
+      page: pagination.value.currentPage,
+      size: pagination.value.pageSize,
+      sortField: filterOptions.value.sortField,
+      sortDirection: filterOptions.value.sortOrder,
+      filterBrands: filterOptions.value.filteredBrands?.join(','),
+    },
+  })
+})
+
 function onPaginate(newPageInfo) {
   pagination.value = newPageInfo
-
-  // TODO: Implement pagination logic here
 }
 
 function editSaleItem(id) {

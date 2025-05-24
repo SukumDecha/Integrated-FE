@@ -18,9 +18,9 @@
       </thead>
 
       <!-- ✅ ถ้ามีข้อมูล -->
-      <tbody v-if="paginatedData.length > 0" class="divide-y divide-gray-200">
+      <tbody v-if="data.length > 0" class="divide-y divide-gray-200">
         <tr
-          v-for="(row, rowIndex) in paginatedData"
+          v-for="(row, rowIndex) in data"
           :key="row.id || rowIndex"
           class="itbms-row hover:bg-gray-50"
         >
@@ -171,7 +171,7 @@ const props = defineProps({
   },
   maxVisiblePages: {
     type: Number,
-    default: 7
+    default: 10
   }
 });
 
@@ -185,14 +185,6 @@ const totalPages = computed(() => {
   return Math.ceil(total / currentPageSize.value);
 });
 
-const paginatedData = computed(() => {
-  if (!props.pagination) return props.data;
-
-  const start = (currentPage.value - 1) * currentPageSize.value;
-  const end = start + currentPageSize.value;
-  return props.data.slice(start, end);
-});
-
 // Generate visible page numbers with ellipsis
 const visiblePages = computed(() => {
   const total = totalPages.value;
@@ -204,32 +196,44 @@ const visiblePages = computed(() => {
   }
 
   const pages = [];
-  const halfVisible = Math.floor(maxVisible / 2);
 
-  if (current <= halfVisible + 1) {
-    // Show pages from start
-    for (let i = 1; i <= maxVisible - 2; i++) {
+  if (current <= maxVisible) {
+    for (let i = 1; i <= maxVisible; i++) {
       pages.push(i);
     }
-    pages.push('...');
-    pages.push(total);
-  } else if (current >= total - halfVisible) {
-    // Show pages from end
-    pages.push(1);
-    pages.push('...');
-    for (let i = total - maxVisible + 3; i <= total; i++) {
+  } else if (current >= maxVisible) {
+    const offSet = current - maxVisible + 1
+    for (let i = offSet; i <= maxVisible + offSet - 1; i++) {
       pages.push(i);
     }
-  } else {
-    // Show pages around current
-    pages.push(1);
-    pages.push('...');
-    for (let i = current - halfVisible + 2; i <= current + halfVisible - 2; i++) {
-      pages.push(i);
-    }
-    pages.push('...');
-    pages.push(total);
   }
+
+  // const halfVisible = Math.floor(maxVisible / 2);
+
+  // if (current <= halfVisible + 1) {
+  //   // Show pages from start
+  //   for (let i = 1; i <= maxVisible - 2; i++) {
+  //     pages.push(i);
+  //   }
+  //   pages.push('...');
+  //   pages.push(total);
+  // } else if (current >= total - halfVisible) {
+  //   // Show pages from end
+  //   pages.push(1);
+  //   pages.push('...');
+  //   for (let i = total - maxVisible + 3; i <= total; i++) {
+  //     pages.push(i);
+  //   }
+  // } else {
+  //   // Show pages around current
+  //   pages.push(1);
+  //   pages.push('...');
+  //   for (let i = current - halfVisible + 2; i <= current + halfVisible - 2; i++) {
+  //     pages.push(i);
+  //   }
+  //   pages.push('...');
+  //   pages.push(total);
+  // }
 
   return pages;
 });
@@ -283,7 +287,6 @@ function getWidthStyle(width) {
   return width ? { width } : {};
 }
 
-// Watch for external pagination changes
 watch(
   () => props.pagination?.currentPage,
   (val) => {
@@ -301,4 +304,6 @@ watch(
     }
   }
 );
+
+
 </script>
