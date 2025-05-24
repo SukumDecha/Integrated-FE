@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- Navbar -->
-    <XNavbar :brand-name="storeName" :cart-count="cartCount" />
+    <XNavbar :brand-name="storeName" />
 
     <!-- Hero Section -->
     <HeroSection
@@ -22,8 +22,9 @@
         >
           <SaleItemCard
             v-for="product in products"
+            :id="product.id"
             :key="product.id"
-            :brand="product.brand"
+            :brand="product.brandName"
             :model="product.model"
             :ramGb="product.ramGb"
             :storageGb="product.storageGb"
@@ -36,7 +37,7 @@
     </div>
 
     <!-- Footer -->
-    <Footer :company-name="storeName" />
+    <XFooter :company-name="storeName" />
   </div>
 </template>
 
@@ -46,6 +47,7 @@ import XNavbar from '@/components/layout/XNavbar.vue'
 import HeroSection from '@/components/home/HeroSection.vue'
 import SaleItemCard from '@/components/sale-item/SaleItemCard.vue'
 import { SaleItemService } from '@/services'
+import XFooter from '@/components/layout/XFooter.vue'
 
 // Store data
 const storeName = ref('GreenCart')
