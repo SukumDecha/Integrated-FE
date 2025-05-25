@@ -1,3 +1,161 @@
+<script setup>
+import { ref, onMounted, watchEffect, computed, reactive } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import XNavbar from '@/components/layout/XNavbar.vue'
+import XLayout from '@/components/layout/XLayout.vue'
+import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
+import XButton from '@/components/common/XButton.vue'
+import XTable from '@/components/common/XTable.vue'
+import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
+import { SaleItemService } from '@/services'
+import { formatPrice, displayOrDash } from '@/utils/TextUtils'
+import { useToastStore } from '@/stores/toast.store'
+
+const router = useRouter()
+const route = useRoute()
+const toast = useToastStore()
+
+const saleItems = reactive([])
+
+const itemToDelete = ref(null)
+const showConfirm = ref(false)
+
+const breadcrumbs = [
+  { text: 'Home', path: '/' },
+  { text: 'Sale Items', path: '/sale-items', active: true },
+]
+
+const columns = [
+  { title: 'ID', key: 'itbms-id', dataIndex: 'id' },
+  { title: 'Brand', key: 'itbms-brand', dataIndex: 'brandName' },
+  { title: 'Model', key: 'itbms-model', dataIndex: 'model' },
+  { title: 'RAM (GB)', key: 'itbms-ramGb', dataIndex: 'ramGb' },
+  { title: 'Storage (GB)', key: 'itbms-storageGb', dataIndex: 'storageGb' },
+  { title: 'Color', key: 'itbms-color', dataIndex: 'color' },
+  { title: 'Price (Baht)', key: 'itbms-price', dataIndex: 'price' },
+  { title: 'Actions', key: 'actions', dataIndex: 'actions' },
+]
+
+const pagination = reactive({
+  currentPage: 1,
+  pageSize: 5,
+  total: 0,
+})
+
+const filterOptions = reactive({
+  filteredBrands: undefined,
+  sortField: 'createdOn', // 'brand.name' or 'null'
+  sortOrder: 'desc', // 'asc', 'desc', or null
+})
+
+const searchParamsObj = computed(() => {
+  return {
+    page: pagination.currentPage - 1,
+    size: pagination.pageSize,
+    sortField: filterOptions.sortField,
+    sortDirection: filterOptions.sortOrder,
+    filterBrands: filterOptions.filteredBrands,
+  }
+})
+
+onMounted(async () => {
+  if (route.query) {
+    const parsedParams = route.query
+
+    pagination.currentPage = parseInt(parsedParams.page) || 1
+    pagination.pageSize = parseInt(parsedParams.size) || 5
+    filterOptions.sortField = parsedParams.sortField || 'createdOn'
+    filterOptions.sortOrder = parsedParams.sortDirection || 'desc'
+    filterOptions.filteredBrands = parsedParams.filterBrands
+      ? parsedParams.filterBrands.split(',')
+      : undefined
+  }
+})
+
+watchEffect(() => {
+  if (route.query.toast === 'created') {
+    toast.add({ message: 'The sale item has been successfully added.', type: 'success' })
+
+    router.replace({ query: {} })
+  }
+})
+
+watchEffect(async () => {
+  const response = await SaleItemService.getSaleItemListPaginated({
+    ...searchParamsObj.value,
+  })
+
+  if (response.error) {
+    console.error('Error fetching Sale Items with filters:', response.error)
+    return
+  }
+
+  saleItems.splice(0, saleItems.length)
+  saleItems.push(...response.data)
+  pagination.total = response.pagination.totalItems
+
+  router.replace({
+    query: {
+      ...route.query,
+      page: pagination.currentPage,
+      size: pagination.pageSize,
+      sortField: filterOptions.sortField,
+      sortDirection: filterOptions.sortOrder,
+      filterBrands: filterOptions.filteredBrands?.join(','),
+    },
+  })
+})
+
+function onPaginate({ currentPage, pageSize }) {
+  pagination.currentPage = currentPage
+  pagination.pageSize = pageSize
+}
+
+function editSaleItem(id) {
+  router.push(`/sale-items/${id}/edit`)
+}
+
+function askDeleteItem(item) {
+  itemToDelete.value = item
+  showConfirm.value = true
+}
+
+async function confirmDeleteItem() {
+  if (!itemToDelete.value) return
+
+  const id = itemToDelete.value.id
+
+  const res = await SaleItemService.deleteSaleItem(id)
+
+  if (res.error) {
+    toast.add({ message: 'Failed to delete sale item.', type: 'error' })
+    return
+  }
+
+  const index = saleItems.findIndex(item => item.id === id)
+  if (index !== -1) {
+    saleItems.splice(index, 1)
+  }
+
+  router.replace({
+    query: {
+      ...route.query,
+    },
+  })
+  toast.add({ message: 'The sale item has been deleted.', type: 'success' })
+
+  itemToDelete.value = null
+  showConfirm.value = false
+}
+
+function onAdd() {
+  router.push('/sale-items/add')
+}
+function onManage() {
+  router.push('/brands')
+}
+</script>
+
 <template>
   <div class="min-h-screen flex flex-col">
     <XNavbar />
@@ -79,155 +237,8 @@
     <XConfirmModal
       v-model="showConfirm"
       title="Delete Sale Item"
-      :message="`Do you want to delete this sale item?`"
+      message="`Do you want to delete this sale item?`"
       @confirm="confirmDeleteItem"
     />
   </div>
 </template>
-
-<script setup>
-import { ref, onMounted, watchEffect, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import XNavbar from '@/components/layout/XNavbar.vue'
-import XLayout from '@/components/layout/XLayout.vue'
-import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
-import XButton from '@/components/common/XButton.vue'
-import XTable from '@/components/common/XTable.vue'
-import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
-import { SaleItemService } from '@/services'
-import { formatPrice, displayOrDash } from '@/utils/TextUtils'
-import { useToastStore } from '@/stores/toast.store'
-
-const router = useRouter()
-const route = useRoute()
-const toast = useToastStore()
-const saleItems = ref([])
-const itemToDelete = ref(null)
-const showConfirm = ref(false)
-
-const breadcrumbs = [
-  { text: 'Home', path: '/' },
-  { text: 'Sale Items', path: '/sale-items', active: true },
-]
-
-const columns = [
-  { title: 'ID', key: 'itbms-id', dataIndex: 'id' },
-  { title: 'Brand', key: 'itbms-brand', dataIndex: 'brandName' },
-  { title: 'Model', key: 'itbms-model', dataIndex: 'model' },
-  { title: 'RAM (GB)', key: 'itbms-ramGb', dataIndex: 'ramGb' },
-  { title: 'Storage (GB)', key: 'itbms-storageGb', dataIndex: 'storageGb' },
-  { title: 'Color', key: 'itbms-color', dataIndex: 'color' },
-  { title: 'Price (Baht)', key: 'itbms-price', dataIndex: 'price' },
-  { title: 'Actions', key: 'actions', dataIndex: 'actions' },
-]
-
-const pagination = ref({
-  currentPage: 1,
-  pageSize: 5,
-  total: 0,
-})
-
-const filterOptions = ref({
-  filteredBrands: undefined,
-  sortField: 'createdOn', // 'brand.name' or 'null'
-  sortOrder: 'desc', // 'asc', 'desc', or null
-})
-
-const searchParamsObj = computed(() => {
-  return {
-    page: pagination.value.currentPage - 1,
-    size: pagination.value.pageSize,
-    sortField: filterOptions.value.sortField,
-    sortDirection: filterOptions.value.sortOrder,
-    filterBrands: filterOptions.value.filteredBrands,
-  }
-})
-
-onMounted(async () => {
-  if (route.query) {
-    const parsedParams = route.query
-
-    pagination.value.currentPage = parseInt(parsedParams.page) || 1
-    pagination.value.pageSize = parseInt(parsedParams.size) || 5
-    filterOptions.value.sortField = parsedParams.sortField || 'createdOn'
-    filterOptions.value.sortOrder = parsedParams.sortDirection || 'desc'
-    filterOptions.value.filteredBrands = parsedParams.filterBrands
-      ? parsedParams.filterBrands.split(',')
-      : undefined
-  }
-})
-
-watchEffect(() => {
-  if (route.query.toast === 'created') {
-    toast.add({ message: 'The sale item has been successfully added.', type: 'success' })
-
-    router.replace({ query: {} })
-  }
-})
-
-watchEffect(async () => {
-  const response = await SaleItemService.getSaleItemListPaginated({
-    ...searchParamsObj.value,
-  })
-
-  if (response.error) {
-    console.error('Error fetching Sale Items with filters:', response.error)
-    return
-  }
-
-  saleItems.value = response.data
-  pagination.value.total = response.pagination.totalItems
-
-  router.replace({
-    query: {
-      ...route.query,
-      page: pagination.value.currentPage,
-      size: pagination.value.pageSize,
-      sortField: filterOptions.value.sortField,
-      sortDirection: filterOptions.value.sortOrder,
-      filterBrands: filterOptions.value.filteredBrands?.join(','),
-    },
-  })
-})
-
-function onPaginate(newPageInfo) {
-  pagination.value = newPageInfo
-}
-
-function editSaleItem(id) {
-  router.push(`/sale-items/${id}/edit`)
-}
-
-function askDeleteItem(item) {
-  itemToDelete.value = item
-  showConfirm.value = true
-}
-
-async function confirmDeleteItem() {
-  if (!itemToDelete.value) return
-
-  const id = itemToDelete.value.id
-
-  const res = await SaleItemService.deleteSaleItem(id)
-
-  if (res.error) {
-    toast.add({ message: 'Failed to delete sale item.', type: 'error' })
-    return
-  }
-
-  saleItems.value = saleItems.value.filter((item) => item.id !== id)
-  pagination.value.total = saleItems.value.length
-
-  toast.add({ message: 'The sale item has been deleted.', type: 'success' })
-
-  itemToDelete.value = null
-  showConfirm.value = false
-}
-
-function onAdd() {
-  router.push('/sale-items/add')
-}
-function onManage() {
-  router.push('/brands')
-}
-</script>

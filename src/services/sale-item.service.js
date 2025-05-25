@@ -14,15 +14,15 @@ const SaleItemService = {
   },
 
   async addSaleItem(data) {
-    return await post(`${BASE_URL_V1}`, data); // ✅ เพิ่มฟังก์ชัน POST
+    return await post(`${BASE_URL_V1}`, data);
   },
 
   async updateSaleItem(id, data) {
-    return await put(`${BASE_URL_V1}/${id}`, data); // สำหรับ Edit
+    return await put(`${BASE_URL_V1}/${id}`, data);
   },
 
   async deleteSaleItem(id) {
-    return await remove(`${BASE_URL_V1}/${id}`); // เผื่อใช้ Delete
+    return await remove(`${BASE_URL_V1}/${id}`);
   },
 
   async getSaleItemList() {
@@ -32,8 +32,8 @@ const SaleItemService = {
   async getSaleItemListPaginated({
     page = 1,
     size = 10,
-    sortField = 'createdAt',
-    sortDirection = 'desc',
+    sortField =  undefined,
+    sortDirection = undefined,
     filterBrands = []
   }) {
     const searchParams = buildSearchParams({
