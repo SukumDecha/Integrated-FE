@@ -24,25 +24,25 @@ const breadcrumbs = [
   { text: 'Sale Items', active: true },
 ]
 
-const pagination = ref({
+const pagination = reactive({
   currentPage: 1,
-  pageSize: 5,
+  pageSize: 10,
   total: 0,
 })
 
-const filterOptions = ref({
+const filterOptions = reactive({
   filteredBrands: undefined,
-  sortField: 'createdOn', // 'brand.name' or 'null'
-  sortOrder: 'desc', // 'asc', 'desc', or null
+  sortField: undefined, // 'brand.name' or 'undefined'
+  sortOrder: undefined, // 'asc', 'desc', or null
 })
 
 const searchParamsObj = computed(() => {
   return {
-    page: pagination.value.currentPage - 1,
-    size: pagination.value.pageSize,
-    sortField: filterOptions.value.sortField,
-    sortDirection: filterOptions.value.sortOrder,
-    filterBrands: filterOptions.value.filteredBrands,
+    page: pagination.currentPage - 1,
+    size: pagination.pageSize,
+    sortField: filterOptions.sortField,
+    sortDirection: filterOptions.sortOrder,
+    filterBrands: filterOptions.filteredBrands,
   }
 })
 
@@ -50,11 +50,11 @@ const parseQueryToState = () => {
   if (route.query) {
     const parsedParams = route.query
 
-    pagination.value.currentPage = parseInt(parsedParams.page) || 1
-    pagination.value.pageSize = parseInt(parsedParams.size) || 5
-    filterOptions.value.sortField = parsedParams.sortField || 'createdOn'
-    filterOptions.value.sortOrder = parsedParams.sortDirection || 'desc'
-    filterOptions.value.filteredBrands = parsedParams.filterBrands
+    pagination.currentPage = parseInt(parsedParams.page) || pagination.currentPage
+    pagination.pageSize = parseInt(parsedParams.size) || pagination.pageSize
+    filterOptions.sortField = parsedParams.sortField
+    filterOptions.sortOrder = parsedParams.sortDirection
+    filterOptions.filteredBrands = parsedParams.filterBrands
       ? parsedParams.filterBrands.split(',')
       : undefined
   }
@@ -64,13 +64,8 @@ function onPaginate({
   currentPage,
   pageSize
 }) {
-  const newPagination = {
-    ...pagination.value,
-    currentPage,
-    pageSize
-  }
-
-  pagination.value = newPagination
+  pagination.currentPage = currentPage
+  pagination.pageSize = pageSize
 }
 async function fetchSaleItems(params) {
   loading.value = true
@@ -86,7 +81,7 @@ async function fetchSaleItems(params) {
 
   saleItems.splice(0, saleItems.length)
   saleItems.push(...response.data)
-  pagination.value.total = response.pagination.totalItems
+  pagination.total = response.pagination.totalItems
 
   loading.value = false
 }
@@ -103,11 +98,11 @@ watch(
     router.replace({
       query: {
         ...route.query,
-        page: pagination.value.currentPage,
-        size: pagination.value.pageSize,
-        sortField: filterOptions.value.sortField,
-        sortDirection: filterOptions.value.sortOrder,
-        filterBrands: filterOptions.value.filteredBrands?.join(','),
+        page: pagination.currentPage,
+        size: pagination.pageSize,
+        sortField: filterOptions.sortField,
+        sortDirection: filterOptions.sortOrder,
+        filterBrands: filterOptions.filteredBrands?.join(','),
       },
     })
   },
