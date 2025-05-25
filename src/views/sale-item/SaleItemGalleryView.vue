@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onMounted, watchEffect } from 'vue'
+import { onMounted, watchEffect, ref, computed, watch, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToastStore } from '@/stores/toast.store'
 import XNavbar from '@/components/layout/XNavbar.vue'
@@ -7,31 +7,115 @@ import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import SaleItemCard from '@/components/sale-item/SaleItemCard.vue'
 import XFooter from '@/components/layout/XFooter.vue'
 import XButton from '@/components/common/XButton.vue'
+import XPagination from '@/components/common/XPagination.vue'
 import { SaleItemService } from '@/services'
 import { PlusIcon } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToastStore()
-const products = reactive([])
+
+const loading = ref(true)
+const error = ref(null)
+const saleItems = reactive([])
 
 const breadcrumbs = [
   { text: 'Home', path: '/' },
   { text: 'Sale Items', active: true },
 ]
 
-const fetchProducts = async () => {
-  const response = await SaleItemService.getAllSaleItems()
+const pagination = ref({
+  currentPage: 1,
+  pageSize: 5,
+  total: 0,
+})
+
+const filterOptions = ref({
+  filteredBrands: undefined,
+  sortField: 'createdOn', // 'brand.name' or 'null'
+  sortOrder: 'desc', // 'asc', 'desc', or null
+})
+
+const searchParamsObj = computed(() => {
+  return {
+    page: pagination.value.currentPage - 1,
+    size: pagination.value.pageSize,
+    sortField: filterOptions.value.sortField,
+    sortDirection: filterOptions.value.sortOrder,
+    filterBrands: filterOptions.value.filteredBrands,
+  }
+})
+
+const parseQueryToState = () => {
+  if (route.query) {
+    const parsedParams = route.query
+
+    pagination.value.currentPage = parseInt(parsedParams.page) || 1
+    pagination.value.pageSize = parseInt(parsedParams.size) || 5
+    filterOptions.value.sortField = parsedParams.sortField || 'createdOn'
+    filterOptions.value.sortOrder = parsedParams.sortDirection || 'desc'
+    filterOptions.value.filteredBrands = parsedParams.filterBrands
+      ? parsedParams.filterBrands.split(',')
+      : undefined
+  }
+}
+
+function onPaginate({
+  currentPage,
+  pageSize
+}) {
+  const newPagination = {
+    ...pagination.value,
+    currentPage,
+    pageSize
+  }
+
+  pagination.value = newPagination
+}
+async function fetchSaleItems(params) {
+  loading.value = true
+  const response = await SaleItemService.getSaleItemListPaginated({
+    ...params.value
+  })
+
   if (response.error) {
-    console.error('Error fetching products:', response.error)
+    console.error('Error fetching Sale Items:', response.error)
+    error.value = response.error
     return
   }
-  products.push(...response.data)
+
+  saleItems.splice(0, saleItems.length)
+  saleItems.push(...response.data)
+  pagination.value.total = response.pagination.totalItems
+
+  loading.value = false
 }
 
 onMounted(async () => {
-  await fetchProducts()
+  parseQueryToState()
 })
+
+watch(
+  ()  => searchParamsObj,
+  async (newParams) => {
+    await fetchSaleItems(newParams)
+
+    router.replace({
+      query: {
+        ...route.query,
+        page: pagination.value.currentPage,
+        size: pagination.value.pageSize,
+        sortField: filterOptions.value.sortField,
+        sortDirection: filterOptions.value.sortOrder,
+        filterBrands: filterOptions.value.filteredBrands?.join(','),
+      },
+    })
+  },
+  {
+    immediate: true,
+    deep: true,
+  }
+)
 
 watchEffect(() => {
   if (route.query.toast === 'created') {
@@ -40,6 +124,7 @@ watchEffect(() => {
     router.replace({ query: {} })
   }
 })
+
 </script>
 
 <template>
@@ -64,10 +149,10 @@ watchEffect(() => {
           <p class="text-gray-500">Check out our most popular items this season.</p>
         </div>
 
-        <div v-if="products.length > 0" class="mt-10">
+        <div v-if="saleItems.length > 0" class="mt-10">
           <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-5 xl:gap-x-8">
             <SaleItemCard
-              v-for="product in products"
+              v-for="product in saleItems"
               :key="product.id"
               :id="product.id"
               :brand="product.brandName"
@@ -77,6 +162,13 @@ watchEffect(() => {
               :price="product.price"
             />
           </div>
+
+          <XPagination
+            class="mt-8"
+            :pagination="pagination"
+            :show-size-changer="true"
+            @change="onPaginate"
+          />
         </div>
 
         <div v-else class="text-center py-10">

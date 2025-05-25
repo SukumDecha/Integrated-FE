@@ -32,7 +32,7 @@ const SaleItemService = {
   async getSaleItemListPaginated({
     page = 1,
     size = 10,
-    sortField = 'createdAt',
+    sortField = 'createdOn',
     sortDirection = 'desc',
     filterBrands = []
   }) {
