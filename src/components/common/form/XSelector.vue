@@ -1,71 +1,170 @@
-<template>
-  <label v-if="label" class="form-label">
-    {{ label }}
-    <span v-if="required" class="text-red-500">*</span>
-  </label>
-
-  <select
-    :value="modelValue"
-    @change="$emit('update:modelValue', $event.target.value)"
-    :disabled="disabled"
-    :class="inputClass"
-  >
-    <option disabled value="">{{ placeholder || 'Select an option' }}</option>
-    <option v-for="option in options" :key="option.value" :value="option.value">
-      {{ option.label }}
-    </option>
-  </select>
-</template>
-
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
-  modelValue: [String, Number],
-  class: {
+  modelValue: [String, Number, Array],
+  mode: {
     type: String,
-    default: '',
-  },
-  label: String,
-  placeholder: String,
-  required: {
-    type: Boolean,
-    default: false,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
+    default: 'single',
   },
   options: {
     type: Array,
     default: () => [],
   },
+  placeholder: String,
+  disabled: Boolean,
+  class: {
+    type: String,
+    default: '',
+  },
 })
 
-defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'remove'])
 
-const inputClass = computed(() => `input ${props.class}`)
+const isMultiple = computed(() => props.mode === 'multiple')
+const search = ref('')
+const isOpen = ref(false)
+const inputRef = ref(null)
+const wrapperRef = ref(null)
+
+const selectedValue = computed({
+  get() {
+    return isMultiple.value
+      ? Array.isArray(props.modelValue)
+        ? props.modelValue
+        : []
+      : props.modelValue ?? ''
+  },
+  set(val) {
+    emit('update:modelValue', val)
+  },
+})
+
+const filteredOptions = computed(() => {
+  return props.options.filter((o) =>
+    isMultiple.value
+      ? !selectedValue.value.includes(o.value) &&
+        o.label.toLowerCase().includes(search.value.toLowerCase())
+      : o.label.toLowerCase().includes(search.value.toLowerCase())
+  )
+})
+
+const selectedLabels = computed(() => {
+  return isMultiple.value
+    ? props.options.filter((o) => selectedValue.value.includes(o.value))
+    : props.options.find((o) => o.value === selectedValue.value)
+})
+
+const addOption = (value) => {
+  if (isMultiple.value) {
+    if (!selectedValue.value.includes(value)) {
+      emit('update:modelValue', [...selectedValue.value, value])
+      search.value = ''
+    }
+  } else {
+    emit('update:modelValue', value)
+    isOpen.value = false
+  }
+}
+
+const removeOption = (value) => {
+  if (isMultiple.value) {
+    emit(
+      'update:modelValue',
+      selectedValue.value.filter((v) => v !== value)
+    )
+    emit('remove', value)
+  } else {
+    emit('update:modelValue', '')
+  }
+}
+
+const handleFocus = () => {
+  isOpen.value = true
+}
+
+const handleClickOutside = (e) => {
+  if (wrapperRef.value && !wrapperRef.value.contains(e.target)) {
+    isOpen.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
-<style scoped>
-.input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #6b7280;
-  border-radius: 0.5rem;
-  color: #374151;
-  transition: all 0.2s;
-}
-.input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.5);
-}
-.form-label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.375rem;
-}
-</style>
+<template>
+  <div ref="wrapperRef" class="relative w-full">
+    <!-- Multiple Mode -->
+    <div
+      v-if="isMultiple"
+      class="flex flex-wrap items-center gap-1 px-3 py-2 border rounded-md bg-white focus-within:ring-2 focus-within:ring-blue-500"
+      :class="props.class"
+      @click="() => inputRef?.focus()"
+    >
+      <!-- Tags -->
+      <div
+        v-for="item in selectedLabels"
+        :key="item.value"
+        class="itbms-filter-item bg-blue-100 text-blue-800 rounded-full px-2 py-1 text-sm flex items-center gap-1"
+      >
+        {{ item.label }}
+        <button
+          type="button"
+          class="itbms-filter-item-clear"
+          @click.stop="removeOption(item.value)"
+        >
+          ×
+        </button>
+      </div>
+
+      <!-- Input -->
+      <input
+        ref="inputRef"
+        type="text"
+        v-model="search"
+        :placeholder="selectedLabels.length === 0 ? placeholder : ''"
+        class="flex-1 border-none focus:ring-0 focus:outline-none min-w-[50px]"
+        @focus="handleFocus"
+        :disabled="disabled"
+      />
+    </div>
+
+    <!-- Single Mode -->
+    <div
+      v-else
+      class="px-3 py-2 border rounded-md bg-white focus-within:ring-2 focus-within:ring-blue-500"
+    >
+      <select
+        v-model="selectedValue"
+        :disabled="disabled"
+        :class="['w-full bg-white outline-none', props.class]"
+      >
+        <option disabled value="">{{ placeholder || 'Select an option' }}</option>
+        <option v-for="option in props.options" :key="option.value" :value="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Dropdown (multiple only) -->
+    <ul
+      v-if="isMultiple && isOpen && filteredOptions.length"
+      class="absolute z-10 w-full bg-white border mt-1 rounded-md shadow-lg max-h-60 overflow-y-auto"
+    >
+      <li
+        v-for="option in filteredOptions"
+        :key="option.value"
+        class="itbms-filter-item px-4 py-2 hover:bg-blue-100 cursor-pointer"
+        @mousedown.prevent="addOption(option.value)"
+      >
+        {{ option.label }}
+      </li>
+    </ul>
+  </div>
+</template>

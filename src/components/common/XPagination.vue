@@ -138,7 +138,7 @@ function handlePageSizeChange() {
         @change="handlePageSizeChange"
         class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
       >
-        <option v-for="size in pageSizeOptions" :key="size" :value="size">
+        <option class="itbms-page-size" v-for="size in pageSizeOptions" :key="size" :value="size">
           {{ size }}
         </option>
       </select>

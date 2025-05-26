@@ -1,4 +1,4 @@
-describe(`TC-FE-PBI8-DELETE-BRAND-4\n
+describe(`TC-FE-PBI8-DELETE-BRAND-4\n 
     Test Scenario : fail - the brand does not exist, \n
                     eg. The brand id does not exist or \n
                     the brand already been deleted by another user.`, () => {
@@ -28,13 +28,13 @@ describe(`TC-FE-PBI8-DELETE-BRAND-4\n
 
         cy.get('@row').find('.itbms-edit-button')
         cy.get('@row').find('.itbms-delete-button').as('delete')
-        cy.get('@delete').click()
+        cy.get('@delete').click() 
         cy.wait(100)
 
-        cy.get('.itbms-message').should('exist')
+        cy.get('.itbms-message').should('exist') 
         cy.get('.itbms-message').should('contain.text', 'Do you want to delete this sale item?') ;
         cy.get('.itbms-cancel-button').should('exist') ;
-        cy.get('.itbms-confirm-button').should('exist') ;
+        cy.get('.itbms-confirm-button').should('exist') ; 
 
         cy.get('.itbms-confirm-button').click() ;
 
@@ -60,12 +60,12 @@ describe(`TC-FE-PBI8-DELETE-BRAND-4\n
         should delete the "Meizu" brand and should have statusCode 204.
         should show a message "The requested sale item does not exist."`,()=>{
 
-        cy.get('.itbms-manage-brand').should('exist').as('manageBrand');
+        cy.get('.itbms-manage-brand').should('exist').as('manageBrand'); 
         cy.get('@manageBrand').click();
         cy.wait(100)
 
 
-        cy.get('.itbms-name').contains('Meizu').should('exist').as('brand')
+        cy.get('.itbms-name').contains('Meizu').should('exist').as('brand') 
         cy.get('@brand').parents('.itbms-row').as('row')
         cy.get('@row').find('.itbms-edit-button').as('edit')
         cy.get('@row').find('.itbms-delete-button').as('delete')
@@ -77,7 +77,7 @@ describe(`TC-FE-PBI8-DELETE-BRAND-4\n
             })
         })
 
-        cy.get('.itbms-name').contains('Meizu').should('exist').as('brand')
+        cy.get('.itbms-name').contains('Meizu').should('exist').as('brand') 
         cy.get('@brand').parents('.itbms-row').as('row')
         cy.get('@row').find('.itbms-edit-button').as('edit')
         cy.get('@row').find('.itbms-delete-button').as('delete')
@@ -85,20 +85,20 @@ describe(`TC-FE-PBI8-DELETE-BRAND-4\n
         cy.get('@delete').click()
         cy.wait(100)
 
-        // cy.intercept('DELETE', `${baseAPI}/v1/**`).as('deleteRequest') ;
+        cy.intercept('DELETE', `${baseAPI}/v1/**`).as('deleteRequest') ;
 
-        cy.get('.itbms-message').should('exist')
+        cy.get('.itbms-message').should('exist') 
         cy.get('.itbms-message').should('contain.text', 'Do you want to delete Meizu brand?') ;
         cy.get('.itbms-cancel-button').should('exist') ;
-        cy.get('.itbms-confirm-button').should('exist') ;
+        cy.get('.itbms-confirm-button').should('exist') ; 
 
         cy.get('.itbms-confirm-button').click() ;
         cy.wait(100)
 
-        // cy.wait('@deleteRequest').then((interception)=>{
-        //     const response = interception.response
-        //     expect(response.statusCode).to.equal(404)
-        // })
+        cy.wait('@deleteRequest').then((interception)=>{
+            const response = interception.response
+            expect(response.statusCode).to.equal(404)
+        })
         cy.wait(100)
 
         cy.url().should('include', '/brands')
@@ -107,7 +107,7 @@ describe(`TC-FE-PBI8-DELETE-BRAND-4\n
     })
 
     it('should not have "Meizu" brand in the brand list page', () => {
-        cy.get('.itbms-manage-brand').should('exist').as('manageBrand');
+        cy.get('.itbms-manage-brand').should('exist').as('manageBrand'); 
         cy.get('@manageBrand').click();
         cy.wait(100)
 
