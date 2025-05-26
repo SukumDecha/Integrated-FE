@@ -1,4 +1,4 @@
-describe(`TC-FE-PBI-PRE6-VIEW-SALE-ITEM-LIST-1\n
+describe(`TC-FE-PBI-PRE6-VIEW-SALE-ITEM-LIST-1\n 
     Test Scenario : normal - sale item table is empty`, () => {
 
     let resource = '/sale-items/list'
