@@ -19,10 +19,14 @@ defineProps({
     default: 'chevron',
   },
 })
+
 </script>
 
 <template>
-  <nav aria-label="Breadcrumb" class="w-full">
+  <nav
+    aria-label="Breadcrumb"
+    class="w-full"
+  >
     <ol class="flex flex-wrap items-center text-base md:text-lg">
       <li
         v-for="(item, index) in items"
@@ -33,18 +37,16 @@ defineProps({
           'text-gray-700 font-medium': index === items.length - 1,
         }"
       >
-        <!-- Home icon for first item (optional) -->
         <component
-          v-if="index === 0 && showHomeIcon"
           :is="HomeIcon"
+          v-if="index === 0 && showHomeIcon"
           class="h-4 w-4 mr-1"
           :class="{ 'text-emerald-600': !item.active }"
         />
 
-        <!-- Item with link -->
         <router-link
           v-if="!item.active && item.path"
-          :to="index === 0 ? '/sale-items' : item.path"
+          :to="index === 0 ? '/' : item.path"
           :class="[
             'hover:text-emerald-600 transition-colors',
             index === 0 ? 'itbms-home-button' : '',
@@ -54,7 +56,6 @@ defineProps({
           {{ item.text }}
         </router-link>
 
-        <!-- Item without link -->
         <a
           v-else-if="!item.active && item.href"
           :href="item.href"
@@ -64,12 +65,17 @@ defineProps({
           {{ item.text }}
         </a>
 
-        <!-- Current/active item -->
         <span v-else>{{ item.text }}</span>
 
-        <!-- Separator -->
-        <span v-if="index < items.length - 1" class="mx-2 text-gray-400" aria-hidden="true">
-          <component :is="separator === 'chevron' ? ChevronRightIcon : separator" class="h-4 w-4" />
+        <span
+          v-if="index < items.length - 1"
+          class="mx-2 text-gray-400"
+          aria-hidden="true"
+        >
+          <component
+            :is="separator === 'chevron' ? ChevronRightIcon : separator"
+            class="h-4 w-4"
+          />
         </span>
       </li>
     </ol>

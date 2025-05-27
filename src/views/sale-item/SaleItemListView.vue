@@ -1,8 +1,6 @@
 <script setup>
 import { ref, onMounted, watchEffect, computed, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import XNavbar from '@/components/layout/XNavbar.vue'
-import XLayout from '@/components/layout/XLayout.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import XButton from '@/components/common/XButton.vue'
 import XTable from '@/components/common/XTable.vue'
@@ -10,6 +8,8 @@ import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { SaleItemService } from '@/services'
 import { formatPrice, displayOrDash } from '@/utils/TextUtils'
 import { useToastStore } from '@/stores/toast.store'
+import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils'
+import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item'
 
 const router = useRouter()
 const route = useRoute()
@@ -38,7 +38,7 @@ const columns = [
 
 const pagination = reactive({
   currentPage: 1,
-  pageSize: 5,
+  pageSize: 100,
   total: 0,
 })
 
@@ -146,6 +146,13 @@ async function confirmDeleteItem() {
 
   itemToDelete.value = null
   showConfirm.value = false
+
+  const paginationState = loadFromLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION)
+
+  saveToLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION, {
+    ...paginationState,
+    currentPage: 1,
+  })
 }
 
 function onAdd() {
@@ -157,88 +164,82 @@ function onManage() {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
-    <XNavbar />
+  <XBreadcrumb :items="breadcrumbs" />
 
-    <XLayout class="flex-grow space-y-6">
-      <XBreadcrumb :items="breadcrumbs" />
-
-      <div class="flex justify-between items-center mb-4">
-        <XButton
-          label="Add Sale Item"
-          variant="primary"
-          size="md"
-          className="itbms-sale-item-add"
-          @click="onAdd"
-        />
-        <XButton
-          label="Manage Brand"
-          variant="outline"
-          size="md"
-          className="itbms-manage-brand"
-          @click="onManage"
-        />
-      </div>
-
-      <div class="p-6">
-        <h1 class="text-2xl font-bold mb-4">Sale Item Table</h1>
-
-        <XTable
-          :columns="columns"
-          :data="saleItems"
-          :pagination="pagination"
-          :pageSizeOptions="[5, 10, 25, 50]"
-          @change="onPaginate"
-          emptyText="No sale item"
-        >
-          <!-- Format ราคาด้วย comma -->
-          <template #itbms-price="{ record }">
-            {{ formatPrice(record.price) }}
-          </template>
-
-          <!-- Show RAM หรือ '-' -->
-          <template #itbms-ramGb="{ record }">
-            {{ displayOrDash(record.ramGb) }}
-          </template>
-
-          <!-- Show Storage หรือ '-' -->
-          <template #itbms-storageGb="{ record }">
-            {{ displayOrDash(record.storageGb) }}
-          </template>
-
-          <!-- Show สี หรือ '-' -->
-          <template #itbms-color="{ record }">
-            {{ displayOrDash(record.color) }}
-          </template>
-
-          <!-- ปุ่ม Edit/Delete -->
-          <template #actions="{ record }">
-            <div class="flex space-x-2">
-              <XButton
-                size="sm"
-                variant="outline"
-                className="itbms-edit-button"
-                label="Edit"
-                @click="editSaleItem(record.id)"
-              />
-              <XButton
-                size="sm"
-                variant="danger"
-                className="itbms-delete-button"
-                label="Delete"
-                @click="askDeleteItem(record)"
-              />
-            </div>
-          </template>
-        </XTable>
-      </div>
-    </XLayout>
-
-    <XConfirmModal
-      v-model="showConfirm"
-      title="Delete Sale Item"
-      message="`Do you want to delete this sale item?`"
-      @confirm="confirmDeleteItem"
+  <div class="flex justify-between items-center mb-4">
+    <XButton
+      label="Add Sale Item"
+      variant="primary"
+      size="md"
+      class-name="itbms-sale-item-add"
+      @click="onAdd"
+    />
+    <XButton
+      label="Manage Brand"
+      variant="outline"
+      size="md"
+      class-name="itbms-manage-brand"
+      @click="onManage"
     />
   </div>
+
+  <div class="p-6">
+    <h1 class="text-2xl font-bold mb-4">
+      Sale Item Table
+    </h1>
+
+    <XTable
+      :columns="columns"
+      :data="saleItems"
+      empty-text="No sale item"
+      @change="onPaginate"
+    >
+      <!-- Format ราคาด้วย comma -->
+      <template #itbms-price="{ record }">
+        {{ formatPrice(record.price) }}
+      </template>
+
+      <!-- Show RAM หรือ '-' -->
+      <template #itbms-ramGb="{ record }">
+        {{ displayOrDash(record.ramGb) }}
+      </template>
+
+      <!-- Show Storage หรือ '-' -->
+      <template #itbms-storageGb="{ record }">
+        {{ displayOrDash(record.storageGb) }}
+      </template>
+
+      <!-- Show สี หรือ '-' -->
+      <template #itbms-color="{ record }">
+        {{ displayOrDash(record.color) }}
+      </template>
+
+      <!-- ปุ่ม Edit/Delete -->
+      <template #actions="{ record }">
+        <div class="flex space-x-2">
+          <XButton
+            size="sm"
+            variant="outline"
+            class-name="itbms-edit-button"
+            label="Edit"
+            @click="editSaleItem(record.id)"
+          />
+          <XButton
+            size="sm"
+            variant="danger"
+            class-name="itbms-delete-button"
+            label="Delete"
+            @click="askDeleteItem(record)"
+          />
+        </div>
+      </template>
+    </XTable>
+  </div>
+
+  <XConfirmModal
+    v-model="showConfirm"
+    title="Delete Sale Item"
+    message="`Do you want to delete this sale item?`"
+    @confirm="confirmDeleteItem"
+  />
 </template>

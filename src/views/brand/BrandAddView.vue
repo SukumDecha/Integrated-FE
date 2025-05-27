@@ -1,25 +1,19 @@
 <template>
-  <div class="min-h-screen flex flex-col">
-    <XNavbar />
-    <XLayout class="space-y-6">
-      <XBreadcrumb :items="breadcrumbs" />
+  <XBreadcrumb :items="breadcrumbs" />
 
-      <BrandForm
-        :isEditMode="false"
-        :onSubmit="handleSubmit"
-        :onCancel="handleCancel"
-      />
-    </XLayout>
-  </div>
+  <BrandForm
+    :is-edit-mode="false"
+    :on-submit="handleSubmit"
+    :on-cancel="handleCancel"
+  />
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router'
+
 import { BrandService } from '@/services'
 import { useToastStore } from '@/stores/toast.store'
 import BrandForm from '@/components/brand/BrandForm.vue'
-import XLayout from '@/components/layout/XLayout.vue'
-import XNavbar from '@/components/layout/XNavbar.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 
 const router = useRouter()

@@ -99,7 +99,10 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="wrapperRef" class="relative w-full">
+  <div
+    ref="wrapperRef"
+    class="relative w-full"
+  >
     <!-- Multiple Mode -->
     <div
       v-if="isMultiple"
@@ -126,13 +129,13 @@ onBeforeUnmount(() => {
       <!-- Input -->
       <input
         ref="inputRef"
-        type="text"
         v-model="search"
+        type="text"
         :placeholder="selectedLabels.length === 0 ? placeholder : ''"
         class="flex-1 border-none focus:ring-0 focus:outline-none min-w-[50px]"
-        @focus="handleFocus"
         :disabled="disabled"
-      />
+        @focus="handleFocus"
+      >
     </div>
 
     <!-- Single Mode -->
@@ -145,8 +148,17 @@ onBeforeUnmount(() => {
         :disabled="disabled"
         :class="['w-full bg-white outline-none', props.class]"
       >
-        <option disabled value="">{{ placeholder || 'Select an option' }}</option>
-        <option v-for="option in props.options" :key="option.value" :value="option.value">
+        <option
+          disabled
+          value=""
+        >
+          {{ placeholder || 'Select an option' }}
+        </option>
+        <option
+          v-for="option in props.options"
+          :key="option.value"
+          :value="option.value"
+        >
           {{ option.label }}
         </option>
       </select>

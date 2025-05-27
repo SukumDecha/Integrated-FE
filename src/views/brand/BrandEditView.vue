@@ -3,7 +3,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { BrandService } from '@/services'
 import { useToastStore } from '@/stores/toast.store'
 import BrandForm from '@/components/brand/BrandForm.vue'
-import XLayout from '@/components/layout/XLayout.vue'
+import XLayout from '@/components/layout/DefaultLayout.vue'
 import XNavbar from '@/components/layout/XNavbar.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import { onMounted, ref } from 'vue'
@@ -69,16 +69,12 @@ onMounted(fetchBrand)
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
-    <XNavbar />
-    <XLayout class="space-y-6">
-      <XBreadcrumb :items="breadcrumbs" />
-      <BrandForm
-        :initialData="brand"
-        :isEditMode="true"
-        :onSubmit="handleSubmit"
-        :onCancel="handleCancel"
-      />
-    </XLayout>
-  </div>
+  <XBreadcrumb :items="breadcrumbs" />
+
+  <BrandForm
+    :initial-data="brand"
+    :is-edit-mode="true"
+    :on-submit="handleSubmit"
+    :on-cancel="handleCancel"
+  />
 </template>
