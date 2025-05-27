@@ -10,6 +10,8 @@ import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { SaleItemService } from '@/services'
 import { formatPrice, displayOrDash } from '@/utils/TextUtils'
 import { useToastStore } from '@/stores/toast.store'
+import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils'
+import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item'
 
 const router = useRouter()
 const route = useRoute()
@@ -38,7 +40,7 @@ const columns = [
 
 const pagination = reactive({
   currentPage: 1,
-  pageSize: 5,
+  pageSize: 100,
   total: 0,
 })
 
@@ -146,6 +148,13 @@ async function confirmDeleteItem() {
 
   itemToDelete.value = null
   showConfirm.value = false
+
+  const paginationState = loadFromLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION)
+
+  saveToLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION, {
+    ...paginationState,
+    currentPage: 1,
+  })
 }
 
 function onAdd() {
@@ -186,8 +195,6 @@ function onManage() {
         <XTable
           :columns="columns"
           :data="saleItems"
-          :pagination="pagination"
-          :pageSizeOptions="[5, 10, 25, 50]"
           @change="onPaginate"
           emptyText="No sale item"
         >

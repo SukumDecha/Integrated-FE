@@ -40,6 +40,9 @@ watch(
     if (newVal !== currentPage.value) {
       currentPage.value = newVal;
     }
+  },
+  {
+    immediate: true
   }
 );
 
@@ -50,6 +53,9 @@ watch(
     if (newVal !== currentPageSize.value) {
       currentPageSize.value = newVal;
     }
+  },
+    {
+    immediate: true
   }
 );
 
@@ -136,9 +142,9 @@ function handlePageSizeChange() {
       <select
         v-model="currentPageSize"
         @change="handlePageSizeChange"
-        class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 itbms-page-size"
       >
-        <option class="itbms-page-size" v-for="size in pageSizeOptions" :key="size" :value="size">
+        <option v-for="size in pageSizeOptions" :key="size" :value="size">
           {{ size }}
         </option>
       </select>
@@ -174,9 +180,8 @@ function handlePageSizeChange() {
 
           <!-- Page Numbers -->
           <template v-for="(page, index) in visiblePages" :key="page">
-            <span v-if="page === '...'" class="px-2 text-gray-400 flex-shrink-0">...</span>
+            <!-- <span v-if="page === '...'" class="px-2 text-gray-400 flex-shrink-0">...</span> -->
             <XButton
-              v-else
               :class="[
                 'flex-shrink-0',
                 `itbms-page-${index}`,
