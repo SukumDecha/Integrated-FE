@@ -21,8 +21,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
           <!-- Left: Image Gallery -->
           <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
-            <div
-              class="aspect-square bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center"
+            <div class="aspect-square bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center"
             >
               <img
                 :src="imageUrl"
@@ -160,7 +159,7 @@ import { formatPrice } from '@/utils/TextUtils'
 
 import SaleItemForm from './SaleItemForm.vue'
 import XButton from '@/components/common/XButton.vue'
-import XConfirmModal from '@/components/common/XConfirmModal.vue'
+import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { ArrowLeft } from 'lucide-vue-next'
 
 const imageUrl = new URL('/assets/sale-item/shopping.webp', import.meta.url).pathname

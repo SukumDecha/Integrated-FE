@@ -1,13 +1,10 @@
 <script setup>
 import { ref, onMounted, watchEffect } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import XNavbar from '@/components/layout/XNavbar.vue'
-import XLayout from '@/components/layout/XLayout.vue'
-import XFooter from '@/components/layout/XFooter.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import XTable from '@/components/common/XTable.vue'
 import XButton from '@/components/common/XButton.vue'
-import XConfirmModal from '@/components/common/XConfirmModal.vue'
+import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { BrandService } from '@/services'
 import { useToastStore } from '@/stores/toast.store'
 
@@ -132,54 +129,48 @@ async function confirmDeleteBrand() {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
-    <XNavbar />
-    <XLayout class="flex-grow space-y-6">
-      <XBreadcrumb :items="breadcrumbs" />
+  <XBreadcrumb :items="breadcrumbs" />
 
-      <div class="flex justify-between items-center mb-4">
-        <XButton
-          label="Add Brand"
-          variant="primary"
-          size="md"
-          class="itbms-add-button"
-          @click="goToAdd"
-        />
-      </div>
-
-      <XTable
-        :columns="columns"
-        :data="brands"
-      >
-        <template #actions="{ record }">
-          <div class="flex space-x-2">
-            <XButton
-              label="Edit"
-              variant="outline"
-              size="xs"
-              class="itbms-edit-button"
-              @click="editBrand(record.id)"
-            />
-            <XButton
-              label="Delete"
-              variant="danger"
-              size="xs"
-              class="itbms-delete-button"
-              @click="askDeleteBrand(record)"
-            />
-          </div>
-        </template>
-      </XTable>
-    </XLayout>
-    <XFooter />
-
-    <!-- Confirm Delete Modal -->
-    <XConfirmModal
-      v-model="showConfirm"
-      title="Delete Brand"
-      :message="modalMessage || `Do you want to delete ${brandToDelete?.name || ''} brand?`"
-      :show-confirm="showConfirmButton"
-      @confirm="confirmDeleteBrand"
+  <div class="flex justify-between items-center mb-4">
+    <XButton
+      label="Add Brand"
+      variant="primary"
+      size="md"
+      class="itbms-add-button"
+      @click="goToAdd"
     />
   </div>
+
+  <XTable
+    :columns="columns"
+    :data="brands"
+  >
+    <template #actions="{ record }">
+      <div class="flex space-x-2">
+        <XButton
+          label="Edit"
+          variant="outline"
+          size="xs"
+          class="itbms-edit-button"
+          @click="editBrand(record.id)"
+        />
+        <XButton
+          label="Delete"
+          variant="danger"
+          size="xs"
+          class="itbms-delete-button"
+          @click="askDeleteBrand(record)"
+        />
+      </div>
+    </template>
+  </XTable>
+
+  <!-- Confirm Delete Modal -->
+  <XConfirmModal
+    v-model="showConfirm"
+    title="Delete Brand"
+    :message="modalMessage || `Do you want to delete ${brandToDelete?.name || ''} brand?`"
+    :show-confirm="showConfirmButton"
+    @confirm="confirmDeleteBrand"
+  />
 </template>

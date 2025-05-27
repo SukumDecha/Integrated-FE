@@ -6,23 +6,41 @@
       sizeClasses,
       variantClasses,
       fullWidth ? 'w-full' : '',
-      disabled || loading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer',
+      'disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500  disabled:border-[#d9d9d9] disabled:border disabled:opacity-60',
       className,
     ]"
     :disabled="disabled || loading"
     @click="$emit('click', $event)"
   >
-    <span v-if="loading" class="mr-2">
-      <Loader2 class="animate-spin" :class="iconSizeClasses" />
+    <span
+      v-if="loading"
+      class="mr-2"
+    >
+      <Loader2
+        class="animate-spin"
+        :class="iconSizeClasses"
+      />
     </span>
-    <span v-else-if="leftIcon" class="mr-2">
-      <component :is="leftIcon" :class="iconSizeClasses" />
+    <span
+      v-else-if="leftIcon"
+      class="mr-2"
+    >
+      <component
+        :is="leftIcon"
+        :class="iconSizeClasses"
+      />
     </span>
 
     <slot>{{ label }}</slot>
 
-    <span v-if="rightIcon && !loading" class="ml-2">
-      <component :is="rightIcon" :class="iconSizeClasses" />
+    <span
+      v-if="rightIcon && !loading"
+      class="ml-2"
+    >
+      <component
+        :is="rightIcon"
+        :class="iconSizeClasses"
+      />
     </span>
   </button>
 </template>

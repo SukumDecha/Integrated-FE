@@ -3,7 +3,7 @@ import { ref, watch, computed } from 'vue'
 import { useToastStore } from '@/stores/toast.store'
 import XInput from '@/components/common/form/XInput.vue'
 import XButton from '@/components/common/XButton.vue'
-import XToggle from '@/components/common/XToggle.vue'
+import XToggle from '@/components/common/form/XToggle.vue'
 
 const props = defineProps({
   initialData: {
@@ -27,6 +27,28 @@ const form = ref({
   countryOfOrigin: ''
 })
 
+const fieldErrors = ref({
+  name: ''
+})
+
+const touchedFields = ref({
+  name: false
+})
+
+const onBlur = (field) => {
+  touchedFields.value[field] = true
+  fieldErrors.value[field] = validateField(field, form.value[field])
+}
+
+function validateField(field, value) {
+  switch (field) {
+    case 'name':
+      return !value?.trim() ? 'Name is required' : ''
+    default:
+      return ''
+  }
+}
+
 watch(
   () => props.initialData,
   (val) => {
@@ -45,7 +67,7 @@ watch(
 const isSaving = ref(false)
 
 const isFormValid = computed(() => {
-  return form.value.name && form.value.name.trim().length > 0
+  return fieldErrors.value.name === '' && form.value.name.trim().length > 0
 })
 
 const isChanged = computed(() => {
@@ -63,20 +85,26 @@ const isChanged = computed(() => {
 })
 
 const handleSave = async () => {
+  Object.keys(touchedFields.value).forEach((k) => {
+    touchedFields.value[k] = true
+    fieldErrors.value[k] = validateField(k, form.value[k])
+  })
+
   if (!isFormValid.value) {
-    toast.add({ message: 'Name is required', type: 'error' })
+    toast.add({ message: 'Please fix the errors in the form.', type: 'error' })
     return
   }
 
   const payload = {
-    name: form.value.name,
-    websiteUrl: form.value.websiteUrl,
+    name: form.value.name.trim(),
+    websiteUrl: form.value.websiteUrl.trim(),
     isActive: form.value.isActive,
-    countryOfOrigin: form.value.countryOfOrigin,
+    countryOfOrigin: form.value.countryOfOrigin.trim(),
   }
 
   isSaving.value = true
   await props.onSubmit(payload)
+  isSaving.value = false
 }
 </script>
 
@@ -88,6 +116,8 @@ const handleSave = async () => {
       label="Name"
       required
       placeholder="Enter brand name"
+      :error-message="touchedFields.name ? fieldErrors.name : ''"
+      @blur="onBlur('name')"
     />
     <XInput
       v-model="form.websiteUrl"
@@ -117,6 +147,7 @@ const handleSave = async () => {
         label="Cancel"
         class="itbms-cancel-button"
         variant="secondary"
+        :loading="isSaving"
         @click="props.onCancel"
       />
     </div>

@@ -4,6 +4,7 @@
       v-model="form.brandId"
       class="itbms-brand"
       label="Brand"
+      mode="single"
       :required="true"
       :options="brands.map((b) => ({ value: b.id, label: b.name }))"
       placeholder="Select a brand"
@@ -15,15 +16,19 @@
       label="Model"
       placeholder="e.g. iPhone 14 Pro"
       :required="true"
+      :error-message="fieldErrors.model"
+      @blur="onBlur('model')"
     />
 
     <XInput
       v-model="form.price"
       class="itbms-price"
-      label="Price (฿)"
+      label="Price"
       type="number"
       placeholder="e.g. 42900"
       :required="true"
+      :error-message="fieldErrors.price"
+      @blur="onBlur('price')"
     />
 
     <XInput
@@ -33,6 +38,8 @@
       :required="true"
       type="number"
       placeholder="e.g. 10"
+      :error-message="fieldErrors.quantity"
+      @blur="onBlur('quantity')"
     />
 
     <XInput
@@ -41,6 +48,8 @@
       label="RAM (GB)"
       type="number"
       placeholder="e.g. 8"
+      :error-message="fieldErrors.ramGb"
+      @blur="onBlur('ramGb')"
     />
 
     <XInput
@@ -50,6 +59,8 @@
       type="number"
       :step="0.1"
       placeholder="e.g. 6.7"
+      :error-message="fieldErrors.screenSizeInch"
+      @blur="onBlur('screenSizeInch')"
     />
 
     <XInput
@@ -58,6 +69,8 @@
       label="Storage (GB)"
       type="number"
       placeholder="e.g. 128"
+      :error-message="fieldErrors.storageGb"
+      @blur="onBlur('storageGb')"
     />
 
     <XInput
@@ -74,22 +87,25 @@
       type="textarea"
       placeholder="Short description"
       :required="true"
+      :error-message="fieldErrors.description"
+      @blur="onBlur('description')"
     />
 
     <div class="flex gap-4 justify-end mt-8">
       <XButton
         type="submit"
         class="itbms-save-button"
+        :loading="isSaving"
         :disabled="!isFormValid || !isChanged"
       >
         Save
-    </XButton>
-
+      </XButton>
 
       <XButton
         variant="danger"
         class="itbms-cancel-button"
-        @click="emit('cancel')">
+        @click="emit('cancel')"
+      >
         Cancel
       </XButton>
     </div>
@@ -97,7 +113,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useToastStore } from '@/stores/toast.store'
 import { BrandService } from '@/services'
 import XInput from '@/components/common/form/XInput.vue'
@@ -125,6 +141,51 @@ const form = ref({
   quantity: null,
 })
 
+const fieldErrors = ref({
+  model: '', price: '', quantity: '', description: '',
+  ramGb: '', screenSizeInch: '', storageGb: ''
+})
+
+const touchedFields = ref({
+  model: false, price: false, quantity: false, description: false,
+  ramGb: false, screenSizeInch: false, storageGb: false
+})
+
+function onBlur(field) {
+  touchedFields.value[field] = true
+  validateField(field)
+}
+
+function validateField(field) {
+  const val = form.value[field]
+  switch (field) {
+    case 'model':
+      fieldErrors.value.model = !val?.trim()
+        ? 'Model is required'
+        : val.length > 60 ? 'Model must be at most 60 characters' : ''
+      break
+    case 'price':
+      fieldErrors.value.price = val == null || val < 0 ? 'Price must be 0 or more' : ''
+      break
+    case 'quantity':
+      fieldErrors.value.quantity = val == null || val < 1 ? 'Quantity must be at least 1' : ''
+      break
+    case 'description':
+      fieldErrors.value.description = !val?.trim() ? 'Description is required' : ''
+      break
+    case 'ramGb':
+      fieldErrors.value.ramGb = val != null && val < 1 ? 'RAM must be at least 1' : ''
+      break
+    case 'screenSizeInch':
+      fieldErrors.value.screenSizeInch = val != null && (val < 0 || val > 99.99)
+        ? 'Screen size must be between 0 and 99.99' : ''
+      break
+    case 'storageGb':
+      fieldErrors.value.storageGb = val != null && val < 1 ? 'Storage must be at least 1' : ''
+      break
+  }
+}
+
 const brands = ref([])
 const isSaving = ref(false)
 
@@ -139,69 +200,23 @@ const fetchBrands = async () => {
 
 onMounted(fetchBrands)
 
-watch(
-  () => [props.initialData, brands.value],
-  ([val, loadedBrands]) => {
-    if (val && loadedBrands.length > 0) {
-      form.value = {
-        brandId: findBrandIdByName(val.brandName),
-        model: val.model ?? '',
-        price: val.price ?? null,
-        description: val.description ?? '',
-        ramGb: val.ramGb ?? null,
-        screenSizeInch: val.screenSizeInch ?? null,
-        storageGb: val.storageGb ?? null,
-        color: val.color ?? '',
-        quantity: val.quantity ?? null,
-      }
-    }
-  },
-  { immediate: true },
-)
-
 const findBrandIdByName = (name) => {
   const found = brands.value.find((b) => b.name === name)
   return found?.id ?? ''
 }
 
 const isFormValid = computed(() => {
-  const result = validate()
-  console.log('🔍 validate result:', result)
-  return validate().length === 0
+  return Object.values(fieldErrors.value).every(msg => msg === '') && form.value.brandId !== ''
 })
 
-const validate = () => {
-  const errors = []
-
-  // Required fields
-  if (!form.value.brandId) errors.push('Brand is required')
-  if (!form.value.model?.trim()) {
-    errors.push('Model is required')
-  } else if (form.value.model.trim().length > 60) {
-    errors.push('Model must be at most 60 characters')
-  }
-  if (form.value.price == null || form.value.price < 0) errors.push('Price must be 0 or more')
-  if (!form.value.description?.trim()) errors.push('Description is required')
-
-  if (
-    form.value.screenSizeInch != null &&
-    (form.value.screenSizeInch < 0 || form.value.screenSizeInch > 99.99)
-  )
-    errors.push('Screen size must be 0 - 99.99', form.value.screenSizeInch)
-  if (form.value.ramGb !== null && form.value.ramGb !== '' && form.value.ramGb < 1)
-    errors.push('RAM must be at least 1', form.value.ramGb)
-
-  if (form.value.storageGb !== null && form.value.storageGb !== '' && form.value.storageGb < 1)
-    errors.push('Storage must be at least 1', form.value.storageGb)
-
-  return errors
-}
-
 const handleSave = async () => {
-  const validationErrors = validate()
-  if (validationErrors.length > 0) {
-    console.log('🔥 Showing toast:', validationErrors[0])
-    toast.add({ message: `⚠️ ${validationErrors[0]}`, type: 'error' })
+  Object.keys(touchedFields.value).forEach((f) => {
+    touchedFields.value[f] = true
+    validateField(f)
+  })
+
+  if (!isFormValid.value) {
+    toast.add({ message: 'Please fix the errors in the form.', type: 'error' })
     return
   }
 
@@ -229,11 +244,9 @@ const handleSave = async () => {
 }
 
 const isChanged = computed(() => {
-  if (!props.isEditMode || !props.initialData) return true // always enabled in Add
-
+  if (!props.isEditMode || !props.initialData) return true
   const current = form.value
   const initial = props.initialData
-
   return (
     findBrandIdByName(initial.brandName) !== current.brandId ||
     initial.model !== current.model ||
@@ -251,10 +264,9 @@ const isChanged = computed(() => {
 <style scoped>
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 2fr)); /* ปรับให้แต่ละคอลัมน์มีขนาดขั้นต่ำ และขยายได้ */
-  gap: 10px; /* เพิ่มระยะห่างระหว่างช่อง */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 2fr));
+  gap: 10px;
   max-width: none;
   margin: 0 auto;
 }
 </style>
-

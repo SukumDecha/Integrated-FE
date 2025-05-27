@@ -18,9 +18,9 @@
       </thead>
 
       <!-- ✅ ถ้ามีข้อมูล -->
-      <tbody v-if="paginatedData.length > 0" class="divide-y divide-gray-200">
+      <tbody v-if="data.length > 0" class="divide-y divide-gray-200">
         <tr
-          v-for="(row, rowIndex) in paginatedData"
+          v-for="(row, rowIndex) in data"
           :key="row.id || rowIndex"
           class="itbms-row hover:bg-gray-50"
         >
@@ -39,7 +39,6 @@
               :name="col.key"
               :record="row"
               :index="rowIndex"
-              :style="getWidthStyle(col.width)"
             />
             <span v-else>
               {{ row[col.dataIndex] }}
@@ -58,68 +57,60 @@
         </tr>
       </tbody>
     </table>
-
-    <!-- ✅ Pagination -->
-    <div v-if="pagination" class="flex justify-end items-center gap-2 mt-4">
-      <button
-        class="px-3 py-1 rounded bg-gray-200 text-sm"
-        :disabled="currentPage === 1"
-        @click="changePage(currentPage - 1)"
-      >
-        Previous
-      </button>
-      <span class="text-sm">Page {{ currentPage }} of {{ totalPages }}</span>
-      <button
-        class="px-3 py-1 rounded bg-gray-200 text-sm"
-        :disabled="currentPage === totalPages"
-        @click="changePage(currentPage + 1)"
-      >
-        Next
-      </button>
-    </div>
   </div>
+
+   <!-- ✅ Pagination with Size Changer -->
+  <XPagination
+    v-if="pagination"
+    :pagination="pagination"
+    :data="data"
+    :page-size-options="pageSizeOptions"
+    :show-size-changer="showSizeChanger"
+    @change="handlePaginationChange"
+  />
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import XPagination from './XPagination.vue';
 
 const props = defineProps({
   columns: { type: Array, required: true },
   data: { type: Array, required: true },
   pagination: {
     type: Object,
-    default: null // Optional pagination
+    default: null
   },
   emptyText: {
     type: String,
     default: 'No data'
+  },
+  pageSizeOptions: {
+    type: Array,
+    default: () => [10, 20, 50, 100]
+  },
+  showSizeChanger: {
+    type: Boolean,
+    default: true
+  },
+  maxVisiblePages: {
+    type: Number,
+    default: 10
   }
 });
 
-const emit = defineEmits(['update:pagination']);
+const emit = defineEmits(['change']);
 
-const currentPage = ref(props.pagination?.currentPage || 1);
-const pageSize = computed(() => props.pagination?.pageSize || props.data.length);
-
-const totalPages = computed(() => {
-  const total = props.pagination?.total || props.data.length;
-  return Math.ceil(total / pageSize.value);
-});
-
-const paginatedData = computed(() => {
-  if (!props.pagination) return props.data;
-
-  const start = (currentPage.value - 1) * pageSize.value;
-  const end = start + pageSize.value;
-  return props.data.slice(start, end);
-});
-
-function changePage(page) {
-  currentPage.value = page;
-  emit('update:pagination', {
+function handlePaginationChange({
+  currentPage,
+  pageSize
+}) {
+  const newPagination = {
     ...props.pagination,
-    currentPage: page
-  });
+    currentPage,
+    pageSize
+  };
+
+  emit('change', newPagination);
 }
 
 function getAlignmentClass(align) {
@@ -138,10 +129,4 @@ function getWidthStyle(width) {
   return width ? { width } : {};
 }
 
-watch(
-  () => props.pagination?.currentPage,
-  (val) => {
-    if (val) currentPage.value = val;
-  }
-);
 </script>

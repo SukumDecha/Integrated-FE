@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import XButton from './XButton.vue'
+import XButton from '../XButton.vue'
 
 defineProps({
   modelValue: Boolean,
