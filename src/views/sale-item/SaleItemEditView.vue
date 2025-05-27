@@ -4,8 +4,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useToastStore } from '@/stores/toast.store'
 import { SaleItemService } from '@/services'
 import SaleItemDetail from '@/components/sale-item/SaleItemDetail.vue'
-import XLayout from '@/components/layout/XLayout.vue'
-import XNavbar from '@/components/layout/XNavbar.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 
 const route = useRoute()
@@ -46,18 +44,13 @@ onMounted(fetchItem)
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
-    <XNavbar />
-    <XLayout class="space-y-6">
-      <XBreadcrumb :items="breadcrumbs" />
+  <XBreadcrumb :items="breadcrumbs" />
 
-      <SaleItemDetail
-        v-if="saleItem"
-        :product="saleItem"
-        mode="edit"
-        :onSubmit="handleUpdate"
-        @cancel="$router.back()"
-      />
-    </XLayout>
-  </div>
+  <SaleItemDetail
+    v-if="saleItem"
+    :product="saleItem"
+    mode="edit"
+    :on-submit="handleUpdate"
+    @cancel="$router.back()"
+  />
 </template>

@@ -3,8 +3,6 @@ import { useRouter } from 'vue-router'
 import { SaleItemService } from '@/services'
 import { useToastStore } from '@/stores/toast.store'
 import SaleItemDetail from '@/components/sale-item/SaleItemDetail.vue'
-import XLayout from '@/components/layout/XLayout.vue'
-import XNavbar from '@/components/layout/XNavbar.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils'
 import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item'
@@ -37,17 +35,12 @@ const handleSubmit = async (data) => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
-    <XNavbar />
-    <XLayout class="space-y-6">
-      <XBreadcrumb :items="breadcrumbs" />
+  <XBreadcrumb :items="breadcrumbs" />
 
-      <SaleItemDetail
-        :product="{}"
-        mode="add"
-        :onSubmit="handleSubmit"
-        @cancel="$router.push('/sale-items')"
-      />
-    </XLayout>
-  </div>
+  <SaleItemDetail
+    :product="{}"
+    mode="add"
+    :on-submit="handleSubmit"
+    @cancel="$router.push('/sale-items')"
+  />
 </template>

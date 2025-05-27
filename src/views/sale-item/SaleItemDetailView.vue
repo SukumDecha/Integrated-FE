@@ -4,8 +4,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { SaleItemService } from '@/services'
 import { useToastStore } from '@/stores/toast.store'
 import SaleItemDetail from '@/components/sale-item/SaleItemDetail.vue'
-import XNavbar from '@/components/layout/XNavbar.vue'
-import XLayout from '@/components/layout/XLayout.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 
 const route = useRoute()
@@ -40,19 +38,24 @@ onMounted(fetchProduct)
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
-    <XNavbar />
+  <XBreadcrumb :items="breadcrumbs" />
 
-    <XLayout class="space-y-6">
-      <XBreadcrumb :items="breadcrumbs" />
-
-      <div v-if="loading" class="text-center py-10 text-gray-500 text-lg">Loading...</div>
-      <div v-else-if="error" class="text-center text-red-500">{{ error }}</div>
-      <SaleItemDetail
-        v-else
-        :product="product"
-        mode="detail"
-      />
-    </XLayout>
+  <div
+    v-if="loading"
+    class="text-center py-10 text-gray-500 text-lg"
+  >
+    Loading...
   </div>
+  <div
+    v-else-if="error"
+    class="text-center text-red-500"
+  >
+    {{ error }}
+  </div>
+
+  <SaleItemDetail
+    v-else
+    :product="product"
+    mode="detail"
+  />
 </template>

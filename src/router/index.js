@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,46 +9,66 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+
     },
     {
-      path: '/sale-items',
-      name: 'sale-items-gallery',
-      component: () => import('../views/sale-item/SaleItemGalleryView.vue'),
-    },
-    {
-      path: '/sale-items/:id',
-      name: 'sale-item-detail',
-      component: () => import('../views/sale-item/SaleItemDetailView.vue'),
-    },
-    {
-      path: '/sale-items/add',
-      name: 'sale-item-add',
-      component: () => import('../views/sale-item/SaleItemAddView.vue'),
-    },
-    {
-      path: '/sale-items/:id/edit',
-      name: 'sale-item-edit',
-      component: () => import('../views/sale-item/SaleItemEditView.vue'),
-    },
-    {
-      path: '/sale-items/list',
-      name: 'sale-item-list',
-      component: () => import('../views/sale-item/SaleItemListView.vue'),
-    },
-    {
-      path: '/brands',
-      name: 'brand-list',
-      component: () => import('../views/brand/BrandListView.vue'),
-    },
-    {
-      path: '/brands/:id/edit',
-      name: 'brand-edit',
-      component: () => import('../views/brand/BrandEditView.vue'),
-    },
-     {
-      path: '/brands/add',
-      name: 'brand-add',
-      component: () => import('../views/brand/BrandAddView.vue'),
+      path: '/',
+      component: DefaultLayout,
+      children: [
+        {
+          path: 'sale-items',
+          children: [
+            {
+              path: '',
+              name: 'sale-items-gallery',
+              component: () => import('../views/sale-item/SaleItemGalleryView.vue'),
+            },
+            {
+              path: ':id',
+              name: 'sale-item-detail',
+              component: () => import('../views/sale-item/SaleItemDetailView.vue'),
+              props: true,
+            },
+            {
+              path: 'add',
+              name: 'sale-item-add',
+              component: () => import('../views/sale-item/SaleItemAddView.vue'),
+            },
+            {
+              path: ':id/edit',
+              name: 'sale-item-edit',
+              component: () => import('../views/sale-item/SaleItemEditView.vue'),
+              props: true,
+            },
+            {
+              path: 'list',
+              name: 'sale-item-list',
+              component: () => import('../views/sale-item/SaleItemListView.vue'),
+            },
+          ],
+        },
+        {
+          path: 'brands',
+          children: [
+            {
+              path: '',
+              name: 'brand-list',
+              component: () => import('../views/brand/BrandListView.vue'),
+            },
+            {
+              path: ':id/edit',
+              name: 'brand-edit',
+              component: () => import('../views/brand/BrandEditView.vue'),
+              props: true,
+            },
+            {
+              path: 'add',
+              name: 'brand-add',
+              component: () => import('../views/brand/BrandAddView.vue'),
+            },
+          ],
+        },
+      ],
     },
   ],
 })

@@ -3,16 +3,13 @@ import { onMounted, watch, reactive, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useToastStore } from '@/stores/toast.store';
 
-import XNavbar from '@/components/layout/XNavbar.vue';
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue';
-import XFooter from '@/components/layout/XFooter.vue';
 import XButton from '@/components/common/XButton.vue';
 import XPagination from '@/components/common/XPagination.vue';
-import XToggle from '@/components/common/form/XToggle.vue';
 import XSelector from '@/components/common/form/XSelector.vue';
 import SaleItemCard from '@/components/sale-item/SaleItemCard.vue';
 
-import { PlusIcon } from 'lucide-vue-next';
+import { AlignJustify, ArrowDownWideNarrow, ArrowUpWideNarrow, PlusIcon } from 'lucide-vue-next';
 
 import { SaleItemService, BrandService } from '@/services';
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils';
@@ -229,94 +226,130 @@ watch(
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
-    <XNavbar />
+  <div class="bg-white flex-grow">
+    <div class="max-w-7xl mx-auto py-8 px-4 space-y-6">
+      <div class="flex justify-between items-center">
+        <XBreadcrumb :items="breadcrumbs" />
+        <XButton
+          class-name="itbms-sale-item-add"
+          @click="$router.push('/sale-items/add')"
+        >
+          <PlusIcon class="h-5 w-5 mr-2" /> Add Sale Item
+        </XButton>
+      </div>
 
-    <div class="bg-white flex-grow">
-      <div class="max-w-7xl mx-auto py-8 px-4 space-y-6">
-        <div class="flex justify-between items-center">
-          <XBreadcrumb :items="breadcrumbs" />
-          <XButton class-name="itbms-sale-item-add" @click="$router.push('/sale-items/add')">
-            <PlusIcon class="h-5 w-5 mr-2" /> Add Sale Item
+      <div class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-md">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-1">
+          <div class="min-w-[200px]">
+            <XSelector
+              v-model="searchOptions.filteredBrands"
+              :options="brandOptions"
+              placeholder="Select Brands"
+              mode="multiple"
+              class="itbms-brand-filter"
+              :searchable="true"
+              :clearable="true"
+              @update:model-value="handleBrandSelect"
+              @remove="handleBrandRemove"
+            />
+          </div>
+          <XButton
+            class-name="itbms-brand-filter-clear"
+            @click="clearBrandFilter"
+          >
+            Clear Brands
           </XButton>
         </div>
 
-        <div class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-md">
-          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-1">
-            <div class="min-w-[200px]">
-              <XSelector
-                v-model="searchOptions.filteredBrands"
-                :options="brandOptions"
-                placeholder="Select Brands"
-                mode="multiple"
-                class="itbms-brand-filter"
-                @update:modelValue="handleBrandSelect"
-                @remove="handleBrandRemove"
-              />
-            </div>
-            <XButton class-name="itbms-brand-filter-clear" @click="clearBrandFilter">
-              Clear Brands
-            </XButton>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <label for="activeToggle" class="text-sm text-gray-700">Active Only</label>
-            <XToggle
-              id="activeToggle"
-              v-model="searchOptions.activeOnly"
-              class="itbms-toggle-active"
-            />
-          </div>
-
-          <div class="flex items-center gap-2">
-            <XButton class-name="itbms-brand-none" @click="clearSort">No Sort</XButton>
-            <XButton class-name="itbms-brand-asc" @click="sortAscByName">Sort A-Z</XButton>
-            <XButton class-name="itbms-brand-desc" @click="sortDescByName">Sort Z-A</XButton>
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <h2 class="text-3xl font-extrabold tracking-tight text-gray-900">Featured Products</h2>
-          <p class="text-gray-500">Check out our most popular items this season.</p>
-        </div>
-
-        <div v-if="loading.items" class="text-center py-10">
-          <p class="text-lg text-gray-500">Loading sale items...</p>
-        </div>
-        <div v-else-if="error.items" class="text-center py-10 text-red-600">
-          <p class="text-lg">{{ error.items }}</p>
-        </div>
-        <div v-else-if="saleItems.length > 0" class="mt-10">
-          <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-5 xl:gap-x-8">
-            <SaleItemCard
-              v-for="product in saleItems"
-              :key="product.id"
-              :id="product.id"
-              :brand="product.brandName"
-              :model="product.model"
-              :ramGb="product.ramGb"
-              :storageGb="product.storageGb"
-              :price="product.price"
-            />
-          </div>
-
-          <XPagination
-            class="mt-8"
-            :pagination="{
-              currentPage: searchOptions.currentPage,
-              pageSize: searchOptions.pageSize,
-              total: searchOptions.totalItems,
-            }"
-            :show-size-changer="true"
-            @change="handlePaginationChange"
-          />
-        </div>
-        <div v-else class="text-center py-10">
-          <p class="text-lg text-gray-500">No sale items available matching your criteria.</p>
+        <div class="flex items-center gap-2">
+          <XButton
+            class-name="itbms-brand-none"
+            variant="info"
+            :disabled="!searchOptions.sortField && !searchOptions.sortOrder"
+            @click="clearSort"
+          >
+            <AlignJustify />
+          </XButton>
+          <XButton
+            class-name="itbms-brand-asc"
+            variant="info"
+            :disabled="searchOptions.sortField === 'brand.name' && searchOptions.sortOrder === 'asc'"
+            @click="sortAscByName"
+          >
+            <ArrowUpWideNarrow />
+          </XButton>
+          <XButton
+            class-name="itbms-brand-desc"
+            variant="info"
+            :disabled="searchOptions.sortField === 'brand.name' && searchOptions.sortOrder === 'desc'"
+            @click="sortDescByName"
+          >
+            <ArrowDownWideNarrow />
+          </XButton>
         </div>
       </div>
-    </div>
 
-    <XFooter :company-name="'Green Cart Inc.'" />
+      <div class="space-y-2">
+        <h2 class="text-3xl font-extrabold tracking-tight text-gray-900">
+          Featured Products
+        </h2>
+        <p class="text-gray-500">
+          Check out our most popular items this season.
+        </p>
+      </div>
+
+      <div
+        v-if="loading.items"
+        class="text-center py-10"
+      >
+        <p class="text-lg text-gray-500">
+          Loading sale items...
+        </p>
+      </div>
+      <div
+        v-else-if="error.items"
+        class="text-center py-10 text-red-600"
+      >
+        <p class="text-lg">
+          {{ error.items }}
+        </p>
+      </div>
+      <div
+        v-else-if="saleItems.length > 0"
+        class="mt-10"
+      >
+        <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-5 xl:gap-x-8">
+          <SaleItemCard
+            v-for="product in saleItems"
+            :id="product.id"
+            :key="product.id"
+            :brand="product.brandName"
+            :model="product.model"
+            :ram-gb="product.ramGb"
+            :storage-gb="product.storageGb"
+            :price="product.price"
+          />
+        </div>
+
+        <XPagination
+          class="mt-8"
+          :pagination="{
+            currentPage: searchOptions.currentPage,
+            pageSize: searchOptions.pageSize,
+            total: searchOptions.totalItems,
+          }"
+          :show-size-changer="true"
+          @change="handlePaginationChange"
+        />
+      </div>
+      <div
+        v-else
+        class="text-center py-10"
+      >
+        <p class="text-lg text-gray-500">
+          No sale items available matching your criteria.
+        </p>
+      </div>
+    </div>
   </div>
 </template>

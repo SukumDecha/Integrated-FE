@@ -12,17 +12,35 @@
     :disabled="disabled || loading"
     @click="$emit('click', $event)"
   >
-    <span v-if="loading" class="mr-2">
-      <Loader2 class="animate-spin" :class="iconSizeClasses" />
+    <span
+      v-if="loading"
+      class="mr-2"
+    >
+      <Loader2
+        class="animate-spin"
+        :class="iconSizeClasses"
+      />
     </span>
-    <span v-else-if="leftIcon" class="mr-2">
-      <component :is="leftIcon" :class="iconSizeClasses" />
+    <span
+      v-else-if="leftIcon"
+      class="mr-2"
+    >
+      <component
+        :is="leftIcon"
+        :class="iconSizeClasses"
+      />
     </span>
 
     <slot>{{ label }}</slot>
 
-    <span v-if="rightIcon && !loading" class="ml-2">
-      <component :is="rightIcon" :class="iconSizeClasses" />
+    <span
+      v-if="rightIcon && !loading"
+      class="ml-2"
+    >
+      <component
+        :is="rightIcon"
+        :class="iconSizeClasses"
+      />
     </span>
   </button>
 </template>
