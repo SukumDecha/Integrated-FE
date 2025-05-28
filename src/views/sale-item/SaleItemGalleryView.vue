@@ -106,7 +106,7 @@ const fetchSaleItems = async () => {
   const response = await SaleItemService.getSaleItemListPaginated(searchParams.value);
 
   if (response.error) {
-    error.items = response.error;
+    error.items = response.error.message || 'Failed to load sale items. Please try again later.';
     toast.add({
       type: 'error',
       message: error.items,
@@ -115,11 +115,10 @@ const fetchSaleItems = async () => {
     return;
   }
 
-
   saleItems.splice(0, saleItems.length);
-    saleItems.push(...response.data);
-    searchOptions.totalItems = response.pagination.totalItems;
-    loading.items = false;
+  saleItems.push(...response.data);
+  searchOptions.totalItems = response.pagination.totalItems;
+  loading.items = false;
 };
 
 const fetchBrands = async () => {
@@ -128,7 +127,7 @@ const fetchBrands = async () => {
 
   const response = await BrandService.getAllBrands();
   if (response.error) {
-    error.brands = response.error;
+    error.brands = response.error.message || 'Failed to load brands. Please try again later.';
     toast.add({
       type: 'error',
       message: 'Failed to load brands. Please try again later.',
@@ -143,9 +142,16 @@ const fetchBrands = async () => {
   loading.brands = false;
 };
 
-const handlePaginationChange = ({ currentPage, pageSize }) => {
+const handlePaginationChange = async ({ currentPage, pageSize }) => {
+  const oldCurrentPage = searchOptions.currentPage;
+
   searchOptions.currentPage = currentPage;
   searchOptions.pageSize = pageSize;
+
+  if (oldCurrentPage === currentPage) {
+    await fetchSaleItems();
+  }
+
   saveToLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION, { currentPage, pageSize });
 };
 
@@ -203,10 +209,13 @@ onMounted(async () => {
 watch(
   searchParams,
   async (newParams, oldParams) => {
-    if (JSON.stringify(newParams) !== JSON.stringify(oldParams)) {
-      updateRouteQuery();
-      await fetchSaleItems();
-    }
+    // If we use deep check, it won't allow us to fetch the same page
+    // if (JSON.stringify(newParams) !== JSON.stringify(oldParams)) {
+    //   updateRouteQuery();
+    //   await fetchSaleItems();
+    // }
+    updateRouteQuery();
+    await fetchSaleItems();
   },
   {  deep: true },
 );
@@ -247,7 +256,7 @@ watch(
               :options="brandOptions"
               placeholder="Select Brands"
               mode="multiple"
-              class="itbms-brand-filter-button"
+              class="itbms-brand-filter itbms-brand-filter-button"
               :searchable="true"
               :clearable="true"
               @update:model-value="handleBrandSelect"
@@ -313,13 +322,12 @@ watch(
             :storage-gb="product.storageGb"
             :price="product.price"
             :is-loading="loading.items"
-            :error="error.items"
           />
         </div>
 
         <XPagination
           class="mt-8"
-          :v-show="!loading.items && saleItems.length > 0"
+          :v-if="!loading.items && saleItems.length > 0"
           :pagination="{
             currentPage: searchOptions.currentPage,
             pageSize: searchOptions.pageSize,
@@ -331,10 +339,10 @@ watch(
       </div>
       <div
         v-if="!loading.items && saleItems.length === 0 && !error.items"
-        class="text-center py-10"
+        class="text-center py-10 itbms-row"
       >
         <p class="text-lg text-gray-500">
-          No sale items available matching your criteria.
+          no sale item
         </p>
       </div>
     </div>

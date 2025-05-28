@@ -7,7 +7,6 @@ import { computed, ref, watch } from 'vue';
 const props = defineProps({
   pagination: {
     type: Object,
-    required: true,
     default: () => ({
       currentPage: 1,
       pageSize: 10,
@@ -36,7 +35,6 @@ const currentPageSize = ref(props.pagination.pageSize);
 watch(
   () => props.pagination.currentPage,
   (newVal) => {
-    console.log("Updating currentPage from props:", newVal);
     if (newVal !== currentPage.value) {
       currentPage.value = newVal;
     }
@@ -49,7 +47,6 @@ watch(
 watch(
   () => props.pagination.pageSize,
   (newVal) => {
-    console.log("Updating currentPageSize from props:", newVal);
     if (newVal !== currentPageSize.value) {
       currentPageSize.value = newVal;
     }
@@ -123,7 +120,7 @@ const paginationInfo = computed(() => {
 });
 
 function changePage(page) {
-  if (page === currentPage.value || page < 1 || page > totalPages.value) return;
+  if ( page < 1 || page > totalPages.value) return;
   currentPage.value = page;
   emit('change', { currentPage: page, pageSize: currentPageSize.value });
 }
@@ -135,7 +132,9 @@ function handlePageSizeChange() {
 </script>
 
 <template>
-  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-4">
+  <div
+    class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-4"
+  >
     <!-- Size Changer -->
     <div
       v-show="showSizeChanger"
@@ -144,7 +143,7 @@ function handlePageSizeChange() {
       <span class="text-sm text-gray-600 whitespace-nowrap">Show</span>
       <select
         v-model="currentPageSize"
-        class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 itbms-page-size"
+        class="itbms-page-size px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         @change="handlePageSizeChange"
       >
         <option
@@ -159,7 +158,10 @@ function handlePageSizeChange() {
     </div>
 
     <!-- Pagination Controls -->
-    <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+    <div
+      v-show="totalPages > 1"
+      class="flex flex-col sm:flex-row sm:items-center gap-2"
+    >
       <!-- Page Info -->
       <span class="text-sm text-gray-600 text-center sm:text-left sm:mr-4 order-2 sm:order-1">
         {{ paginationInfo }}
@@ -193,8 +195,8 @@ function handlePageSizeChange() {
             <!-- <span v-if="page === '...'" class="px-2 text-gray-400 flex-shrink-0">...</span> -->
             <XButton
               :class="[
-                'flex-shrink-0',
                 `itbms-page-${index}`,
+                'flex-shrink-0',
                 currentPage === page ? '!font-bold' : ''
               ]"
               :variant="currentPage === page ? 'primary' : 'outline'"

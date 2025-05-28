@@ -211,8 +211,9 @@ function validateField(field) {
 
     case 'description': {
       const trimmed = (val ?? '').trim()
+      const len = trimmed.length
       fieldErrors.value.description =
-        trimmed.length === 0 ? 'Description must be 1-65,535 characters long.' : ''
+        len < 1 || len > 16384 ? 'Description must be 1-16,384 characters long.' : ''
       break
     }
 

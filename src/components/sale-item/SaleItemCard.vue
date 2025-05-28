@@ -10,10 +10,6 @@ defineProps({
     type: Boolean,
     default: false,
   },
-  error: {
-    type: String,
-    default: null,
-  },
   brand: {
     type: String,
     default: '',
@@ -77,19 +73,8 @@ defineProps({
     </div>
   </div>
 
-  <div
-    v-if="error"
-    class="itbms-row w-full bg-white rounded-xl shadow-lg overflow-hidden"
-  >
-    <div class="flex items-center justify-center w-full h-64 bg-red-100 rounded-t-xl">
-      <p class="text-red-600 text-lg font-semibold">
-        {{ error }}
-      </p>
-    </div>
-  </div>
-
   <router-link
-    v-show="!isLoading && !error && id"
+    v-if="!isLoading && id"
     :to="`/sale-items/${id}`"
     class="itbms-row w-full bg-white rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow h-full flex flex-col"
   >

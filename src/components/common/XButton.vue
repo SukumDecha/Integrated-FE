@@ -2,12 +2,12 @@
   <button
     :type="type"
     :class="[
+      className,
       'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500',
       sizeClasses,
       variantClasses,
       fullWidth ? 'w-full' : '',
       'disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500  disabled:border-[#d9d9d9] disabled:border disabled:opacity-60',
-      className,
     ]"
     :disabled="disabled || loading"
     @click="$emit('click', $event)"
