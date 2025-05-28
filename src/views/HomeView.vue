@@ -52,6 +52,7 @@ import HeroSection from '@/components/home/HeroSection.vue'
 import SaleItemCard from '@/components/sale-item/SaleItemCard.vue'
 import { SaleItemService } from '@/services'
 import XFooter from '@/components/layout/XFooter.vue'
+import { useLoaderStore } from '@/stores/loader.store'
 
 // Store data
 const storeName = ref('GreenCart')
@@ -60,8 +61,12 @@ const products = ref([])
 const loading = ref(true)
 const error = ref(null)
 
+const loaderStore = useLoaderStore();
+
 const fetchProducts = async () => {
   loading.value = true
+
+  loaderStore.startLoading()
   try {
     const response = await SaleItemService.getAllSaleItems()
     products.value = response.data
@@ -71,6 +76,8 @@ const fetchProducts = async () => {
   } finally {
     loading.value = false
   }
+
+  loaderStore.resetLoading()
 }
 
 onMounted(() => {

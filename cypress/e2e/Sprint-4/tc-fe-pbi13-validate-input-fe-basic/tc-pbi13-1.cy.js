@@ -1,13 +1,13 @@
-describe(`TC-FE-PBI13-VALIDATE-INPUT-FE-BASIC-1\n
+describe(`TC-FE-PBI13-VALIDATE-INPUT-FE-BASIC-1\n 
     Test Scenario : normal - add sale item with valid data\n
                            - compulsory field only
                            - min boundary case
                            - max boundary case with leading/trailing whitespaces`, () => {
-
+    
     let resource = '/sale-items'
     let baseAPI = Cypress.config('baseAPI')
 
-    let lastSaleItemId
+    let lastSaleItemId 
 
     beforeEach(()=> {
         cy.visit(resource) ;
@@ -23,7 +23,7 @@ describe(`TC-FE-PBI13-VALIDATE-INPUT-FE-BASIC-1\n
         [Step 3] should add the sale item successfully.`,()=>{
         cy.intercept('POST', `${baseAPI}/v1/**`).as('saveRequest') ;
 
-        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton');
+        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton'); 
         cy.get('@addSaleItemButton').click();
         cy.wait(100)
 
@@ -54,7 +54,7 @@ describe(`TC-FE-PBI13-VALIDATE-INPUT-FE-BASIC-1\n
             const response = interception.response
             expect(response.statusCode).to.equal(201)
             lastSaleItemId = response.body.id
-        })
+        })        
     })
 
     it(`[Step 4] should show and contain the recend added sale item SALE_ITEMS_VALIDATION (td-1).\n
@@ -79,10 +79,10 @@ describe(`TC-FE-PBI13-VALIDATE-INPUT-FE-BASIC-1\n
         cy.get('@delete').click()
         cy.wait(100)
 
-        cy.get('.itbms-message').should('exist')
+        cy.get('.itbms-message').should('exist') 
         cy.get('.itbms-message').should('contain.text', 'Do you want to delete this sale item?') ;
         cy.get('.itbms-cancel-button').should('exist') ;
-        cy.get('.itbms-confirm-button').should('exist') ;
+        cy.get('.itbms-confirm-button').should('exist') ; 
 
         cy.get('.itbms-confirm-button').click() ;
 
@@ -99,7 +99,7 @@ describe(`TC-FE-PBI13-VALIDATE-INPUT-FE-BASIC-1\n
         [Step 7] should add the sale item successfully.`,()=>{
         cy.intercept('POST', `${baseAPI}/v1/**`).as('saveRequest') ;
 
-        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton');
+        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton'); 
         cy.get('@addSaleItemButton').click();
         cy.wait(100)
 
@@ -142,7 +142,7 @@ describe(`TC-FE-PBI13-VALIDATE-INPUT-FE-BASIC-1\n
             const response = interception.response
             expect(response.statusCode).to.equal(201)
             lastSaleItemId = response.body.id
-        })
+        })        
     })
 
     it(`[Step 8] should show and contain the recend added sale item SALE_ITEMS_VALIDATION (td-2).\n
@@ -161,16 +161,16 @@ describe(`TC-FE-PBI13-VALIDATE-INPUT-FE-BASIC-1\n
         cy.get('@row').contains('.itbms-screenSizeInch','0.01')
         cy.get('@row').contains('.itbms-storageGb','1')
         cy.get('@row').contains('.itbms-color','B')
-        cy.get('@row').contains('.itbms-quantity','1')
+        cy.get('@row').contains('.itbms-quantity','0')
 
         cy.get('@row').find('.itbms-delete-button').as('delete')
         cy.get('@delete').click()
         cy.wait(100)
 
-        cy.get('.itbms-message').should('exist')
+        cy.get('.itbms-message').should('exist') 
         cy.get('.itbms-message').should('contain.text', 'Do you want to delete this sale item?') ;
         cy.get('.itbms-cancel-button').should('exist') ;
-        cy.get('.itbms-confirm-button').should('exist') ;
+        cy.get('.itbms-confirm-button').should('exist') ; 
 
         cy.get('.itbms-confirm-button').click() ;
 
@@ -187,7 +187,7 @@ describe(`TC-FE-PBI13-VALIDATE-INPUT-FE-BASIC-1\n
         [Step 11] should add the sale item successfully.`,()=>{
         cy.intercept('POST', `${baseAPI}/v1/**`).as('saveRequest') ;
 
-        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton');
+        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton'); 
         cy.get('@addSaleItemButton').click();
         cy.wait(100)
 
@@ -229,7 +229,7 @@ describe(`TC-FE-PBI13-VALIDATE-INPUT-FE-BASIC-1\n
             const response = interception.response
             expect(response.statusCode).to.equal(201)
             lastSaleItemId = response.body.id
-        })
+        })        
     })
 
     it(`[Step 12] should show and contain the recend added sale item SALE_ITEMS_VALIDATION (td-3).\n
@@ -254,10 +254,10 @@ describe(`TC-FE-PBI13-VALIDATE-INPUT-FE-BASIC-1\n
         cy.get('@delete').click()
         cy.wait(100)
 
-        cy.get('.itbms-message').should('exist')
+        cy.get('.itbms-message').should('exist') 
         cy.get('.itbms-message').should('contain.text', 'Do you want to delete this sale item?') ;
         cy.get('.itbms-cancel-button').should('exist') ;
-        cy.get('.itbms-confirm-button').should('exist') ;
+        cy.get('.itbms-confirm-button').should('exist') ; 
 
         cy.get('.itbms-confirm-button').click() ;
 

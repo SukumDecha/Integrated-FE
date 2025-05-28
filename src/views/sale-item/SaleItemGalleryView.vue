@@ -115,10 +115,11 @@ const fetchSaleItems = async () => {
     return;
   }
 
+
   saleItems.splice(0, saleItems.length);
-  saleItems.push(...response.data);
-  searchOptions.totalItems = response.pagination.totalItems;
-  loading.items = false;
+    saleItems.push(...response.data);
+    searchOptions.totalItems = response.pagination.totalItems;
+    loading.items = false;
 };
 
 const fetchBrands = async () => {
@@ -246,7 +247,7 @@ watch(
               :options="brandOptions"
               placeholder="Select Brands"
               mode="multiple"
-              class="itbms-brand-filter"
+              class="itbms-brand-filter-button"
               :searchable="true"
               :clearable="true"
               @update:model-value="handleBrandSelect"
@@ -299,23 +300,6 @@ watch(
       </div>
 
       <div
-        v-if="loading.items"
-        class="text-center py-10"
-      >
-        <p class="text-lg text-gray-500">
-          Loading sale items...
-        </p>
-      </div>
-      <div
-        v-else-if="error.items"
-        class="text-center py-10 text-red-600"
-      >
-        <p class="text-lg">
-          {{ error.items }}
-        </p>
-      </div>
-      <div
-        v-else-if="saleItems.length > 0"
         class="mt-10"
       >
         <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-5 xl:gap-x-8">
@@ -328,11 +312,14 @@ watch(
             :ram-gb="product.ramGb"
             :storage-gb="product.storageGb"
             :price="product.price"
+            :is-loading="loading.items"
+            :error="error.items"
           />
         </div>
 
         <XPagination
           class="mt-8"
+          :v-show="!loading.items && saleItems.length > 0"
           :pagination="{
             currentPage: searchOptions.currentPage,
             pageSize: searchOptions.pageSize,
@@ -343,7 +330,7 @@ watch(
         />
       </div>
       <div
-        v-else
+        v-if="!loading.items && saleItems.length === 0 && !error.items"
         class="text-center py-10"
       >
         <p class="text-lg text-gray-500">
