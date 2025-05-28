@@ -10,17 +10,13 @@ defineProps({
     type: Boolean,
     default: false,
   },
-  error: {
-    type: String,
-    default: null,
-  },
   brand: {
     type: String,
-    required: true,
+    default: '',
   },
   model: {
     type: String,
-    required: true,
+    default: '',
   },
   ramGb: {
     type: Number,
@@ -32,7 +28,8 @@ defineProps({
   },
   price: {
     type: Number,
-    required: true,
+    required: false,
+    default: 0,
   },
   imageUrl: {
     type: String,
@@ -44,46 +41,49 @@ defineProps({
   },
   id: {
     type: Number,
-    required: true,
+    required: false, // Changed to false
+    default: 0,
   },
 })
 </script>
 
-<style scoped>
-.line-clamp-1 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-}
-</style>
-
 <template>
-  <div v-if="isLoading" class="itbms-row w-full bg-white rounded-xl shadow-lg overflow-hidden">
-    <div class="flex items justify-center w-full h-64 bg-gray-200 animate-pulse rounded-t-xl">
-      <div class="w-1/2 h-full bg-gray-300 animate-pulse"></div>
+  <div
+    v-show="isLoading"
+    class="w-full bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col"
+  >
+    <div class="relative w-full h-64 bg-gray-200 animate-pulse overflow-hidden rounded-t-xl">
+      <div class="w-full h-full bg-gray-300 animate-pulse" />
+      <span class="absolute top-4 left-4 h-5 w-16 bg-gray-300 rounded-full animate-pulse" />
     </div>
-  </div>
 
-  <div v-if="error" class="itbms-row w-full bg-white rounded-xl shadow-lg overflow-hidden">
-    <div class="flex items justify-center w-full h-64 bg-red-200 rounded-t-xl">
-      <p class="text-red-600 text-lg font-semibold">{{ error }}</p>
+    <div class="p-4 flex flex-col justify-between flex-grow">
+      <p class="h-4 w-2/3 bg-gray-200 rounded animate-pulse mb-2" />
+      <p class="h-6 w-5/6 bg-gray-200 rounded animate-pulse mb-4" />
+
+      <div class="space-y-2">
+        <p class="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
+        <p class="h-4 w-2/3 bg-gray-200 rounded animate-pulse" />
+        <p class="mt-3 h-8 w-1/2 bg-gray-200 rounded animate-pulse" />
+      </div>
+
+      <div class="mt-6">
+        <div class="h-10 w-full bg-gray-200 rounded-md animate-pulse" />
+      </div>
     </div>
   </div>
 
   <router-link
+    v-if="!isLoading && id"
     :to="`/sale-items/${id}`"
-    v-else
     class="itbms-row w-full bg-white rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow h-full flex flex-col"
   >
-    <!-- Image Section -->
     <div class="relative w-full h-64 overflow-hidden">
       <img
         :src="imageUrl || fallbackImageUrl"
         :alt="`${brand} ${model} product image`"
         class="w-full h-full object-cover object-center rounded-t-xl"
-      />
-      <!-- Stock Badge -->
+      >
       <span
         class="absolute top-4 left-4 bg-emerald-100 text-emerald-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
       >
@@ -91,10 +91,11 @@ defineProps({
       </span>
     </div>
 
-    <!-- Content Section -->
     <div class="p-4 flex flex-col justify-between flex-grow">
-      <!-- Product Brand and Model -->
-      <p class="itbms-brand text-gray-700 text-base line-clamp-1" :class="`text-${color}-600`">
+      <p
+        class="itbms-brand text-gray-700 text-base line-clamp-1"
+        :class="`text-${color}-600`"
+      >
         {{ brand }}
       </p>
 
@@ -102,7 +103,6 @@ defineProps({
         {{ model }}
       </p>
 
-      <!-- Product Specifications -->
       <div class="text-base text-gray-600 space-y-1">
         <p class="itbms-ramGb">
           <span class="mr-2">🧠</span>
@@ -120,19 +120,27 @@ defineProps({
         </p>
       </div>
 
-      <!-- Action Button -->
       <div class="mt-6">
         <router-link
           :to="`/sale-items/${id}`"
         >
-        <XButton>
-          <span class="flex items-center">
-            <EyeIcon class="mr-2 h-5 w-5" />
-            View Details
-          </span>
-        </XButton>
+          <XButton>
+            <span class="flex items-center">
+              <EyeIcon class="mr-2 h-5 w-5" />
+              View Details
+            </span>
+          </XButton>
         </router-link>
       </div>
     </div>
   </router-link>
 </template>
+
+<style scoped>
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+</style>

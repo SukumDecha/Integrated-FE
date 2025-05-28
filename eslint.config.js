@@ -21,6 +21,5 @@ export default defineConfig([
   },
 
   js.configs.recommended,
-  // Changed from 'flat/essential' to 'flat/recommended' for more comprehensive formatting rules
   ...pluginVue.configs['flat/recommended']
 ])
