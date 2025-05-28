@@ -16,12 +16,10 @@ defineProps({
   },
   brand: {
     type: String,
-    required: false, // Changed to false as it won't be present during loading
     default: '',
   },
   model: {
     type: String,
-    required: false, // Changed to false
     default: '',
   },
   ramGb: {
@@ -34,7 +32,7 @@ defineProps({
   },
   price: {
     type: Number,
-    required: false, // Changed to false
+    required: false,
     default: 0,
   },
   imageUrl: {
@@ -55,8 +53,8 @@ defineProps({
 
 <template>
   <div
-    v-if="isLoading"
-    class="itbms-row w-full bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col"
+    v-show="isLoading"
+    class="w-full bg-white rounded-xl shadow-lg overflow-hidden h-full flex flex-col"
   >
     <div class="relative w-full h-64 bg-gray-200 animate-pulse overflow-hidden rounded-t-xl">
       <div class="w-full h-full bg-gray-300 animate-pulse" />
@@ -80,7 +78,7 @@ defineProps({
   </div>
 
   <div
-    v-else-if="error"
+    v-if="error"
     class="itbms-row w-full bg-white rounded-xl shadow-lg overflow-hidden"
   >
     <div class="flex items-center justify-center w-full h-64 bg-red-100 rounded-t-xl">
@@ -91,7 +89,7 @@ defineProps({
   </div>
 
   <router-link
-    v-else
+    v-show="!isLoading && !error && id"
     :to="`/sale-items/${id}`"
     class="itbms-row w-full bg-white rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow h-full flex flex-col"
   >

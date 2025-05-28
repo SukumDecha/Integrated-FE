@@ -64,7 +64,7 @@
 
   <!-- ✅ Pagination with Size Changer -->
   <XPagination
-    v-show="pagination"
+    v-if="pagination"
     :pagination="pagination"
     :data="data"
     :page-size-options="pageSizeOptions"

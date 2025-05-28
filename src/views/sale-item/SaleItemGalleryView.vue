@@ -14,7 +14,6 @@ import { AlignJustify, ArrowDownWideNarrow, ArrowUpWideNarrow, PlusIcon } from '
 import { SaleItemService, BrandService } from '@/services';
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils';
 import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item';
-import { useLoaderStore } from '@/stores/loader.store';
 
 // --- State Management ---
 const searchOptions = reactive({
@@ -43,7 +42,6 @@ const error = reactive({
 const route = useRoute();
 const router = useRouter();
 const toast = useToastStore();
-const loaderStore = useLoaderStore();
 
 const breadcrumbs = [
   { text: 'Home', path: '/' },
@@ -117,16 +115,16 @@ const fetchSaleItems = async () => {
     return;
   }
 
+
   saleItems.splice(0, saleItems.length);
-  saleItems.push(...response.data);
-  searchOptions.totalItems = response.pagination.totalItems;
-  loading.items = false;
+    saleItems.push(...response.data);
+    searchOptions.totalItems = response.pagination.totalItems;
+    loading.items = false;
 };
 
 const fetchBrands = async () => {
   loading.brands = true;
   error.brands = null;
-  loaderStore.startLoading();
 
   const response = await BrandService.getAllBrands();
   if (response.error) {
@@ -136,7 +134,6 @@ const fetchBrands = async () => {
       message: 'Failed to load brands. Please try again later.',
     });
     loading.brands = false;
-    loaderStore.stopLoading();
     return;
   }
 
@@ -144,7 +141,6 @@ const fetchBrands = async () => {
                     .map((b) => b.name)
                     .sort((a, b) => a.localeCompare(b)))
   loading.brands = false;
-  loaderStore.stopLoading();
 };
 
 const handlePaginationChange = ({ currentPage, pageSize }) => {
@@ -304,23 +300,6 @@ watch(
       </div>
 
       <div
-        v-if="loading.items"
-        class="text-center py-10"
-      >
-        <p class="text-lg text-gray-500">
-          Loading sale items...
-        </p>
-      </div>
-      <div
-        v-else-if="error.items"
-        class="text-center py-10 text-red-600"
-      >
-        <p class="text-lg">
-          {{ error.items }}
-        </p>
-      </div>
-      <div
-        v-else-if="saleItems.length > 0"
         class="mt-10"
       >
         <div class="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-5 xl:gap-x-8">
@@ -333,11 +312,14 @@ watch(
             :ram-gb="product.ramGb"
             :storage-gb="product.storageGb"
             :price="product.price"
+            :is-loading="loading.items"
+            :error="error.items"
           />
         </div>
 
         <XPagination
           class="mt-8"
+          :v-show="!loading.items && saleItems.length > 0"
           :pagination="{
             currentPage: searchOptions.currentPage,
             pageSize: searchOptions.pageSize,
@@ -348,7 +330,7 @@ watch(
         />
       </div>
       <div
-        v-else
+        v-if="!loading.items && saleItems.length === 0 && !error.items"
         class="text-center py-10"
       >
         <p class="text-lg text-gray-500">
