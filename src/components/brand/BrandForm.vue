@@ -8,7 +8,7 @@ import XToggle from '@/components/common/form/XToggle.vue'
 const props = defineProps({
   initialData: {
     type: Object,
-    default: () => ({})
+    default: () => ({}),
   },
   isEditMode: {
     type: Boolean,
@@ -24,19 +24,19 @@ const form = ref({
   name: '',
   websiteUrl: '',
   isActive: true,
-  countryOfOrigin: ''
+  countryOfOrigin: '',
 })
 
 const fieldErrors = ref({
   name: '',
   websiteUrl: '',
-  countryOfOrigin: ''
+  countryOfOrigin: '',
 })
 
 const touchedFields = ref({
   name: false,
   websiteUrl: false,
-  countryOfOrigin: false
+  countryOfOrigin: false,
 })
 
 const onBlur = (field) => {
@@ -57,11 +57,12 @@ function isValidURL(url) {
 function validateField(field, value) {
   switch (field) {
     case 'name': {
-      // const len = value?.trim().length ?? 0
-      const len = value?.length ?? 0
-      if (len > 30 || len < 1 ) return 'Brand name must be 1-30 characters long.'
+      const trimmed = value?.trim() ?? ''
+      const len = trimmed.length
+      if (len < 1 || len > 30) return 'Brand name must be 1-30 characters long.'
       return ''
     }
+
     case 'countryOfOrigin': {
       const len = value?.trim().length ?? 0
       if (len > 80) return 'Brand country of origin must be 1-80 characters long or not specified.'
@@ -82,11 +83,11 @@ watch(
         name: val.name ?? '',
         websiteUrl: val.websiteUrl ?? '',
         isActive: typeof val.isActive === 'boolean' ? val.isActive : true,
-        countryOfOrigin: val.countryOfOrigin ?? ''
+        countryOfOrigin: val.countryOfOrigin ?? '',
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(
@@ -98,7 +99,7 @@ watch(
       }
     })
   },
-  { deep: true }
+  { deep: true },
 )
 
 const isSaving = ref(false)
@@ -112,7 +113,8 @@ const isFormValid = computed(() => {
 })
 
 const isChanged = computed(() => {
-  if (!props.isEditMode || !props.initialData || Object.keys(props.initialData).length === 0) return true
+  if (!props.isEditMode || !props.initialData || Object.keys(props.initialData).length === 0)
+    return true
 
   const current = form.value
   const initial = props.initialData
@@ -120,7 +122,8 @@ const isChanged = computed(() => {
   return (
     (current.name ?? '') !== (initial.name ?? '') ||
     (current.websiteUrl ?? '') !== (initial.websiteUrl ?? '') ||
-    (current.isActive !== undefined ? current.isActive : true) !== (initial.isActive !== undefined ? initial.isActive : true) ||
+    (current.isActive !== undefined ? current.isActive : true) !==
+      (initial.isActive !== undefined ? initial.isActive : true) ||
     (current.countryOfOrigin ?? '') !== (initial.countryOfOrigin ?? '')
   )
 })

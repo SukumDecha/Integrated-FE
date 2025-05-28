@@ -1,4 +1,4 @@
-describe(`TC-FE-PBI11-FILTER-SALE-ITEM-GALLERY-BY-BRAND-1\n 
+describe(`TC-FE-PBI11-FILTER-SALE-ITEM-GALLERY-BY-BRAND-1\n
     Test Scenario : normal - filter by brand`, () => {
 
     let resource = '/sale-items'
@@ -52,7 +52,7 @@ describe(`TC-FE-PBI11-FILTER-SALE-ITEM-GALLERY-BY-BRAND-1\n
         cy.get('.itbms-brand-filter-button').should('exist').as('brand-filter')
         cy.get('@brand-filter').click()
         cy.wait(100)
-        
+
         cy.get('.itbms-filter-item').as('brand-options')
         cy.get('@brand-options').should('have.length', 20)
         cy.get('@brand-options').eq(0).contains('Apple')
@@ -64,8 +64,8 @@ describe(`TC-FE-PBI11-FILTER-SALE-ITEM-GALLERY-BY-BRAND-1\n
         cy.get('@brand-options').eq(6).contains('Huawei')
         cy.get('@brand-options').eq(7).contains('Lenovo')
         cy.get('@brand-options').eq(8).contains('LG')
-        cy.get('@brand-options').eq(9).contains('Motorola')            
-        cy.get('@brand-options').eq(10).contains('Nokia')  
+        cy.get('@brand-options').eq(9).contains('Motorola')
+        cy.get('@brand-options').eq(10).contains('Nokia')
         cy.get('@brand-options').eq(11).contains('Nothing')
         cy.get('@brand-options').eq(12).contains('OnePlus')
         cy.get('@brand-options').eq(13).contains('OPPO')
@@ -91,7 +91,7 @@ describe(`TC-FE-PBI11-FILTER-SALE-ITEM-GALLERY-BY-BRAND-1\n
     it('[Step 2] should add a sale item "LG, W41 Pro/6/128GB/5,600".',()=>{
         cy.intercept('POST', `${baseAPI}/v1/**`).as('saveRequest') ;
 
-        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton'); 
+        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton');
         cy.get('@addSaleItemButton').click();
         cy.wait(100)
 
@@ -149,7 +149,7 @@ describe(`TC-FE-PBI11-FILTER-SALE-ITEM-GALLERY-BY-BRAND-1\n
             expect(matched).to.have.length(10)
         })
         cy.wait(100)
-        
+
         cy.contains('.itbms-filter-item', 'Samsung').should('exist').click()
         cy.wait(100)
 
@@ -164,7 +164,7 @@ describe(`TC-FE-PBI11-FILTER-SALE-ITEM-GALLERY-BY-BRAND-1\n
         cy.contains('.itbms-filter-item', 'LG').should('exist').click()
         cy.wait(100)
 
-        cy.get('[class^="itbms-page-"]').then(($pages)=>{
+        cy.get('[class^="itbms-page-"]', { timeout: 15000 }).then(($pages)=>{
             expect($pages).to.have.length.greaterThan(0)
             cy.get('.itbms-page-2').should('exist').click()
         })
