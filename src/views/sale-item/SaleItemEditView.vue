@@ -20,6 +20,8 @@ const breadcrumbs = [
 ]
 
 const fetchItem = async () => {
+  if (productId === undefined) return
+
   const res = await SaleItemService.getSaleItemById(productId)
   if (res.error) {
     toast.add({ message: 'Failed to load sale item', type: 'error' })

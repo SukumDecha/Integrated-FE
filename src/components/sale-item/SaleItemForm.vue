@@ -1,5 +1,14 @@
 <template>
-  <form @submit.prevent="handleSave" class="form-grid">
+  <form
+    class="form-grid"
+    @submit.prevent="handleSave"
+  >
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+      Brand
+      <span
+        class="text-red-500"
+      >*</span>
+    </label>
     <XSelector
       v-model="form.brandId"
       class="itbms-brand"
@@ -106,7 +115,11 @@
         Save
       </XButton>
 
-      <XButton variant="danger" class="itbms-cancel-button" @click="emit('cancel')">
+      <XButton
+        variant="danger"
+        class="itbms-cancel-button"
+        @click="emit('cancel')"
+      >
         Cancel
       </XButton>
     </div>
