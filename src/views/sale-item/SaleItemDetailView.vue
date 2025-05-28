@@ -22,6 +22,8 @@ const breadcrumbs = [
 ]
 
 const fetchProduct = async () => {
+  if (productId === undefined) return
+
   loading.value = true
   const response = await SaleItemService.getSaleItemById(productId)
   if (response.error) {

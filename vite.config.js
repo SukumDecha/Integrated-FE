@@ -19,6 +19,6 @@ export default defineConfig(({  mode }) => {
         '@': fileURLToPath(new URL('./src', import.meta.url))
       },
     },
-    base: mode === 'production' ? '/ssa1/' : '/', // Now 'base' will be a simple string
+    base: (mode === 'uat' || mode === 'production') ? '/ssa1/' : '/',
   }
 })

@@ -1,5 +1,14 @@
 <template>
-  <form @submit.prevent="handleSave" class="form-grid">
+  <form
+    class="form-grid"
+    @submit.prevent="handleSave"
+  >
+    <label class="block text-sm font-medium text-gray-700 mb-1">
+      Brand
+      <span
+        class="text-red-500"
+      >*</span>
+    </label>
     <XSelector
       v-model="form.brandId"
       class="itbms-brand"
@@ -8,6 +17,9 @@
       :required="true"
       :options="brands.map((b) => ({ value: b.id, label: b.name }))"
       placeholder="Select a brand"
+      :error-message="fieldErrors.brandId"
+      @blur="onBlur('brandId')"
+      @change="onBlur('brandId')"
     />
 
     <XInput
@@ -78,6 +90,8 @@
       class="itbms-color"
       label="Color"
       placeholder="e.g. Midnight Purple"
+      :error-message="fieldErrors.color"
+      @blur="onBlur('color')"
     />
 
     <XInput
@@ -130,7 +144,7 @@ const emit = defineEmits(['cancel'])
 const toast = useToastStore()
 
 const form = ref({
-  brandId: '',
+  brandId: null,
   model: '',
   price: null,
   description: '',
@@ -142,13 +156,25 @@ const form = ref({
 })
 
 const fieldErrors = ref({
-  model: '', price: '', quantity: '', description: '',
-  ramGb: '', screenSizeInch: '', storageGb: ''
+  brandId: '',
+  model: '',
+  price: '',
+  quantity: '',
+  description: '',
+  ramGb: '',
+  screenSizeInch: '',
+  storageGb: '',
 })
 
 const touchedFields = ref({
-  model: false, price: false, quantity: false, description: false,
-  ramGb: false, screenSizeInch: false, storageGb: false
+  brandId: false,
+  model: false,
+  price: false,
+  quantity: false,
+  description: false,
+  ramGb: false,
+  screenSizeInch: false,
+  storageGb: false,
 })
 
 function onBlur(field) {
@@ -158,31 +184,74 @@ function onBlur(field) {
 
 function validateField(field) {
   const val = form.value[field]
+
   switch (field) {
-    case 'model':
-      fieldErrors.value.model = !val?.trim()
-        ? 'Model is required'
-        : val.length > 60 ? 'Model must be at most 60 characters' : ''
+    case 'brandId':
+      fieldErrors.value.brandId = !val ? 'Brand must be selected.' : ''
       break
+
+    case 'model': {
+      const raw = val ?? ''
+      const trimmed = raw.trim()
+      const length = trimmed.length
+
+      fieldErrors.value.model =
+        length === 0 || length > 60 ? 'Model must be 1-60 characters long.' : ''
+      break
+    }
+
     case 'price':
-      fieldErrors.value.price = val == null || val < 0 ? 'Price must be 0 or more' : ''
+      fieldErrors.value.price = val == null || val < 0 ? 'Price must be non-negative integer.' : ''
       break
+
     case 'quantity':
-      fieldErrors.value.quantity = val == null || val < 1 ? 'Quantity must be at least 1' : ''
+      fieldErrors.value.quantity =
+        val == null || val < 0 ? 'Quantity must be non-negative integer.' : ''
       break
-    case 'description':
-      fieldErrors.value.description = !val?.trim() ? 'Description is required' : ''
+
+    case 'description': {
+      const trimmed = (val ?? '').trim()
+      fieldErrors.value.description =
+        trimmed.length === 0 ? 'Description must be 1-65,535 characters long.' : ''
       break
-    case 'ramGb':
-      fieldErrors.value.ramGb = val != null && val < 1 ? 'RAM must be at least 1' : ''
+    }
+
+    case 'ramGb': {
+      const raw = val
+      const isEmpty = raw === '' || raw === null
+      const isValid = Number.isInteger(+raw) && +raw > 0
+
+      fieldErrors.value.ramGb =
+        isEmpty || isValid ? '' : 'RAM size must be positive integer or not specified.'
       break
+    }
+
     case 'screenSizeInch':
-      fieldErrors.value.screenSizeInch = val != null && (val < 0 || val > 99.99)
-        ? 'Screen size must be between 0 and 99.99' : ''
+      fieldErrors.value.screenSizeInch =
+        val != null && (val <= 0 || !/^\d{1,2}(\.\d{1,2})?$/.test(val.toString()))
+          ? 'Screen size must be positive number with at most 2 decimal points or not specified.'
+          : ''
       break
-    case 'storageGb':
-      fieldErrors.value.storageGb = val != null && val < 1 ? 'Storage must be at least 1' : ''
+
+    case 'storageGb': {
+      const raw = val
+      const isEmpty = raw === '' || raw === null
+      const isValid = Number.isInteger(+raw) && +raw > 0
+
+      fieldErrors.value.storageGb =
+        isEmpty || isValid ? '' : 'Storage size must be positive integer or not specified.'
       break
+    }
+
+    case 'color': {
+      const raw = val ?? ''
+      const trimmed = raw.trim()
+      const length = trimmed.length
+
+      fieldErrors.value.color =
+        length > 40 ? 'Color must be 1-40 characters long or not specified.' : ''
+      break
+    }
   }
 }
 
@@ -195,6 +264,21 @@ const fetchBrands = async () => {
     toast.add({ message: 'Failed to load brands', type: 'error' })
   } else {
     brands.value = res.data
+
+    if (props.initialData) {
+      const val = props.initialData
+      form.value = {
+        brandId: findBrandIdByName(val.brandName),
+        model: val.model ?? '',
+        price: val.price ?? null,
+        description: val.description ?? '',
+        ramGb: val.ramGb ?? null,
+        screenSizeInch: val.screenSizeInch ?? null,
+        storageGb: val.storageGb ?? null,
+        color: val.color ?? '',
+        quantity: val.quantity ?? null,
+      }
+    }
   }
 }
 
@@ -206,8 +290,24 @@ const findBrandIdByName = (name) => {
 }
 
 const isFormValid = computed(() => {
-  return Object.values(fieldErrors.value).every(msg => msg === '') && form.value.brandId !== ''
+  const requiredFields = ['model', 'price', 'quantity', 'description']
+  const hasRequiredValues = requiredFields.every((field) => {
+    const val = form.value[field]
+    return val !== null && val !== '' && !(typeof val === 'string' && val.trim() === '')
+  })
+
+  return (
+    Object.values(fieldErrors.value).every((msg) => msg === '') &&
+    form.value.brandId !== null &&
+    form.value.brandId !== '' &&
+    hasRequiredValues
+  )
 })
+
+const parseNumber = (v) => {
+  const n = parseFloat(v)
+  return isNaN(n) ? null : n
+}
 
 const handleSave = async () => {
   Object.keys(touchedFields.value).forEach((f) => {
@@ -225,10 +325,10 @@ const handleSave = async () => {
     model: form.value.model.trim(),
     price: form.value.price,
     ramGb: form.value.ramGb,
-    screenSizeInch: form.value.screenSizeInch,
+    screenSizeInch: parseNumber(form.value.screenSizeInch),
     storageGb: form.value.storageGb,
     color: form.value.color?.trim() || null,
-    quantity: form.value.quantity || 1,
+    quantity: form.value.quantity,
     description: form.value.description.trim(),
   }
 
@@ -249,7 +349,7 @@ const isChanged = computed(() => {
   const initial = props.initialData
   return (
     findBrandIdByName(initial.brandName) !== current.brandId ||
-    initial.model !== current.model ||
+    initial.model.trim() !== current.model.trim() ||
     initial.price !== current.price ||
     initial.description !== current.description ||
     initial.ramGb !== current.ramGb ||

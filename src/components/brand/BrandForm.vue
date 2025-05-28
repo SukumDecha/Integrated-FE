@@ -28,11 +28,15 @@ const form = ref({
 })
 
 const fieldErrors = ref({
-  name: ''
+  name: '',
+  websiteUrl: '',
+  countryOfOrigin: ''
 })
 
 const touchedFields = ref({
-  name: false
+  name: false,
+  websiteUrl: false,
+  countryOfOrigin: false
 })
 
 const onBlur = (field) => {
@@ -40,10 +44,31 @@ const onBlur = (field) => {
   fieldErrors.value[field] = validateField(field, form.value[field])
 }
 
+function isValidURL(url) {
+  try {
+    if (!url.trim()) return true
+    new URL(url.trim())
+    return true
+  } catch {
+    return false
+  }
+}
+
 function validateField(field, value) {
   switch (field) {
-    case 'name':
-      return !value?.trim() ? 'Name is required' : ''
+    case 'name': {
+      // const len = value?.trim().length ?? 0
+      const len = value?.length ?? 0
+      if (len > 30 || len < 1 ) return 'Brand name must be 1-30 characters long.'
+      return ''
+    }
+    case 'countryOfOrigin': {
+      const len = value?.trim().length ?? 0
+      if (len > 80) return 'Brand country of origin must be 1-80 characters long or not specified.'
+      return ''
+    }
+    case 'websiteUrl':
+      return isValidURL(value ?? '') ? '' : 'Brand URL must be a valid URL or not specified.'
     default:
       return ''
   }
@@ -64,10 +89,26 @@ watch(
   { immediate: true }
 )
 
+watch(
+  form,
+  (newVal) => {
+    Object.keys(newVal).forEach((field) => {
+      if (touchedFields.value[field]) {
+        fieldErrors.value[field] = validateField(field, newVal[field])
+      }
+    })
+  },
+  { deep: true }
+)
+
 const isSaving = ref(false)
 
 const isFormValid = computed(() => {
-  return fieldErrors.value.name === '' && form.value.name.trim().length > 0
+  return (
+    validateField('name', form.value.name) === '' &&
+    validateField('websiteUrl', form.value.websiteUrl) === '' &&
+    validateField('countryOfOrigin', form.value.countryOfOrigin) === ''
+  )
 })
 
 const isChanged = computed(() => {
@@ -119,22 +160,30 @@ const handleSave = async () => {
       :error-message="touchedFields.name ? fieldErrors.name : ''"
       @blur="onBlur('name')"
     />
+
     <XInput
       v-model="form.websiteUrl"
       class="itbms-websiteUrl"
       label="Website URL"
       placeholder="https://..."
+      :error-message="touchedFields.websiteUrl ? fieldErrors.websiteUrl : ''"
+      @blur="onBlur('websiteUrl')"
     />
+
     <div class="flex items-center gap-4">
       <label for="active" class="form-label"> Active </label>
       <XToggle id="active" v-model="form.isActive" class="itbms-isActive" />
     </div>
+
     <XInput
       v-model="form.countryOfOrigin"
       class="itbms-countryOfOrigin"
       label="Country Of Origin"
       placeholder="e.g. Japan"
+      :error-message="touchedFields.countryOfOrigin ? fieldErrors.countryOfOrigin : ''"
+      @blur="onBlur('countryOfOrigin')"
     />
+
     <div class="flex gap-2 pt-4">
       <XButton
         label="Save"

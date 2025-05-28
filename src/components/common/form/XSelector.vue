@@ -3,23 +3,15 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
   modelValue: [String, Number, Array],
-  mode: {
-    type: String,
-    default: 'single',
-  },
-  options: {
-    type: Array,
-    default: () => [],
-  },
+  mode: { type: String, default: 'single' },
+  options: { type: Array, default: () => [] },
   placeholder: String,
   disabled: Boolean,
-  class: {
-    type: String,
-    default: '',
-  },
+  class: { type: String, default: '' },
+  errorMessage: String, // ✅ รับ errorMessage
 })
 
-const emit = defineEmits(['update:modelValue', 'remove'])
+const emit = defineEmits(['update:modelValue', 'remove', 'blur', 'change'])
 
 const isMultiple = computed(() => props.mode === 'multiple')
 const search = ref('')
@@ -33,7 +25,7 @@ const selectedValue = computed({
       ? Array.isArray(props.modelValue)
         ? props.modelValue
         : []
-      : props.modelValue ?? ''
+      : (props.modelValue ?? '')
   },
   set(val) {
     emit('update:modelValue', val)
@@ -45,7 +37,7 @@ const filteredOptions = computed(() => {
     isMultiple.value
       ? !selectedValue.value.includes(o.value) &&
         o.label.toLowerCase().includes(search.value.toLowerCase())
-      : o.label.toLowerCase().includes(search.value.toLowerCase())
+      : o.label.toLowerCase().includes(search.value.toLowerCase()),
   )
 })
 
@@ -63,6 +55,7 @@ const addOption = (value) => {
     }
   } else {
     emit('update:modelValue', value)
+    emit('change') // ✅ trigger validateField ตอนเลือก
     isOpen.value = false
   }
 }
@@ -71,7 +64,7 @@ const removeOption = (value) => {
   if (isMultiple.value) {
     emit(
       'update:modelValue',
-      selectedValue.value.filter((v) => v !== value)
+      selectedValue.value.filter((v) => v !== value),
     )
     emit('remove', value)
   } else {
@@ -92,17 +85,13 @@ const handleClickOutside = (e) => {
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
 })
-
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
 <template>
-  <div
-    ref="wrapperRef"
-    class="relative w-full"
-  >
+  <div ref="wrapperRef" class="relative w-full">
     <!-- Multiple Mode -->
     <div
       v-if="isMultiple"
@@ -110,7 +99,6 @@ onBeforeUnmount(() => {
       :class="props.class"
       @click="() => inputRef?.focus()"
     >
-      <!-- Tags -->
       <div
         v-for="item in selectedLabels"
         :key="item.value"
@@ -126,7 +114,6 @@ onBeforeUnmount(() => {
         </button>
       </div>
 
-      <!-- Input -->
       <input
         ref="inputRef"
         v-model="search"
@@ -135,7 +122,7 @@ onBeforeUnmount(() => {
         class="flex-1 border-none focus:ring-0 focus:outline-none min-w-[50px]"
         :disabled="disabled"
         @focus="handleFocus"
-      >
+      />
     </div>
 
     <!-- Single Mode -->
@@ -147,24 +134,23 @@ onBeforeUnmount(() => {
         v-model="selectedValue"
         :disabled="disabled"
         :class="['w-full bg-white outline-none', props.class]"
+        @blur="$emit('blur')"
+        @change="$emit('change')"
       >
-        <option
-          disabled
-          value=""
-        >
+        <option value="">
           {{ placeholder || 'Select an option' }}
         </option>
-        <option
-          v-for="option in props.options"
-          :key="option.value"
-          :value="option.value"
-        >
+        <option v-for="option in props.options" :key="option.value" :value="option.value">
           {{ option.label }}
         </option>
       </select>
     </div>
+    <!-- ✅ Show error -->
+    <p v-if="props.errorMessage" class="itbms-message text-sm text-red-600 mt-1">
+      {{ props.errorMessage }}
+    </p>
 
-    <!-- Dropdown (multiple only) -->
+    <!-- Dropdown for multiple -->
     <ul
       v-if="isMultiple && isOpen && filteredOptions.length"
       class="absolute z-10 w-full bg-white border mt-1 rounded-md shadow-lg max-h-60 overflow-y-auto"
