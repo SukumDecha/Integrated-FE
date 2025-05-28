@@ -47,7 +47,7 @@ onMounted(fetchItem)
 
 <template>
   <XBreadcrumb :items="breadcrumbs" />
-
+  
   <SaleItemDetail
     v-if="saleItem"
     :product="saleItem"

@@ -14,6 +14,7 @@ import { AlignJustify, ArrowDownWideNarrow, ArrowUpWideNarrow, PlusIcon } from '
 import { SaleItemService, BrandService } from '@/services';
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils';
 import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item';
+import { useLoaderStore } from '@/stores/loader.store';
 
 // --- State Management ---
 const searchOptions = reactive({
@@ -42,6 +43,7 @@ const error = reactive({
 const route = useRoute();
 const router = useRouter();
 const toast = useToastStore();
+const loaderStore = useLoaderStore();
 
 const breadcrumbs = [
   { text: 'Home', path: '/' },
@@ -124,6 +126,7 @@ const fetchSaleItems = async () => {
 const fetchBrands = async () => {
   loading.brands = true;
   error.brands = null;
+  loaderStore.startLoading();
 
   const response = await BrandService.getAllBrands();
   if (response.error) {
@@ -133,6 +136,7 @@ const fetchBrands = async () => {
       message: 'Failed to load brands. Please try again later.',
     });
     loading.brands = false;
+    loaderStore.stopLoading();
     return;
   }
 
@@ -140,6 +144,7 @@ const fetchBrands = async () => {
                     .map((b) => b.name)
                     .sort((a, b) => a.localeCompare(b)))
   loading.brands = false;
+  loaderStore.stopLoading();
 };
 
 const handlePaginationChange = ({ currentPage, pageSize }) => {
@@ -246,7 +251,7 @@ watch(
               :options="brandOptions"
               placeholder="Select Brands"
               mode="multiple"
-              class="itbms-brand-filter"
+              class="itbms-brand-filter-button"
               :searchable="true"
               :clearable="true"
               @update:model-value="handleBrandSelect"
