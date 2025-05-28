@@ -18,7 +18,10 @@
       </thead>
 
       <!-- ✅ ถ้ามีข้อมูล -->
-      <tbody v-if="data.length > 0" class="divide-y divide-gray-200">
+      <tbody
+        v-if="data.length > 0"
+        class="divide-y divide-gray-200"
+      >
         <tr
           v-for="(row, rowIndex) in data"
           :key="row.id || rowIndex"
@@ -59,9 +62,9 @@
     </table>
   </div>
 
-   <!-- ✅ Pagination with Size Changer -->
+  <!-- ✅ Pagination with Size Changer -->
   <XPagination
-    v-if="pagination"
+    v-show="pagination"
     :pagination="pagination"
     :data="data"
     :page-size-options="pageSizeOptions"

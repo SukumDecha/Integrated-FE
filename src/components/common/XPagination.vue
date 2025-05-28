@@ -137,14 +137,21 @@ function handlePageSizeChange() {
 <template>
   <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-4">
     <!-- Size Changer -->
-    <div v-if="showSizeChanger" class="flex items-center gap-2 flex-shrink-0">
+    <div
+      v-show="showSizeChanger"
+      class="flex items-center gap-2 flex-shrink-0"
+    >
       <span class="text-sm text-gray-600 whitespace-nowrap">Show</span>
       <select
         v-model="currentPageSize"
-        @change="handlePageSizeChange"
         class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 itbms-page-size"
+        @change="handlePageSizeChange"
       >
-        <option v-for="size in pageSizeOptions" :key="size" :value="size">
+        <option
+          v-for="size in pageSizeOptions"
+          :key="size"
+          :value="size"
+        >
           {{ size }}
         </option>
       </select>
@@ -179,7 +186,10 @@ function handlePageSizeChange() {
           </XButton>
 
           <!-- Page Numbers -->
-          <template v-for="(page, index) in visiblePages" :key="page">
+          <template
+            v-for="(page, index) in visiblePages"
+            :key="page"
+          >
             <!-- <span v-if="page === '...'" class="px-2 text-gray-400 flex-shrink-0">...</span> -->
             <XButton
               :class="[
