@@ -22,7 +22,8 @@ const touched = ref(false)
 
 const handleInput = (e) => {
   const raw = e.target.value
-  emit('update:modelValue', props.type === 'number' ? +raw || null : raw)
+  // emit('update:modelValue', props.type === 'number' ? (raw === '' ? null : +raw) : raw)
+  emit('update:modelValue', raw)
 }
 
 const onBlur = () => {
@@ -57,7 +58,7 @@ const onBlur = () => {
     @blur="onBlur"
   />
 
-  <p v-if="touched && errorMessage" class="text-sm text-red-500 mt-1">
+  <p v-if="touched && errorMessage" class="itbms-message text-sm text-red-500 mt-1">
     {{ errorMessage }}
   </p>
 </template>
