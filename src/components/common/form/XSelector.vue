@@ -88,6 +88,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
+
+console.log(props.options)
 </script>
 
 <template>
@@ -136,6 +138,7 @@ onBeforeUnmount(() => {
       <select
         v-model="selectedValue"
         :disabled="disabled"
+        :placeholder="placeholder"
         :class="['w-full bg-white outline-none', props.class]"
         @blur="$emit('blur')"
         @change="$emit('change')"
