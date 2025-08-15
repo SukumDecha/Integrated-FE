@@ -46,7 +46,7 @@ const storageOptions = computed(() => [
   { label: '256 GB', value: 256 },
   { label: '512 GB', value: 512 },
   { label: '1 TB+', value: 1024 },
-  { label: 'Not specified', value: 0 },
+  { label: 'Not specified', value: -1 },
 ])
 
 const allBrands = reactive([])
@@ -103,6 +103,29 @@ const searchParams = computed(() => {
   }
 })
 
+watch(
+  () => ({ min: customPrice.min, max: customPrice.max }),
+  (value) => {
+    saveToLocalStorage(LOCAL_STORAGE_KEYS.CUSTOM_PRICE, value)
+  },
+  { deep: true },
+)
+
+watch(
+  () => searchOptions.filteredStorages,
+  (value) => {
+    saveToLocalStorage(LOCAL_STORAGE_KEYS.FILTER_STORAGES, value)
+  },
+  { deep: true },
+)
+
+watch(
+  () => searchOptions.filteredPrices,
+  (value) => {
+    saveToLocalStorage(LOCAL_STORAGE_KEYS.FILTER_PRICES, value)
+  },
+)
+
 const initializeStateFromRouteOrStorage = () => {
   const q = route.query
 
@@ -123,11 +146,24 @@ const initializeStateFromRouteOrStorage = () => {
     : loadFromLocalStorage(LOCAL_STORAGE_KEYS.FILTER_BRANDS, [])
 
   // Filter Prices
+  let priceFromLS = loadFromLocalStorage(LOCAL_STORAGE_KEYS.FILTER_PRICES, null)
+  if (Array.isArray(priceFromLS)) priceFromLS = priceFromLS[0] ?? null
+
   searchOptions.filteredPrices =
-    q.filterPrices ?? loadFromLocalStorage(LOCAL_STORAGE_KEYS.FILTER_PRICES, null)
-  if (Array.isArray(searchOptions.filteredPrices)) {
-    searchOptions.filteredPrices = searchOptions.filteredPrices[0] ?? null
-  }
+    typeof priceFromRoute === 'string' && priceFromRoute !== ''
+      ? priceFromRoute
+      : typeof priceFromLS === 'string' && priceFromLS !== ''
+        ? priceFromLS
+        : null
+
+  // Custom price min/max
+  const customPriceLS = loadFromLocalStorage(LOCAL_STORAGE_KEYS.CUSTOM_PRICE, {
+    min: '',
+    max: '',
+  })
+  customPrice.min = customPriceLS.min ?? ''
+  customPrice.max = customPriceLS.max ?? ''
+
   // Filter Storages
   searchOptions.filteredStorages = q.filterStorages
     ? q.filterStorages.split(',').map(Number)
@@ -157,7 +193,7 @@ const updateRouteQuery = () => {
 
   if (searchOptions.filteredPrices) query.filterPrices = searchOptions.filteredPrices
 
-  if (searchOptions.filteredStorages.length > 0)
+  if (Array.isArray(searchOptions.filteredStorages) && searchOptions.filteredStorages.length > 0)
     query.filterStorages = searchOptions.filteredStorages.join(',')
 
   router.replace({ query })
@@ -228,16 +264,6 @@ const setSort = (field, order) => {
   }
 }
 
-watch(
-  searchParams,
-  async () => {
-    console.log('[searchParams]', JSON.stringify(searchParams.value, null, 2))
-    updateRouteQuery()
-    await fetchSaleItems()
-  },
-  { deep: true },
-)
-
 const sortAscByName = () => setSort('brand.name', 'asc')
 const sortDescByName = () => setSort('brand.name', 'desc')
 const clearSort = () => setSort(undefined, undefined)
@@ -265,6 +291,7 @@ const clearAllFilter = () => {
   localStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_BRANDS)
   localStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_PRICES)
   localStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_STORAGES)
+  localStorage.removeItem(LOCAL_STORAGE_KEYS.CUSTOM_PRICE)
 
   resetPagination(false)
 }
