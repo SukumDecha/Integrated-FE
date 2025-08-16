@@ -21,9 +21,10 @@ const request = async (
   const httpOptions = {
     method,
     headers: httpHeaders,
+    ...options
   }
 
-  if (payload) {
+  if (payload && httpOptions.headers['Content-Type'] === 'application/json') {
     httpOptions.body = JSON.stringify(payload)
   }
 
@@ -101,12 +102,12 @@ const post = async (url, payload) => {
   return request(url, 'POST', payload)
 }
 
-const patch = async (url, payload) => {
-  return request(url, 'PATCH', payload)
+const patch = async (url, payload, options) => {
+  return request(url, 'PATCH', payload, options)
 }
 
-const put = async (url, payload) => {
-  return request(url, 'PUT', payload)
+const put = async (url, payload, options) => {
+  return request(url, 'PUT', payload, options)
 }
 
 const remove = async (url) => {

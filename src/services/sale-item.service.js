@@ -14,11 +14,19 @@ const SaleItemService = {
   },
 
   async addSaleItem(data) {
-    return await post(`${BASE_URL_V1}`, data)
+    return await post(`${BASE_URL_V1}`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
   },
 
   async updateSaleItem(id, data) {
-    return await put(`${BASE_URL_V1}/${id}`, data)
+    return await put(`${BASE_URL_V1}/${id}`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
   },
 
   async deleteSaleItem(id) {
