@@ -5,10 +5,10 @@ const props = defineProps({
   modelValue: [String, Number, Array],
   mode: { type: String, default: 'single' },
   options: { type: Array, default: () => [] },
-  placeholder: String,
-  disabled: Boolean,
+  placeholder: { type: String, default: '' },
+  disabled: { type: Boolean, default: false },
   class: { type: String, default: '' },
-  errorMessage: String, // ✅ รับ errorMessage
+  errorMessage: { type: String, default: '' },
 })
 
 const emit = defineEmits(['update:modelValue', 'remove', 'blur', 'change'])
@@ -91,7 +91,10 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="wrapperRef" class="relative w-full">
+  <div
+    ref="wrapperRef"
+    class="relative w-full"
+  >
     <!-- Multiple Mode -->
     <div
       v-if="isMultiple"
@@ -122,7 +125,7 @@ onBeforeUnmount(() => {
         class="flex-1 border-none focus:ring-0 focus:outline-none min-w-[50px]"
         :disabled="disabled"
         @focus="handleFocus"
-      />
+      >
     </div>
 
     <!-- Single Mode -->
@@ -137,16 +140,25 @@ onBeforeUnmount(() => {
         @blur="$emit('blur')"
         @change="$emit('change')"
       >
-        <option value="">
+        <option
+          value=""
+        >
           {{ placeholder || 'Select an option' }}
         </option>
-        <option v-for="option in props.options" :key="option.value" :value="option.value">
+        <option
+          v-for="option in props.options"
+          :key="option.value"
+          :value="option.value"
+        >
           {{ option.label }}
         </option>
       </select>
     </div>
     <!-- ✅ Show error -->
-    <p v-if="props.errorMessage" class="itbms-message text-sm text-red-600 mt-1">
+    <p
+      v-if="props.errorMessage"
+      class="itbms-message text-sm text-red-600 mt-1"
+    >
       {{ props.errorMessage }}
     </p>
 
