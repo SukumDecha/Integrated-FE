@@ -1,6 +1,9 @@
 <template>
   <div class="fixed top-4 right-4 z-50 space-y-2 w-80">
-    <transition-group name="fade" tag="div">
+    <transition-group
+      name="fade"
+      tag="div"
+    >
       <div
         v-for="toast in toasts"
         :key="toast.id"
@@ -16,7 +19,9 @@
         <button
           class="ml-4 text-sm opacity-70 hover:opacity-100"
           @click="remove(toast.id)"
-        >×</button>
+        >
+          ×
+        </button>
       </div>
     </transition-group>
   </div>

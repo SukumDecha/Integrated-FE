@@ -105,6 +105,17 @@
       @blur="onBlur('description')"
     />
 
+    <XUpload
+      v-model="form.images"
+      accept="image/*"
+      :multiple="true"
+      :max-files="4"
+      :max-size="2 * 1024 * 1024"
+      class-name="bg-white"
+      @error="onUploadImageError"
+      @blur="onBlur('images')"
+    />
+
     <div class="flex gap-4 justify-end mt-8">
       <XButton
         type="submit"
@@ -132,12 +143,19 @@ import { useToastStore } from '@/stores/toast.store'
 import { BrandService } from '@/services'
 import XInput from '@/components/common/form/XInput.vue'
 import XSelector from '@/components/common/form/XSelector.vue'
-import XButton from '../common/XButton.vue'
+import XButton from '@/components/common/XButton.vue'
+import XUpload from '@/components/common/XUpload.vue'
 
 const props = defineProps({
-  initialData: Object,
+  initialData: {
+    type: Object,
+    default: () => ({}),
+  },
   isEditMode: Boolean,
-  onSubmit: Function,
+  onSubmit: {
+    type: Function,
+    required: true,
+  },
 })
 
 const emit = defineEmits(['cancel'])
@@ -153,6 +171,8 @@ const form = ref({
   storageGb: null,
   color: '',
   quantity: null,
+  images: [],
+
 })
 
 const fieldErrors = ref({
@@ -164,6 +184,7 @@ const fieldErrors = ref({
   ramGb: '',
   screenSizeInch: '',
   storageGb: '',
+  images: '',
 })
 
 const touchedFields = ref({
@@ -175,11 +196,17 @@ const touchedFields = ref({
   ramGb: false,
   screenSizeInch: false,
   storageGb: false,
+  images: false,
 })
 
 function onBlur(field) {
   touchedFields.value[field] = true
   validateField(field)
+}
+
+function onUploadImageError(error) {
+  fieldErrors.value.images = error
+  toast.add({ message: error, type: 'error' })
 }
 
 function validateField(field) {
@@ -278,6 +305,7 @@ const fetchBrands = async () => {
         storageGb: val.storageGb ?? null,
         color: val.color ?? '',
         quantity: val.quantity ?? null,
+        images: val.images ?? [],
       }
     }
   }
@@ -321,21 +349,34 @@ const handleSave = async () => {
     return
   }
 
-  const payload = {
-    brand: { id: form.value.brandId },
-    model: form.value.model.trim(),
-    price: form.value.price,
-    ramGb: form.value.ramGb,
-    screenSizeInch: parseNumber(form.value.screenSizeInch),
-    storageGb: form.value.storageGb,
-    color: form.value.color?.trim() || null,
-    quantity: form.value.quantity,
-    description: form.value.description.trim(),
-  }
+  // const payload = {
+  //   brand: { id: form.value.brandId },
+  //   model: form.value.model.trim(),
+  //   price: form.value.price,
+  //   ramGb: form.value.ramGb,
+  //   screenSizeInch: parseNumber(form.value.screenSizeInch),
+  //   storageGb: form.value.storageGb,
+  //   color: form.value.color?.trim() || null,
+  //   quantity: form.value.quantity,
+  //   description: form.value.description.trim(),
+  //   images: form.value.image
+  // }
+
+  const formData = new FormData()
+  formData.append('brand', JSON.stringify({ id: form.value.brandId }))
+  formData.append('model', form.value.model.trim())
+  formData.append('price', form.value.price)
+  formData.append('ramGb', form.value.ramGb)
+  formData.append('screenSizeInch', parseNumber(form.value.screenSizeInch))
+  formData.append('storageGb', form.value.storageGb)
+  formData.append('color', form.value.color?.trim() || null)
+  formData.append('quantity', form.value.quantity)
+  formData.append('description', form.value.description.trim())
+  formData.append('images', form.value.images)
 
   isSaving.value = true
   try {
-    await props.onSubmit(payload)
+    await props.onSubmit(formData)
   } catch (err) {
     toast.add({ message: 'Failed to save item', type: 'error' })
     console.error(err)
@@ -348,6 +389,10 @@ const isChanged = computed(() => {
   if (!props.isEditMode || !props.initialData) return true
   const current = form.value
   const initial = props.initialData
+
+  const sameImages =
+    JSON.stringify(initial.images ?? []) === JSON.stringify(current.images ?? [])
+
   return (
     findBrandIdByName(initial.brandName) !== current.brandId ||
     initial.model.trim() !== current.model.trim() ||
@@ -357,9 +402,13 @@ const isChanged = computed(() => {
     initial.screenSizeInch !== current.screenSizeInch ||
     initial.storageGb !== current.storageGb ||
     (initial.color ?? '') !== current.color ||
-    initial.quantity !== current.quantity
+    initial.quantity !== current.quantity ||
+    !sameImages
   )
 })
+
+
+
 </script>
 
 <style scoped>
