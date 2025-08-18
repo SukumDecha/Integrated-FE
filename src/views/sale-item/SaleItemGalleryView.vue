@@ -14,7 +14,7 @@ import { AlignJustify, ArrowDownWideNarrow, ArrowUpWideNarrow, PlusIcon } from '
 
 import { SaleItemService, BrandService } from '@/services'
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils'
-import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item'
+import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item.constant'
 
 // --- State Management ---
 const searchOptions = reactive({

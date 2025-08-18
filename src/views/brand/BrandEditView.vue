@@ -3,8 +3,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { BrandService } from '@/services'
 import { useToastStore } from '@/stores/toast.store'
 import BrandForm from '@/components/brand/BrandForm.vue'
-import XLayout from '@/components/layout/DefaultLayout.vue'
-import XNavbar from '@/components/layout/XNavbar.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import { onMounted, ref } from 'vue'
 
@@ -31,7 +29,7 @@ const fetchBrand = async () => {
   if (isNotFound) {
     toast.add({
       message: 'The brand does not exist.',
-      type: 'error'
+      type: 'error',
     })
     router.push('/brands')
     return
@@ -40,7 +38,7 @@ const fetchBrand = async () => {
   if (res.error) {
     toast.add({
       message: 'Failed to fetch brand',
-      type: 'error'
+      type: 'error',
     })
     router.push('/brands')
     return
@@ -48,8 +46,6 @@ const fetchBrand = async () => {
 
   brand.value = res.data
 }
-
-
 
 const handleSubmit = async (data) => {
   const res = await BrandService.updateBrand(brandId, data)

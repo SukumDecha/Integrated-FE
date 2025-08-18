@@ -2,7 +2,7 @@
   <div :class="['w-full', className]">
     <!-- Dropzone -->
     <label
-      class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed p-6 text-center cursor-pointer transition hover:border-gray-400"
+      class="itbms-upload-button flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed p-6 text-center cursor-pointer transition hover:border-gray-400"
       :class="isDragging ? 'border-gray-500 bg-gray-50' : 'border-gray-300'"
       @dragover.prevent="onDragOver"
       @dragleave.prevent="onDragLeave"
@@ -15,18 +15,15 @@
         :accept="accept"
         :multiple="multiple"
         @change="onInputChange"
-      >
+      />
       <div class="text-sm text-gray-600">
         <slot name="label">
           <p class="font-medium">Drop files here or click to upload</p>
-          <p
-            v-if="accept"
-            class="text-xs text-gray-500 mt-1"
-          >Accepted: {{ accept }}</p>
-          <p
-            v-if="maxSize"
-            class="text-xs text-gray-500"
-          >Max size: {{ prettyBytes(maxSize) }}</p>
+          <p v-if="accept" class="text-xs text-gray-500 mt-1">Accepted: {{ accept }}</p>
+          <p v-if="maxSize" class="text-xs text-gray-500">Max size: {{ prettyBytes(maxSize) }}</p>
+          <p v-if="maxSlots" class="text-xs text-gray-500">
+            Slots: {{ occupiedSlots }}/{{ maxSlots }}
+          </p>
         </slot>
       </div>
       <button
@@ -38,67 +35,180 @@
       </button>
     </label>
 
-    <!-- File list -->
-    <div
-      v-if="files.length"
-      class="mt-4 space-y-2"
-    >
+    <!-- File slots grid -->
+    <div v-if="maxSlots" class="mt-4 grid gap-2" :class="gridClass">
+      <div
+        v-for="slotIndex in maxSlots"
+        :key="slotIndex"
+        class="aspect-square rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden relative group"
+        :class="[
+          getSlotFile(slotIndex - 1)
+            ? 'border-solid border-gray-300 bg-white'
+            : 'hover:border-gray-300',
+          dropTargetSlotIndex === slotIndex - 1 && draggedSlotIndex !== null
+            ? 'border-blue-400 bg-blue-50'
+            : '',
+        ]"
+      >
+        <!-- File content -->
+        <template v-if="getSlotFile(slotIndex - 1)">
+          <div
+            class="w-full h-full relative cursor-move"
+            draggable="true"
+            @dragstart="onFileDragStart($event, slotIndex - 1)"
+            @dragend="onFileDragEnd"
+          >
+            <!-- Image preview -->
+            <img
+              v-if="getSlotFile(slotIndex - 1).previewUrl"
+              :src="getSlotFile(slotIndex - 1).previewUrl"
+              :alt="getSlotFile(slotIndex - 1).fileName"
+              class="w-full h-full object-cover"
+            />
+            <!-- File icon for non-images -->
+            <div
+              v-else
+              class="w-full h-full flex flex-col items-center justify-center text-gray-500"
+            >
+              <span class="text-xs font-medium mb-1">FILE</span>
+              <span class="text-xs truncate px-2">{{ getSlotFile(slotIndex - 1).fileName }}</span>
+            </div>
+
+            <!-- File info overlay -->
+            <div
+              class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <p class="text-xs truncate font-medium" :class="`itbms-picture-file${slotIndex}`">
+                {{ getSlotFile(slotIndex - 1).fileName }}
+              </p>
+              <p class="text-xs text-gray-300">
+                {{ getSlotFile(slotIndex - 1).imageFile?.type || '—' }} •
+                {{ prettyBytes(getSlotFile(slotIndex - 1).imageFile?.size) }}
+              </p>
+            </div>
+
+            <!-- Error indicator -->
+            <div
+              v-if="getSlotFile(slotIndex - 1).error"
+              class="absolute inset-0 bg-red-500 bg-opacity-20 flex items-center justify-center"
+            >
+              <div class="bg-red-500 text-white text-xs px-2 py-1 rounded">Error</div>
+            </div>
+
+            <!-- Action buttons -->
+            <div
+              class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <!-- Move left -->
+              <button
+                v-if="slotIndex > 1 && canMoveLeft(slotIndex - 1)"
+                type="button"
+                class="bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                :class="`itbms-picture-file${slotIndex}-up`"
+                title="Move left"
+                @click="moveSlotLeft(slotIndex - 1)"
+              >
+                ←
+              </button>
+              <!-- Move right -->
+              <button
+                v-if="slotIndex < maxSlots && canMoveRight(slotIndex - 1)"
+                type="button"
+                class="bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                :class="`itbms-picture-file${slotIndex}-down`"
+                title="Move right"
+                @click="moveSlotRight(slotIndex - 1)"
+              >
+                →
+              </button>
+              <!-- Remove -->
+              <button
+                type="button"
+                class="bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                :class="`itbms-picture-file${slotIndex}-clear`"
+                title="Remove"
+                @click="removeFromSlot(slotIndex - 1)"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        </template>
+
+        <!-- Empty slot with drop target -->
+        <template v-else>
+          <div
+            class="text-gray-400 text-center h-full w-full flex flex-col items-center justify-center"
+            @dragover.prevent="onSlotDragOver($event, slotIndex - 1)"
+            @dragleave.prevent="onSlotDragLeave"
+            @drop.prevent="onSlotDrop($event, slotIndex - 1)"
+          >
+            <div class="text-2xl mb-1">+</div>
+            <div class="text-xs">Slot {{ slotIndex }}</div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Traditional file list (when not using slots) -->
+    <div v-else-if="files.length" class="mt-4 space-y-2">
       <div
         v-for="(item, index) in files"
         :key="item.id"
         class="flex items-center gap-3 rounded-xl border p-3"
-        :class="item.error
-          ? 'border-red-500 bg-red-50'
-          : 'border-gray-200 bg-white'"
+        :class="item.error ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white'"
       >
         <!-- Thumbnail -->
-        <div class="w-12 h-12 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center shrink-0">
+        <div
+          class="w-12 h-12 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center shrink-0"
+        >
           <img
             v-if="item.previewUrl"
             :src="item.previewUrl"
             alt=""
             class="w-full h-full object-cover"
-          >
-          <span
-            v-else
-            class="text-xs text-gray-500"
-          >FILE</span>
+          />
+          <span v-else class="text-xs text-gray-500">FILE</span>
         </div>
 
         <!-- File info -->
         <div class="min-w-0 flex-1">
           <p
-            class="truncate text-sm font-medium"
-            :class="item.error ? 'text-red-600' : 'text-gray-900'"
+            :class="[
+              'truncate text-sm font-medium',
+              item.error ? 'text-red-600' : 'text-gray-900',
+              `itbms-picture-file${index + 1}`,
+            ]"
           >
-            {{ item.file.name }}
+            {{ item.fileName }}
           </p>
           <p class="text-xs text-gray-500">
-            {{ item.file.type || '—' }} • {{ prettyBytes(item.file.size) }}
+            {{ item.imageFile?.type || '—' }} • {{ prettyBytes(item.imageFile?.size) }}
           </p>
 
           <!-- Error message for this file -->
-          <p
-            v-if="item.error"
-            class="mt-1 text-xs font-medium text-red-700"
-          >
+          <p v-if="item.error" class="mt-1 text-xs font-medium text-red-700">
             {{ item.error }}
           </p>
         </div>
 
         <!-- Action buttons -->
-        <div class="flex items-center gap-1">
+        <div v-if="files.length > 1" class="flex items-center gap-1">
           <button
+            v-if="index !== 0"
             type="button"
-            class="text-xs rounded-lg border px-2 py-1"
+            class="text-xs rounded-lg border px-2 py-1 hover:bg-green-50 hover:border-green-400 hover:text-green-400"
+            :class="`itbms-picture-file${index + 1}-up`"
             :disabled="index === 0"
             @click="moveUp(index)"
           >
             ↑
           </button>
           <button
+            v-if="index !== files.length - 1"
             type="button"
-            class="text-xs rounded-lg border px-2 py-1"
+            class="text-xs rounded-lg border px-2 py-1 hover:bg-green-50 hover:border-green-400 hover:text-green-400"
+            :class="`itbms-picture-file${index + 1}-down`"
             :disabled="index === files.length - 1"
             @click="moveDown(index)"
           >
@@ -106,28 +216,26 @@
           </button>
           <button
             type="button"
-            class="text-xs rounded-lg border px-2 py-1"
+            class="group text-xs rounded-lg border px-2 py-1 hover:bg-red-50 hover:border-red-400"
+            :class="`itbms-picture-file${index + 1}-clear`"
             @click="remove(item.id)"
           >
-            Remove
+            <TrashIcon class="h-4 w-4 text-gray-500 group-hover:text-red-400" />
           </button>
         </div>
       </div>
     </div>
 
-
     <!-- Helper / errors -->
-    <p
-      v-if="errors.length"
-      class="mt-3 text-xs text-red-600"
-    >
+    <p v-if="errors.length" class="mt-3 text-xs text-red-600">
       {{ errors[errors.length - 1] }}
     </p>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onBeforeUnmount } from 'vue'
+import { TrashIcon } from 'lucide-vue-next'
+import { ref, watch, onBeforeUnmount, computed } from 'vue'
 
 const props = defineProps({
   modelValue: { type: Array, default: () => [] },
@@ -135,8 +243,9 @@ const props = defineProps({
   multiple: { type: Boolean, default: true },
   maxSize: { type: Number, default: null },
   maxFiles: { type: Number, default: null },
+  maxSlots: { type: Number, default: null }, // New prop for slot-based upload
   validators: { type: Array, default: () => [] },
-  className: { type: String, default: '' }
+  className: { type: String, default: '' },
 })
 
 const emit = defineEmits(['update:modelValue', 'change', 'error'])
@@ -145,10 +254,26 @@ const inputEl = ref(null)
 const isDragging = ref(false)
 const files = ref([])
 const errors = ref([])
+const draggedSlotIndex = ref(null)
+const dropTargetSlotIndex = ref(null)
+
+// Computed property for grid layout based on slot count
+const gridClass = computed(() => {
+  if (!props.maxSlots) return 'grid-cols-1'
+  if (props.maxSlots <= 2) return 'grid-cols-2'
+  if (props.maxSlots <= 4) return 'grid-cols-2 sm:grid-cols-4'
+  if (props.maxSlots <= 6) return 'grid-cols-2 sm:grid-cols-3'
+  return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4'
+})
+
+// Computed property to count occupied slots
+const occupiedSlots = computed(() => {
+  return files.value.filter((f) => f && !f.error).length
+})
 
 const revokePreviewUrls = () => {
-  files.value.forEach(f => {
-    if (f.previewUrl) URL.revokeObjectURL(f.previewUrl)
+  files.value.forEach((f) => {
+    if (f && f.previewUrl) URL.revokeObjectURL(f.previewUrl)
   })
 }
 
@@ -157,20 +282,77 @@ onBeforeUnmount(revokePreviewUrls)
 watch(
   () => props.modelValue,
   (val) => {
-    const existing = new Map(files.value.map(f => [f.file, f]))
-    revokePreviewUrls()
-    files.value = (val || []).map(file => {
-      const prev = existing.get(file)
-      return {
-        id: prev?.id || makeId(),
-        file,
-        previewUrl: isPreviewable(file) ? URL.createObjectURL(file) : null,
-        error: null
-      }
-    })
+    // Revoke old URLs
+    // revokePreviewUrls()
+
+    if (props.maxSlots) {
+      // Initialize slots array with null values
+      const newFiles = new Array(props.maxSlots).fill(null)
+
+      // Fill slots with existing files, maintaining their positions
+      ;(val || []).forEach((item) => {
+        const slotIndex =
+          item.slotIndex !== undefined ? item.slotIndex : findNextEmptySlot(newFiles)
+        if (slotIndex !== -1 && slotIndex < props.maxSlots) {
+          const isFile = item.imageFile instanceof File
+
+          let previewUrl = null
+
+          console.log('Item', item)
+          if (item.previewUrl) {
+            previewUrl = item.previewUrl
+          } else if (isFile && isPreviewable(item.imageFile)) {
+            previewUrl = URL.createObjectURL(item.imageFile)
+          }
+
+          newFiles[slotIndex] = {
+            id: item.id || makeId(),
+            imageFile: isFile ? item.imageFile : null,
+            fileName: item.fileName || item.name,
+            slotIndex,
+            previewUrl,
+            error: null,
+          }
+        }
+      })
+
+      files.value = newFiles
+    } else {
+      // Original behavior for non-slot mode
+      files.value = (val || []).map((item) => {
+        const isFile = item.imageFile instanceof File
+
+        let previewUrl = null
+        if (item.previewUrl) {
+          previewUrl = item.previewUrl
+        } else if (isFile && isPreviewable(item.imageFile)) {
+          previewUrl = URL.createObjectURL(item.imageFile)
+        }
+
+        return {
+          id: item.id || makeId(),
+          imageFile: isFile ? item.imageFile : null,
+          fileName: item.fileName || item.name,
+          previewUrl,
+          error: null,
+        }
+      })
+    }
   },
-  { immediate: true }
+  { immediate: true },
 )
+
+function findNextEmptySlot(slotsArray) {
+  for (let i = 0; i < slotsArray.length; i++) {
+    if (!slotsArray[i]) return i
+  }
+  return -1
+}
+
+function getSlotFile(slotIndex) {
+  if (!props.maxSlots) return null
+  return files.value[slotIndex] || null
+}
 
 function open() {
   inputEl.value && inputEl.value.click()
@@ -198,48 +380,118 @@ function onDrop(e) {
 function addFiles(incoming) {
   if (!incoming.length) return
 
-  if (props.maxFiles && files.value.length + incoming.length > props.maxFiles) {
-    const msg = `You can only upload up to ${props.maxFiles} file(s).`
-    errors.value.push(msg)
-    emit('error', msg)
-    incoming = incoming.slice(0, Math.max(0, props.maxFiles - files.value.length))
+  if (props.maxSlots) {
+    // Slot-based upload
+    const availableSlots = files.value.filter((f) => !f).length
+    if (availableSlots === 0) {
+      const msg = `All ${props.maxSlots} slots are occupied.`
+      errors.value.push(msg)
+      emit('error', msg)
+      return
+    }
+
+    if (incoming.length > availableSlots) {
+      const msg = `Maximum ${availableSlots} pictures are allowed.`
+      errors.value.push(msg)
+      emit('error', msg)
+      incoming = incoming.slice(0, availableSlots)
+    }
+
+    // Add files to empty slots
+    let fileIndex = 0
+    for (
+      let slotIndex = 0;
+      slotIndex < props.maxSlots && fileIndex < incoming.length;
+      slotIndex++
+    ) {
+      if (!files.value[slotIndex]) {
+        const file = incoming[fileIndex]
+        const error = validateFile(file)
+
+        if (error) {
+          emit('error', error)
+        }
+
+        files.value[slotIndex] = {
+          id: makeId(),
+          imageFile: file,
+          fileName: file.name,
+          slotIndex,
+          order: slotIndex + 1,
+          previewUrl: isPreviewable(file) ? URL.createObjectURL(file) : null,
+          error,
+        }
+        fileIndex++
+      }
+    }
+  } else {
+    // Original behavior for non-slot mode
+    if (props.maxFiles && files.value.length + incoming.length > props.maxFiles) {
+      const msg = `You can only upload up to ${props.maxFiles} file(s).`
+      errors.value.push(msg)
+      emit('error', msg)
+      incoming = incoming.slice(0, Math.max(0, props.maxFiles - files.value.length))
+    }
+
+    const newItems = incoming.map((file) => {
+      const error = validateFile(file)
+
+      if (error) {
+        emit('error', error)
+      }
+
+      return {
+        id: makeId(),
+        imageFile: file,
+        fileName: file.name,
+        order: null,
+        previewUrl: isPreviewable(file) ? URL.createObjectURL(file) : null,
+        error,
+      }
+    })
+
+    files.value = props.multiple ? [...files.value, ...newItems] : [newItems[0]].filter(Boolean)
   }
 
-  const newItems = incoming.map(file => {
-    const error = validateFile(file)
-
-    if (error) {
-      emit("error", error)
-    }
-
-    return {
-      id: makeId(),
-      file,
-      previewUrl: isPreviewable(file) ? URL.createObjectURL(file) : null,
-      error // keep the error even if invalid
-    }
-  })
-
-  // Keep both valid & invalid files in the internal list
-  files.value = props.multiple
-    ? [...files.value, ...newItems]
-    : [newItems[0]].filter(Boolean)
-
-  // Only emit valid files
   emitValidFiles()
 }
 
-function remove(id) {
-  const idx = files.value.findIndex(f => f.id === id)
-  if (idx !== -1) {
-    const [removed] = files.value.splice(idx, 1)
-    if (removed.previewUrl) URL.revokeObjectURL(removed.previewUrl)
+function removeFromSlot(slotIndex) {
+  if (props.maxSlots && files.value[slotIndex]) {
+    const fileToRemove = files.value[slotIndex]
+
+    if (fileToRemove.previewUrl) {
+      URL.revokeObjectURL(fileToRemove.previewUrl)
+    }
+
+    // Set slot to null instead of removing
+    files.value[slotIndex] = null
     emitValidFiles()
   }
 }
 
+function remove(id) {
+  if (props.maxSlots) {
+    // Find and remove from slot
+    const slotIndex = files.value.findIndex((f) => f && f.id === id)
+    if (slotIndex !== -1) {
+      removeFromSlot(slotIndex)
+    }
+  } else {
+    // Original behavior
+    const idx = files.value.findIndex((f) => f.id === id)
+    if (idx !== -1) {
+      const fileToRemove = files.value[idx]
+      files.value.splice(idx, 1)
+
+      if (fileToRemove.previewUrl) URL.revokeObjectURL(fileToRemove.previewUrl)
+      emitValidFiles()
+    }
+  }
+}
+
 function moveUp(index) {
-  if (index > 0) {
+  if (index > 0 && !props.maxSlots) {
     const temp = files.value[index]
     files.value[index] = files.value[index - 1]
     files.value[index - 1] = temp
@@ -248,7 +500,7 @@ function moveUp(index) {
 }
 
 function moveDown(index) {
-  if (index < files.value.length - 1) {
+  if (index < files.value.length - 1 && !props.maxSlots) {
     const temp = files.value[index]
     files.value[index] = files.value[index + 1]
     files.value[index + 1] = temp
@@ -257,9 +509,40 @@ function moveDown(index) {
 }
 
 function emitValidFiles() {
-  const validFiles = files.value
-    .filter(f => !f.error) // filter only valid
-    .map(f => f.file)
+  let validFiles
+
+  if (props.maxSlots) {
+    // For slot-based upload, include slot information
+    validFiles = files.value
+      .map((f, slotIndex) => {
+        if (!f || f.error) return null
+        return {
+          id: f.id,
+          imageFile: f.imageFile,
+          fileName: f.fileName,
+          previewUrl: f.previewUrl,
+          slotIndex,
+          order: slotIndex, // Use slot index as order
+        }
+      })
+      .filter(Boolean) // Remove null entries
+
+    console.log('Valid Files', validFiles)
+  } else {
+    // Original behavior for non-slot mode
+    validFiles = files.value
+      .filter((f) => !f.error)
+      .map((f) => ({
+        id: f.id,
+        imageFile: f.imageFile,
+        previewUrl: f.previewUrl,
+        fileName: f.fileName,
+        order: f.order,
+      }))
+  }
+
+  console.log('Emitting valid files:', validFiles)
+
   emit('update:modelValue', validFiles)
   emit('change', validFiles)
 }
@@ -292,10 +575,13 @@ function isPreviewable(file) {
 }
 
 function matchesAccept(file, accept) {
-  const parts = accept.split(',').map(s => s.trim()).filter(Boolean)
+  const parts = accept
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
   const ext = file.name.includes('.') ? '.' + file.name.split('.').pop().toLowerCase() : ''
   const type = (file.type || '').toLowerCase()
-  return parts.some(p => {
+  return parts.some((p) => {
     p = p.toLowerCase()
     if (p === '*/*') return true
     if (p.endsWith('/*')) return type.startsWith(p.replace('/*', '') + '/')
@@ -314,5 +600,82 @@ function prettyBytes(num) {
     i++
   }
   return `${n.toFixed(n >= 10 || i === 0 ? 0 : 1)} ${units[i]}`
+}
+
+// Slot movement functions
+function canMoveLeft(slotIndex) {
+  return slotIndex > 0
+}
+
+function canMoveRight(slotIndex) {
+  return slotIndex < props.maxSlots - 1
+}
+
+function moveSlotLeft(slotIndex) {
+  if (canMoveLeft(slotIndex)) {
+    const targetIndex = slotIndex - 1
+    swapSlots(slotIndex, targetIndex)
+  }
+}
+
+function moveSlotRight(slotIndex) {
+  if (canMoveRight(slotIndex)) {
+    const targetIndex = slotIndex + 1
+    swapSlots(slotIndex, targetIndex)
+  }
+}
+
+function swapSlots(fromIndex, toIndex) {
+  const temp = files.value[fromIndex]
+  files.value[fromIndex] = files.value[toIndex]
+  files.value[toIndex] = temp
+
+  // Update slot indices
+  if (files.value[fromIndex]) {
+    files.value[fromIndex].slotIndex = fromIndex
+    files.value[fromIndex].order = toIndex
+    console.log('Swapped from', fromIndex, 'to', toIndex)
+  }
+  if (files.value[toIndex]) {
+    files.value[toIndex].slotIndex = toIndex
+    files.value[toIndex].order = fromIndex
+    console.log('Swapped from', toIndex, 'to', fromIndex)
+  }
+
+  emitValidFiles()
+}
+
+// Drag and drop for slot rearrangement
+function onFileDragStart(e, slotIndex) {
+  draggedSlotIndex.value = slotIndex
+  e.dataTransfer.effectAllowed = 'move'
+  e.dataTransfer.setData('text/plain', slotIndex.toString())
+}
+
+function onFileDragEnd() {
+  draggedSlotIndex.value = null
+  dropTargetSlotIndex.value = null
+}
+
+function onSlotDragOver(e, slotIndex) {
+  if (draggedSlotIndex.value !== null && draggedSlotIndex.value !== slotIndex) {
+    e.dataTransfer.dropEffect = 'move'
+    dropTargetSlotIndex.value = slotIndex
+  }
+}
+
+function onSlotDragLeave() {
+  dropTargetSlotIndex.value = null
+}
+
+function onSlotDrop(e, slotIndex) {
+  e.preventDefault()
+
+  if (draggedSlotIndex.value !== null && draggedSlotIndex.value !== slotIndex) {
+    swapSlots(draggedSlotIndex.value, slotIndex)
+  }
+
+  draggedSlotIndex.value = null
+  dropTargetSlotIndex.value = null
 }
 </script>

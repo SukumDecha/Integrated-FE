@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
-  modelValue: [String, Number, Array],
+  modelValue: { type: [String, Number, Array], default: '' },
   mode: { type: String, default: 'single' },
   options: { type: Array, default: () => [] },
   placeholder: { type: String, default: '' },
