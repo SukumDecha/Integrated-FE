@@ -5,7 +5,7 @@ import { useToastStore } from '@/stores/toast.store'
 import SaleItemDetail from '@/components/sale-item/SaleItemDetail.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils'
-import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item'
+import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item.constant'
 
 const router = useRouter()
 const toast = useToastStore()

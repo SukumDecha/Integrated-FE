@@ -9,7 +9,7 @@ import { SaleItemService } from '@/services'
 import { formatPrice, displayOrDash } from '@/utils/TextUtils'
 import { useToastStore } from '@/stores/toast.store'
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils'
-import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item'
+import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item.constant'
 
 const router = useRouter()
 const route = useRoute()

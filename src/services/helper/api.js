@@ -24,8 +24,12 @@ const request = async (
     ...options
   }
 
-  if (payload && httpOptions.headers['Content-Type'] === 'application/json') {
-    httpOptions.body = JSON.stringify(payload)
+  if (payload instanceof FormData) {
+    // ❌ Do not set Content-Type at all
+    delete httpOptions.headers['Content-Type'];
+    httpOptions.body = payload;
+  } else if (payload && httpOptions.headers['Content-Type'] === 'application/json') {
+    httpOptions.body = JSON.stringify(payload);
   }
 
   try {
@@ -98,8 +102,8 @@ const get = async (url, options) => {
   return request(url, 'GET', null, options)
 }
 
-const post = async (url, payload) => {
-  return request(url, 'POST', payload)
+const post = async (url, payload, options) => {
+  return request(url, 'POST', payload, options)
 }
 
 const patch = async (url, payload, options) => {
