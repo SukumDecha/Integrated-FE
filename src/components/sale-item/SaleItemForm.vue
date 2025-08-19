@@ -288,6 +288,7 @@ const fetchBrands = async () => {
     if (props.initialData) {
       const val = props.initialData
 
+      console.log('initial val', val)
       const imagesWithPreview =
         val.saleItemImages?.map((img) => ({
           ...img,
@@ -306,6 +307,8 @@ const fetchBrands = async () => {
         quantity: val.quantity ?? null,
         images: imagesWithPreview,
       }
+
+      console.log('Form.value', form.value)
     }
   }
 }
@@ -408,12 +411,12 @@ const isImageChanged = computed(() => {
   if (!props.isEditMode || !props.initialData) return true
 
   const initialImages =
-    props.initialData.saleItemImages.map((img) => ({
+    props.initialData.saleItemImages?.map((img) => ({
       fileName: img.fileName,
       imageViewOrder: img.imageViewOrder,
     })) ?? []
   const currentImages =
-    form.value.images.map((img) => ({
+    form.value.images?.map((img) => ({
       fileName: img.fileName,
       imageViewOrder: img.imageViewOrder,
     })) ?? []
