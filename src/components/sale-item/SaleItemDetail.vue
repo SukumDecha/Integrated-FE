@@ -3,29 +3,37 @@ import { defineProps, defineEmits, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToastStore } from '@/stores/toast.store'
 import { SaleItemService } from '@/services'
-import { formatPrice } from '@/utils/TextUtils'
+import { formatPrice, getImageUrl } from '@/utils'
 
 import SaleItemForm from './SaleItemForm.vue'
 import XButton from '@/components/common/XButton.vue'
 import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { ArrowLeft } from 'lucide-vue-next'
 
-const imageUrl = new URL('/assets/sale-item/shopping.webp', import.meta.url).pathname
+const imageUrl = new URL('/assets/fallback-image.jpg', import.meta.url).pathname
 
 defineEmits(['cancel'])
 
 const props = defineProps({
-  product: Object,
+  product: {
+    type: Object,
+    default: () => ({}),
+  },
   mode: {
     type: String,
     default: 'detail',
   },
-  onSubmit: Function,
+  onSubmit: {
+    type: Function,
+    default: () => {},
+  },
 })
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToastStore()
+
+const currentImage = ref(null)
 const showConfirm = ref(false)
 const productId = route.params.id
 
@@ -34,6 +42,10 @@ const modeTitle = {
   edit: 'Edit Sale Item',
   detail: 'Sale Item Detail',
 }[props.mode]
+
+const selectCurrentImage = (image) => {
+  currentImage.value = image
+}
 
 const deleteProduct = async () => {
   showConfirm.value = false
@@ -45,18 +57,18 @@ const deleteProduct = async () => {
   if (res.error) {
     toast.add({
       message: 'The requested sale item does not exist.',
-      type: 'error' })
+      type: 'error',
+    })
     router.push('/sale-items')
   } else {
     toast.add({
       message: 'The sale item has been deleted.',
-      type: 'success'
+      type: 'success',
     })
     router.push('/sale-items')
   }
 }
 </script>
-
 
 <template>
   <div class="min-h-screen bg-gray-50 py-8 px-4">
@@ -82,12 +94,16 @@ const deleteProduct = async () => {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
           <!-- Left: Image Gallery -->
           <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
-            <div class="aspect-square bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center">
+            <div
+              class="aspect-square bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center"
+            >
               <img
-                :src="imageUrl"
+                :src="
+                  currentImage || getImageUrl(product.saleItemImages?.[0]?.imageUrl) || imageUrl
+                "
                 alt="Product image"
                 class="w-full h-full object-contain"
-              >
+              />
             </div>
 
             <!-- Thumbnails -->
@@ -98,10 +114,15 @@ const deleteProduct = async () => {
                 class="aspect-square bg-white border border-gray-200 rounded-md overflow-hidden cursor-pointer hover:border-gray-400 transition-colors"
               >
                 <img
-                  :src="imageUrl"
+                  :src="getImageUrl(product.saleItemImages?.[i - 1]?.imageUrl) || imageUrl"
                   alt="Thumbnail"
                   class="w-full h-full object-cover"
-                >
+                  @click="
+                    selectCurrentImage(
+                      getImageUrl(product.saleItemImages[i - 1]?.imageUrl) || imageUrl,
+                    )
+                  "
+                />
               </div>
             </div>
           </div>
@@ -116,10 +137,7 @@ const deleteProduct = async () => {
               @cancel="$emit('cancel')"
             />
 
-            <div
-              v-else
-              class="space-y-6"
-            >
+            <div v-else class="space-y-6">
               <!-- Product title section -->
               <div class="space-y-1">
                 <h2 class="text-2xl font-bold text-gray-800 itbms-model">
@@ -148,9 +166,7 @@ const deleteProduct = async () => {
 
               <!-- Description -->
               <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </h3>
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Description</h3>
                 <p class="text-gray-700 itbms-description">
                   {{ product.description }}
                 </p>
@@ -158,9 +174,7 @@ const deleteProduct = async () => {
 
               <!-- Specifications -->
               <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-3">
-                  Specifications
-                </h3>
+                <h3 class="text-sm font-medium text-gray-700 mb-3">Specifications</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
                   <div class="flex justify-between">
                     <span class="text-gray-500">RAM</span>
@@ -222,4 +236,3 @@ const deleteProduct = async () => {
     />
   </div>
 </template>
-

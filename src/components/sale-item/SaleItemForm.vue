@@ -1,18 +1,12 @@
 <template>
-  <form
-    class="form-grid"
-    @submit.prevent="handleSave"
-  >
+  <form class="form-grid" @submit.prevent="handleSave">
     <label class="block text-sm font-medium text-gray-700 mb-1">
       Brand
-      <span
-        class="text-red-500"
-      >*</span>
+      <span class="text-red-500">*</span>
     </label>
     <XSelector
       v-model="form.brandId"
       class="itbms-brand"
-      label="Brand"
       mode="single"
       :required="true"
       :options="brands.map((b) => ({ value: b.id, label: b.name }))"
@@ -105,21 +99,28 @@
       @blur="onBlur('description')"
     />
 
+    <XUpload
+      v-model="form.images"
+      accept="image/*"
+      :multiple="true"
+      :max-slots="4"
+      :max-size="2 * 1024 * 1024"
+      class-name="bg-white"
+      @error="onUploadImageError"
+      @blur="onBlur('images')"
+    />
+
     <div class="flex gap-4 justify-end mt-8">
       <XButton
         type="submit"
         class="itbms-save-button"
         :loading="isSaving"
-        :disabled="!isFormValid || !isChanged"
+        :disabled="!isFormValid || !(isImageChanged || isDetailChanged)"
       >
         Save
       </XButton>
 
-      <XButton
-        variant="danger"
-        class="itbms-cancel-button"
-        @click="emit('cancel')"
-      >
+      <XButton variant="danger" class="itbms-cancel-button" @click="emit('cancel')">
         Cancel
       </XButton>
     </div>
@@ -132,12 +133,21 @@ import { useToastStore } from '@/stores/toast.store'
 import { BrandService } from '@/services'
 import XInput from '@/components/common/form/XInput.vue'
 import XSelector from '@/components/common/form/XSelector.vue'
-import XButton from '../common/XButton.vue'
+import XButton from '@/components/common/XButton.vue'
+import XUpload from '@/components/common/XUpload.vue'
+import { parseNumber } from '@/utils/NumberUtils'
+import { getImageUrl } from '@/utils'
 
 const props = defineProps({
-  initialData: Object,
+  initialData: {
+    type: Object,
+    default: () => ({}),
+  },
   isEditMode: Boolean,
-  onSubmit: Function,
+  onSubmit: {
+    type: Function,
+    required: true,
+  },
 })
 
 const emit = defineEmits(['cancel'])
@@ -153,6 +163,7 @@ const form = ref({
   storageGb: null,
   color: '',
   quantity: null,
+  images: [],
 })
 
 const fieldErrors = ref({
@@ -164,6 +175,7 @@ const fieldErrors = ref({
   ramGb: '',
   screenSizeInch: '',
   storageGb: '',
+  images: '',
 })
 
 const touchedFields = ref({
@@ -175,11 +187,21 @@ const touchedFields = ref({
   ramGb: false,
   screenSizeInch: false,
   storageGb: false,
+  images: false,
 })
+
+const brands = ref([])
+const storageOptions = ref([])
+const isSaving = ref(false)
 
 function onBlur(field) {
   touchedFields.value[field] = true
   validateField(field)
+}
+
+function onUploadImageError(error) {
+  fieldErrors.value.images = error
+  toast.add({ message: error, type: 'error' })
 }
 
 function validateField(field) {
@@ -256,9 +278,6 @@ function validateField(field) {
   }
 }
 
-const brands = ref([])
-const isSaving = ref(false)
-
 const fetchBrands = async () => {
   const res = await BrandService.getAllBrands()
   if (res.error) {
@@ -268,6 +287,13 @@ const fetchBrands = async () => {
 
     if (props.initialData) {
       const val = props.initialData
+
+      const imagesWithPreview =
+        val.saleItemImages?.map((img) => ({
+          ...img,
+          previewUrl: getImageUrl(img.imageUrl), // assuming the backend returns a 'url' for the image
+        })) || []
+
       form.value = {
         brandId: findBrandIdByName(val.brandName),
         model: val.model ?? '',
@@ -278,12 +304,11 @@ const fetchBrands = async () => {
         storageGb: val.storageGb ?? null,
         color: val.color ?? '',
         quantity: val.quantity ?? null,
+        images: imagesWithPreview,
       }
     }
   }
 }
-
-onMounted(fetchBrands)
 
 const findBrandIdByName = (name) => {
   const found = brands.value.find((b) => b.name === name)
@@ -305,11 +330,6 @@ const isFormValid = computed(() => {
   )
 })
 
-const parseNumber = (v) => {
-  const n = parseFloat(v)
-  return isNaN(n) ? null : n
-}
-
 const handleSave = async () => {
   Object.keys(touchedFields.value).forEach((f) => {
     touchedFields.value[f] = true
@@ -321,33 +341,56 @@ const handleSave = async () => {
     return
   }
 
-  const payload = {
-    brand: { id: form.value.brandId },
-    model: form.value.model.trim(),
-    price: form.value.price,
-    ramGb: form.value.ramGb,
-    screenSizeInch: parseNumber(form.value.screenSizeInch),
-    storageGb: form.value.storageGb,
-    color: form.value.color?.trim() || null,
-    quantity: form.value.quantity,
-    description: form.value.description.trim(),
-  }
+  const formData = new FormData()
+
+  formData.append('brand.id', form.value.brandId)
+
+  // Scalars
+  formData.append('model', form.value.model.trim())
+  formData.append('price', form.value.price)
+  formData.append('ramGb', form.value.ramGb)
+  formData.append('screenSizeInch', parseNumber(form.value.screenSizeInch))
+  formData.append('storageGb', form.value.storageGb)
+  formData.append('color', form.value.color?.trim() || '')
+  formData.append('quantity', form.value.quantity)
+  formData.append('description', form.value.description.trim())
+
+  const sortedImages = form.value.images
+    .filter((img) => img.fileName) // remove empty images
+    .sort((a, b) => a.order - b.order) // sort by existing order
+    .map((img, index) => ({
+      // reassign consecutive order numbers
+      ...img,
+      order: index + 1,
+    }))
+
+  // ImageInfos (list of objects)
+  sortedImages.forEach((img, index) => {
+    const prefix = `imageInfos[${index}]`
+    formData.append(`${prefix}.order`, img.order)
+    formData.append(`${prefix}.fileName`, img.fileName)
+    // formData.append(`${prefix}.status`, img.status)
+
+    if (img.imageFile) {
+      formData.append(`${prefix}.imageFile`, img.imageFile)
+    }
+  })
+
+  // for (const [key, value] of formData.entries()) {
+  //   console.log(key, value)
+  // }
 
   isSaving.value = true
-  try {
-    await props.onSubmit(payload)
-  } catch (err) {
-    toast.add({ message: 'Failed to save item', type: 'error' })
-    console.error(err)
-  } finally {
-    isSaving.value = false
-  }
+  await props.onSubmit(formData)
+  isSaving.value = false
 }
 
-const isChanged = computed(() => {
+const isDetailChanged = computed(() => {
   if (!props.isEditMode || !props.initialData) return true
+
   const current = form.value
   const initial = props.initialData
+
   return (
     findBrandIdByName(initial.brandName) !== current.brandId ||
     initial.model.trim() !== current.model.trim() ||
@@ -360,6 +403,25 @@ const isChanged = computed(() => {
     initial.quantity !== current.quantity
   )
 })
+
+const isImageChanged = computed(() => {
+  if (!props.isEditMode || !props.initialData) return true
+
+  const initialImages =
+    props.initialData.saleItemImages.map((img) => ({
+      fileName: img.fileName,
+      imageViewOrder: img.imageViewOrder,
+    })) ?? []
+  const currentImages =
+    form.value.images.map((img) => ({
+      fileName: img.fileName,
+      imageViewOrder: img.imageViewOrder,
+    })) ?? []
+
+  return JSON.stringify(initialImages) !== JSON.stringify(currentImages)
+})
+
+onMounted(fetchBrands)
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 <script setup>
-import { NAVBAR_MENU } from '@/constants/navbar';
+import { NAVBAR_MENU } from '@/constants/navbar.constant';
 import { Menu, Search, ShoppingBag, ShoppingCart, User, X } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';

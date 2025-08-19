@@ -49,7 +49,7 @@ const onBlur = () => {
       'w-full px-4 py-3 rounded-lg text-gray-800 border transition-all duration-200',
       touched && errorMessage
         ? 'border-red-500 focus:ring-red-300 focus:border-red-500'
-        : 'border-gray-400 focus:ring-blue-300 focus:border-blue-500',
+        : 'border-black-400 focus:ring-blue-300 focus:border-blue-500',
       disabled ? 'bg-gray-100 cursor-not-allowed' : '',
       props.class
     ]"
