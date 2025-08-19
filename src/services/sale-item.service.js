@@ -135,6 +135,10 @@ const SaleItemService = {
       isPaginated: true,
     })
   },
+
+  async getStorageSizes() {
+    return await get(`${BASE_URL_V2}/storage-sizes`)
+  }
 }
 
 export default SaleItemService

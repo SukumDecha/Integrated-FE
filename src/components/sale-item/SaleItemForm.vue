@@ -191,6 +191,7 @@ const touchedFields = ref({
 })
 
 const brands = ref([])
+const storageOptions = ref([])
 const isSaving = ref(false)
 
 function onBlur(field) {

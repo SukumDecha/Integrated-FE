@@ -39,18 +39,9 @@ const priceOptions = computed(() => [
   { label: '50,000 + Baht', value: '50000+' },
 ])
 
-const storageOptions = computed(() => [
-  { label: '32 GB', value: 32 },
-  { label: '64 GB', value: 64 },
-  { label: '128 GB', value: 128 },
-  { label: '256 GB', value: 256 },
-  { label: '512 GB', value: 512 },
-  { label: '1 TB+', value: 1024 },
-  { label: 'Not specified', value: -1 },
-])
-
 const allBrands = reactive([])
 const saleItems = reactive([])
+const storageOptions = reactive([])
 
 const loading = reactive({
   items: true,
@@ -150,11 +141,7 @@ const initializeStateFromRouteOrStorage = () => {
   if (Array.isArray(priceFromLS)) priceFromLS = priceFromLS[0] ?? null
 
   searchOptions.filteredPrices =
-    typeof priceFromRoute === 'string' && priceFromRoute !== ''
-      ? priceFromRoute
-      : typeof priceFromLS === 'string' && priceFromLS !== ''
-        ? priceFromLS
-        : null
+    typeof priceFromLS === 'string' && priceFromLS !== '' ? priceFromLS : null
 
   // Custom price min/max
   const customPriceLS = loadFromLocalStorage(LOCAL_STORAGE_KEYS.CUSTOM_PRICE, {
@@ -241,6 +228,19 @@ const fetchBrands = async () => {
   loading.brands = false
 }
 
+const fetchStorageSizes = async () => {
+  const { data } = await SaleItemService.getStorageSizes()
+
+  if (data) {
+    storageOptions.push(
+      ...(data.map((size) => ({
+        label: size === -1 ? 'Not Specific' : `${size} GB`,
+        value: size,
+      })) || []),
+    )
+  }
+}
+
 const handlePaginationChange = async ({ currentPage, pageSize }) => {
   const oldCurrentPage = searchOptions.currentPage
 
@@ -260,7 +260,7 @@ const setSort = (field, order) => {
   if (field && order) {
     saveToLocalStorage(LOCAL_STORAGE_KEYS.SORT, { field, order })
   } else {
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.SORT)
+    sessionStorage.removeItem(LOCAL_STORAGE_KEYS.SORT)
   }
 }
 
@@ -288,10 +288,10 @@ const clearAllFilter = () => {
   customPrice.min = ''
   customPrice.max = ''
 
-  localStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_BRANDS)
-  localStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_PRICES)
-  localStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_STORAGES)
-  localStorage.removeItem(LOCAL_STORAGE_KEYS.CUSTOM_PRICE)
+  sessionStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_BRANDS)
+  sessionStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_PRICES)
+  sessionStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_STORAGES)
+  sessionStorage.removeItem(LOCAL_STORAGE_KEYS.CUSTOM_PRICE)
 
   resetPagination(false)
 }
@@ -313,6 +313,7 @@ onMounted(async () => {
   initializeStateFromRouteOrStorage()
   await fetchBrands()
   await fetchSaleItems()
+  await fetchStorageSizes()
 })
 
 watch(
@@ -398,7 +399,7 @@ watch(
           <XButton class-name="itbms-brand-filter-clear" @click="clearAllFilter"> Clear </XButton>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 p-4 pt-0 rounded-md"></div>
+        <div class="flex flex-wrap items-center gap-2 p-4 pt-0 rounded-md" />
 
         <div class="flex items-center gap-2">
           <XButton

@@ -6,11 +6,11 @@
  */
 export function loadFromLocalStorage (key, defaultValue) {
   try {
-    const item = localStorage.getItem(key);
+    const item = sessionStorage.getItem(key);
     return item ? JSON.parse(item) : defaultValue;
   } catch (e) {
     console.error(`Error parsing localStorage key "${key}":`, e);
-    localStorage.removeItem(key);
+    sessionStorage.removeItem(key);
     return defaultValue;
   }
 };
@@ -21,7 +21,7 @@ export function loadFromLocalStorage (key, defaultValue) {
  * @param {*} value
  */
 export function saveToLocalStorage (key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
+  sessionStorage.setItem(key, JSON.stringify(value));
 };
 
 
