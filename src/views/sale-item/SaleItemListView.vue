@@ -45,7 +45,7 @@ const pagination = reactive({
 const filterOptions = reactive({
   filteredBrands: undefined,
   sortField: 'createdOn', // 'brand.name' or 'null'
-  sortOrder: 'desc', // 'asc', 'desc', or null
+  sortOrder: 'asc', // 'asc', 'desc', or null
 })
 
 const searchParamsObj = computed(() => {
