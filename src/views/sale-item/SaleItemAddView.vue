@@ -17,20 +17,31 @@ const breadcrumbs = [
 ]
 
 const handleSubmit = async (data) => {
-  const res = await SaleItemService.addSaleItem(data)
-  if (res.error) {
-    toast.add({ message: 'Failed to save item', type: 'error' })
-    throw new Error('Backend error')
-  } else {
+  try {
+    console.log(' FormData before send:')
+    for (const [key, value] of data.entries()) {
+      console.log(`${key}:`, value)
+    }
+
+    const res = await SaleItemService.addSaleItem(data)
+
+    if (res?.error) {
+      toast.add({ message: res.message || 'Failed to save item', type: 'error' })
+      return
+    }
+
     router.push({ path: '/sale-items/list', query: { toast: 'created' } })
+
+    const paginationState = loadFromLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION)
+    saveToLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION, {
+      ...paginationState,
+      currentPage: 1,
+    })
+  } catch (err) {
+
+    console.error('🔥 Submit error:', err)
+    toast.add({ message: 'Unexpected error while saving item', type: 'error' })
   }
-
-  const paginationState = loadFromLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION)
-
-  saveToLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION, {
-    ...paginationState,
-    currentPage: 1,
-  })
 }
 </script>
 
