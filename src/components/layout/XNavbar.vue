@@ -62,13 +62,13 @@ const closeMobileMenu = () => {
 
         <!-- Desktop Action Buttons -->
         <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-3">
-          <button
+          <!-- <button
             type="button"
             class="p-1 rounded-full text-gray-500 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200"
             aria-label="Search"
           >
             <Search class="h-6 w-6" />
-          </button>
+          </button> -->
 
           <button
             type="button"

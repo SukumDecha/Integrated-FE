@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, watch, reactive, computed } from 'vue'
+import { onMounted, watch, reactive, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToastStore } from '@/stores/toast.store'
 
@@ -16,6 +16,12 @@ import { SaleItemService, BrandService } from '@/services'
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils'
 import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item.constant'
 
+
+const route = useRoute()
+const router = useRouter()
+const toast = useToastStore()
+const query = route.query
+
 // --- State Management ---
 const searchOptions = reactive({
   currentPage: 1,
@@ -27,6 +33,7 @@ const searchOptions = reactive({
   filteredPrices: null,
   filteredStorages: [],
   activeOnly: false,
+  filterSearch: query.search,
 })
 
 const priceOptions = computed(() => [
@@ -53,14 +60,46 @@ const error = reactive({
   brands: null,
 })
 
-const route = useRoute()
-const router = useRouter()
-const toast = useToastStore()
-
 const breadcrumbs = [
   { text: 'Home', path: '/' },
   { text: 'Sale Items', active: true },
 ]
+
+const searchKeyword = ref('')
+// กด Search หรือ Enter
+const onSearch = () => {
+  router.push({
+    query: {
+      ...route.query,
+      search: searchKeyword.value?.trim() || undefined,
+    },
+  })
+}
+
+// Clear Search
+const clearSearch = async () => {
+  searchKeyword.value = ''
+  const newQuery = { ...route.query }
+  delete newQuery.search //เคลียร์เฉพาะ search
+
+  await router.replace({ query: newQuery }) // ✅ ใช้ replace เพื่อให้ refresh route ทันที
+  await nextTick()
+  fetchSaleItems()
+}
+
+// โหลดค่า search จาก query ตอนเปิดหน้า
+if (route.query.search) {
+  searchKeyword.value = route.query.search
+  searchOptions.filterSearch = route.query.search 
+}
+
+watch(
+  () => route.query,
+  (newQuery) => {
+    searchOptions.filterSearch = newQuery.search || ''
+  },
+  { immediate: true },
+)
 
 const customPrice = reactive({
   min: '',
@@ -91,6 +130,7 @@ const searchParams = computed(() => {
     activeOnly: searchOptions.activeOnly,
     priceMin: minToSend,
     priceMax: maxToSend,
+    filterSearch: searchOptions.filterSearch,
   }
 })
 
@@ -182,6 +222,10 @@ const updateRouteQuery = () => {
 
   if (Array.isArray(searchOptions.filteredStorages) && searchOptions.filteredStorages.length > 0)
     query.filterStorages = searchOptions.filteredStorages.join(',')
+
+  if (searchOptions.filterSearch?.trim()) {
+    query.search = searchOptions.filterSearch.trim()
+  }
 
   router.replace({ query })
 }
@@ -348,8 +392,27 @@ watch(
 <template>
   <div class="bg-white flex-grow">
     <div class="max-w-7xl mx-auto py-8 px-4 space-y-6">
-      <div class="flex justify-between items-center">
-        <XBreadcrumb :items="breadcrumbs" />
+      <div class="flex justify-between items-center mb-6 mx-4">
+        <div class="flex items-center gap-x-2 w-full max-w-3xl">
+          <XBreadcrumb :items="breadcrumbs" />
+
+          <!-- 🔍 Search section -->
+
+          <XInput
+            v-model="searchKeyword"
+            placeholder="Search..."
+            class="pl-4 px-68 rounded-md"
+            @keydown.enter="onSearch"
+          />
+
+          <XButton @click="onSearch" color="primary">
+            <template #default> 🔍 </template>
+          </XButton>
+
+          <XButton class="itbms-search-clear-button" @click="clearSearch"> Clear </XButton>
+        </div>
+
+        <!-- Add Sale Item  -->
         <XButton class-name="itbms-sale-item-add" @click="$router.push('/sale-items/add')">
           <PlusIcon class="h-5 w-5 mr-2" /> Add Sale Item
         </XButton>
