@@ -10,11 +10,11 @@ const SaleItemService = {
   },
 
   async getSaleItemById(id) {
-    return await get(`${BASE_URL_V1}/${id}`)
+    return await get(`${BASE_URL_V2}/${id}`)
   },
 
   async addSaleItem(data) {
-    return await post(`${BASE_URL_V1}`, data, {
+    return await post(`${BASE_URL_V2}`, data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -22,7 +22,7 @@ const SaleItemService = {
   },
 
   async updateSaleItem(id, data) {
-    return await put(`${BASE_URL_V1}/${id}`, data, {
+    return await put(`${BASE_URL_V2}/${id}`, data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -30,7 +30,7 @@ const SaleItemService = {
   },
 
   async deleteSaleItem(id) {
-    return await remove(`${BASE_URL_V1}/${id}`)
+    return await remove(`${BASE_URL_V2}/${id}`)
   },
 
   async getSaleItemList() {
