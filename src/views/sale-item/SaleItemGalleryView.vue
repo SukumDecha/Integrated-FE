@@ -67,20 +67,31 @@ const breadcrumbs = [
 
 const searchKeyword = ref('')
 // กด Search หรือ Enter
-const onSearch = () => {
-  router.push({
+const onSearch = async () => {
+  const trimmed = searchKeyword.value?.trim() || ''
+
+  searchOptions.filterSearch = trimmed
+  searchOptions.currentPage = 1
+
+  await router.replace({
     query: {
       ...route.query,
-      search: searchKeyword.value?.trim() || undefined,
+      page: 1,
+      search: trimmed || undefined,
     },
   })
+    
+  await fetchSaleItems()
 }
 
 // Clear Search
 const clearSearch = async () => {
   searchKeyword.value = ''
+  searchOptions.filterSearch = ''
+  searchOptions.currentPage = 1
   const newQuery = { ...route.query }
   delete newQuery.search //เคลียร์เฉพาะ search
+   newQuery.page = 1
 
   await router.replace({ query: newQuery }) // ✅ ใช้ replace เพื่อให้ refresh route ทันที
   await nextTick()
@@ -92,14 +103,6 @@ if (route.query.search) {
   searchKeyword.value = route.query.search
   searchOptions.filterSearch = route.query.search 
 }
-
-watch(
-  () => route.query,
-  (newQuery) => {
-    searchOptions.filterSearch = newQuery.search || ''
-  },
-  { immediate: true },
-)
 
 const customPrice = reactive({
   min: '',
@@ -252,6 +255,17 @@ const fetchSaleItems = async () => {
   searchOptions.totalItems = response.pagination.totalItems
   loading.items = false
 }
+
+watch(
+  () => route.query,
+  async (newQuery) => {
+    searchOptions.filterSearch = newQuery.search || ''
+    await fetchSaleItems()
+  },
+  { immediate: true,
+     flush: 'post', 
+   },
+)
 
 const fetchBrands = async () => {
   loading.brands = true
