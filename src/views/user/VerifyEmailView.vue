@@ -1,14 +1,21 @@
 <template>
   <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50">
     <div class="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
-      <h1 class="text-2xl font-bold text-gray-800 mb-4">Email Verification</h1>
+      <h1 class="text-2xl font-bold text-gray-800 mb-4">
+        Email Verification
+      </h1>
 
       <!-- Loading State -->
-      <div v-if="loading" class="flex flex-col items-center gap-2">
+      <div
+        v-if="loading"
+        class="flex flex-col items-center gap-2"
+      >
         <span
           class="loader border-4 border-gray-200 border-t-blue-500 rounded-full w-12 h-12 animate-spin"
-        ></span>
-        <p class="text-gray-600">Verifying your email, please wait...</p>
+        />
+        <p class="text-gray-600">
+          Verifying your email, please wait...
+        </p>
       </div>
 
       <!-- Success State -->
@@ -26,17 +33,22 @@
 
       <!-- Error State (invalid or expired token) -->
       <div v-else-if="error">
-        <p class="text-red-600 font-semibold mb-4">❌ {{ errorMessage }}</p>
+        <p class="text-red-600 font-semibold mb-4">
+          ❌ {{ errorMessage }}
+        </p>
         <button
-          @click="resendVerification"
           :disabled="resendLoading || resendCooldown > 0"
           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+          @click="resendVerification"
         >
           <span v-if="resendLoading">Sending...</span>
           <span v-else-if="resendCooldown > 0"> Resend available in {{ resendCooldown }}s </span>
           <span v-else>Resend Verification Email</span>
         </button>
-        <p v-if="resendSuccess" class="text-green-600 mt-3">
+        <p
+          v-if="resendSuccess"
+          class="text-green-600 mt-3"
+        >
           📧 New verification email sent successfully!
         </p>
       </div>
@@ -46,13 +58,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { UserService } from '@/services'
 import { useToastStore } from '@/stores/toast.store'
 
 const route = useRoute()
+const router = useRouter()
 const token = route.query.token
-const toast = useToastStore
+const toast = useToastStore()
 
 // State
 const loading = ref(true)
@@ -66,15 +79,32 @@ let cooldownInterval = null
 
 // ฟังก์ชันตรวจสอบ token และ activate user
 const verifyEmail = async () => {
-  try {
-    await UserService.verifyEmail(token)
+  loading.value = true;
+  const response = await UserService.verifyEmail(token)
+
+    if (response.error) {
+      loading.value = false
+      error.value = true
+      errorMessage.value = response.error || 'Failed to verify email.'
+      toast.add({
+        title: 'Error',
+        message: errorMessage.value,
+        type: 'error'
+      })
+      return
+    }
+
     success.value = true
-  } catch (err) {
-    error.value = true
-    errorMessage.value = err.response?.data?.message || 'Verification link is invalid or expired.'
-  } finally {
+    toast.add({
+      title: 'Success',
+      message: 'Your email has been verified successfully!',
+      type: 'success'
+    })
+    setTimeout(() => {
+      router.push('/')
+    }, 2000)
+
     loading.value = false
-  }
 }
 
 // ฟังก์ชัน resend verification email

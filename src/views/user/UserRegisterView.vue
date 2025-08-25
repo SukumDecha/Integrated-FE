@@ -1,6 +1,8 @@
 <template>
   <div class="max-w-4xl mx-auto p-6">
-    <h1 class="text-3xl font-semibold text-center text-gray-800 mb-6">Create Your Account</h1>
+    <h1 class="text-3xl font-semibold text-center text-gray-800 mb-6">
+      Create Your Account
+    </h1>
     <p class="text-center text-gray-500 mb-8 text-sm">
       Sign up to explore the latest smartphones and exclusive deals
     </p>
@@ -22,14 +24,17 @@
     </div>
 
     <!-- ฟอร์มลงทะเบียน -->
-    <UserRegisterForm :mode="userType" @submitted="handleSuccess" />
+    <UserRegisterForm
+      :mode="userType"
+      @submitted="handleSuccess"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import UserRegisterForm from '@/components/userAccount/UserRegisterForm.vue'
+import UserRegisterForm from '@/components/user/UserRegisterForm.vue'
 import XButton from '@/components/common/XButton.vue'
 
 const userType = ref('BUYER')

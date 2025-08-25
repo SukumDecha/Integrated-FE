@@ -18,12 +18,12 @@ const router = createRouter({
         {
           path: '/register',
           name: 'user-register',
-          component: () => import('../views/userAccount/UserRegisterView.vue'),
+          component: () => import('../views/user/UserRegisterView.vue'),
         },
         {
           path: '/verify-email',
           name: 'verify-email',
-          component: () => import('../views/userAccount/VerifyEmailView.vue'),
+          component: () => import('../views/user/VerifyEmailView.vue'),
         },
       ],
     },
