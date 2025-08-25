@@ -54,6 +54,7 @@ const onBlur = () => {
       props.class
     ]"
     v-bind="$attrs"
+    v-on="$attrs"
     @input="handleInput"
     @blur="onBlur"
   />
