@@ -249,14 +249,12 @@ function validateField(field) {
       break
     }
 
-case 'screenSizeInch':
-  fieldErrors.value.screenSizeInch =
-    val != null &&
-    val !== '' &&
-    (val <= 0 || !/^\d{1,2}(\.\d{1,2})?$/.test(val.toString()))
-      ? 'Screen size must be positive number with at most 2 decimal points or not specified.'
-      : ''
-  break
+    case 'screenSizeInch':
+      fieldErrors.value.screenSizeInch =
+        val != null && val !== '' && (val <= 0 || !/^\d{1,2}(\.\d{1,2})?$/.test(val.toString()))
+          ? 'Screen size must be positive number with at most 2 decimal points or not specified.'
+          : ''
+      break
 
     case 'storageGb': {
       const raw = val
