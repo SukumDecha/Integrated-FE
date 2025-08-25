@@ -1,6 +1,6 @@
-import { get, post, } from './helper/api'
+import {  post, } from './helper/api'
 
-const BASE_URL = '/v1/users'
+const BASE_URL = '/v2/users'
 
 const UserService = {
   // async getAllUsers() {
@@ -20,13 +20,11 @@ const UserService = {
   },
 
   async verifyEmail(token) {
-    return await get((`${BASE_URL}/v1/verify-request`, {
-      params: { token }
-    }))
+    return await post((`${BASE_URL}/verify-email?jwtToken=${token}`))
   },
 
   async resendVerification(data) {
-    return await post(`${BASE_URL}/v1/resend-verification`, data)
+    return await post(`${BASE_URL}/resend-verification`, data)
   }
 
   // async updateUser(id, data) {

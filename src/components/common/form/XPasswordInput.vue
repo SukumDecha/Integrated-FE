@@ -27,7 +27,7 @@ const passwordRules = computed(() => {
     lowercase: /[a-z]/.test(value),
     uppercase: /[A-Z]/.test(value),
     number: /\d/.test(value),
-    special: /[@$!%*?&.]/.test(value),
+    special: /[@$!%*?&./]/.test(value),
   }
 })
 
@@ -39,7 +39,10 @@ const isPasswordValid = computed(() => Object.values(passwordRules.value).every(
     <!-- Label -->
     <label class="block text-sm font-medium text-gray-700 mb-1">
       {{ label }}
-      <span v-if="required" class="text-red-500">*</span>
+      <span
+        v-if="required"
+        class="text-red-500"
+      >*</span>
     </label>
 
     <!-- Input -->
@@ -62,7 +65,7 @@ const isPasswordValid = computed(() => Object.values(passwordRules.value).every(
       ]"
       @input="handleInput"
       @blur="onBlur"
-    />
+    >
 
     <!-- Checklist -->
     <div class="mt-3 space-y-1">
@@ -91,7 +94,11 @@ const isPasswordValid = computed(() => Object.values(passwordRules.value).every(
             stroke="currentColor"
             stroke-width="2"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M5 13l4 4L19 7"
+            />
           </svg>
           <svg
             v-else
@@ -102,7 +109,11 @@ const isPasswordValid = computed(() => Object.values(passwordRules.value).every(
             stroke="currentColor"
             stroke-width="2"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </span>
         <span>
@@ -122,7 +133,10 @@ const isPasswordValid = computed(() => Object.values(passwordRules.value).every(
     </div>
 
     <!-- Error Message -->
-    <p v-if="touched && !isPasswordValid && !modelValue" class="text-sm text-red-500 mt-1">
+    <p
+      v-if="touched && !isPasswordValid && !modelValue"
+      class="text-sm text-red-500 mt-1"
+    >
       {{ errorMessage || 'Password is required.' }}
     </p>
   </div>

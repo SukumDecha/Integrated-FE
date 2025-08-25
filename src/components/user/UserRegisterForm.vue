@@ -1,14 +1,17 @@
 <template>
-  <form class="space-y-4" @submit.prevent="handleSubmit">
+  <form
+    class="space-y-4"
+    @submit.prevent="handleSubmit"
+  >
     <!-- Nickname -->
     <XInput
-      v-model="form.nickname"
+      v-model="form.nickName"
       label="Nickname"
       required
-      :error-message="touchedFields.nickname ? errors.nickname : ''"
+      :error-message="touchedFields.nickName ? errors.nickName : ''"
       placeholder="e.g. Somsuk"
-      class="itbms-nickname"
-      @blur="onBlur('nickname')"
+      class="itbms-nickName"
+      @blur="onBlur('nickName')"
     />
 
     <!-- Email -->
@@ -37,13 +40,13 @@
 
     <!-- Fullname -->
     <XInput
-      v-model="form.fullname"
+      v-model="form.fullName"
       label="Full Name"
       required
-      :error-message="touchedFields.fullname ? errors.fullname : ''"
+      :error-message="touchedFields.fullName ? errors.fullName : ''"
       placeholder="e.g. Somsuk Decha"
-      class="itbms-fullname"
-      @blur="onBlur('fullname')"
+      class="itbms-fullName"
+      @blur="onBlur('fullName')"
     />
 
     <!-- Seller fields -->
@@ -161,10 +164,10 @@ const props = defineProps({
 const loading = ref(false)
 
 const form = reactive({
-  nickname: '',
+  nickName: '',
   email: '',
   password: '',
-  fullname: '',
+  fullName: '',
   mobileNumber: '',
   bankAccountNumber: '',
   bankName: '',
@@ -174,10 +177,10 @@ const form = reactive({
 })
 
 const errors = reactive({
-  nickname: '',
+  nickName: '',
   email: '',
   password: '',
-  fullname: '',
+  fullName: '',
   mobileNumber: '',
   bankAccountNumber: '',
   bankName: '',
@@ -186,7 +189,9 @@ const errors = reactive({
   nationalIdBackImage: '',
 })
 
-const touchedFields = reactive(Object.keys(errors).reduce((acc, key) => ({ ...acc, [key]: false }), {}))
+const touchedFields = reactive(
+  Object.keys(errors).reduce((acc, key) => ({ ...acc, [key]: false }), {}),
+)
 
 function onBlur(field) {
   touchedFields[field] = true
@@ -196,17 +201,17 @@ function onBlur(field) {
 function validateForm() {
   Object.keys(errors).forEach((key) => (errors[key] = ''))
 
-  if (!form.nickname) errors.nickname = 'Nickname is required.'
+  if (!form.nickName) errors.nickName = 'Nickname is required.'
   if (!form.email) errors.email = 'Email is required.'
   if (!form.password) {
     errors.password = 'Password is required.'
   } else if (!isValidPassword(form.password)) {
     errors.password = 'Password must contain upper, lower, digit, symbol and be 8+ chars.'
   }
-  if (!form.fullname) {
-    errors.fullname = 'Fullname is required.'
-  } else if (form.fullname.length < 4 || form.fullname.length > 40) {
-    errors.fullname = 'Fullname must be between 4 and 40 characters.'
+  if (!form.fullName) {
+    errors.fullName = 'Fullname is required.'
+  } else if (form.fullName.length < 4 || form.fullName.length > 40) {
+    errors.fullName = 'Fullname must be between 4 and 40 characters.'
   }
 
   if (props.mode === 'SELLER') {
@@ -226,7 +231,7 @@ function isValidPassword(password) {
     /[a-z]/.test(password) &&
     /[A-Z]/.test(password) &&
     /\d/.test(password) &&
-    /[!@#$%^&*.]/.test(password) &&
+    /[@$!%*?&./]/.test(password) &&
     password.length >= 8
   )
 }
@@ -242,30 +247,46 @@ const handleSubmit = async () => {
 
   loading.value = true
   const formData = new FormData()
-  formData.append('type', props.mode)
-  formData.append('nickname', form.nickname)
-  formData.append('email', form.email)
-  formData.append('password', form.password)
-  formData.append('fullname', form.fullname)
+
+  const data = {
+    type: props.mode,
+    nickName: form.nickName.trim(),
+    email: form.email.trim(),
+    password: form.password.trim(),
+    fullName: form.fullName.trim(),
+    userType: props.mode === "SELLER" ? "SELLER" : "BUYER",
+  }
 
   if (props.mode === 'SELLER') {
-    formData.append('mobileNumber', form.mobileNumber)
-    formData.append('bankAccountNumber', form.bankAccountNumber)
-    formData.append('bankName', form.bankName)
-    formData.append('nationalId', form.nationalId)
-    formData.append('nationalIdFrontImage', form.nationalIdFrontImage[0])
-    formData.append('nationalIdBackImage', form.nationalIdBackImage[0])
+    Object.assign(data, {
+      mobileNumber: form.mobileNumber.trim(),
+      bankAccountNumber: form.bankAccountNumber.trim(),
+      bankName: form.bankName.trim(),
+      idCardNumber: form.nationalId.trim(),
+    })
   }
 
-  try {
-    await UserService.registerUser(formData)
-    toast.add({ type: 'success', message: 'Registration successful!' })
-    emit('submitted')
-  } catch {
-    toast.add({ type: 'error', message: 'Registration failed. Please try again.' })
-  } finally {
-    loading.value = false
+  formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }))
+
+  if (props.mode === 'SELLER') {
+    formData.append('idCardImageFront', form.nationalIdFrontImage[0].imageFile)
+    formData.append('idCardImageBack', form.nationalIdBackImage[0].imageFile)
   }
+
+  const response = await UserService.registerUser(formData)
+
+  if (response.error) {
+    toast.add({ type: 'error', message: response.error })
+    loading.value = false
+    return
+  }
+
+  toast.add({
+    type: 'success',
+    message: 'Registration successful! Please check your email to verify your account.',
+  })
+  emit('submitted')
+  loading.value = false
 }
 
 function onUploadImageError(err) {
@@ -273,6 +294,6 @@ function onUploadImageError(err) {
 }
 
 function handleCancel() {
-  router.push("/")
+  router.push('/')
 }
 </script>
