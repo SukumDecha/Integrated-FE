@@ -39,7 +39,7 @@
     <div v-if="maxSlots" class="mt-4 grid gap-2" :class="gridClass">
       <div
         v-for="slotIndex in maxSlots"
-        :key="slotIndex"
+        :key="`slot-${slotIndex}-${getSlotFile(slotIndex - 1)?.id}-${getSlotFile(slotIndex - 1)?.isRemoved}`"
         class="aspect-square rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden relative group"
         :class="[
           getSlotFile(slotIndex - 1)
@@ -63,20 +63,35 @@
               v-if="getSlotFile(slotIndex - 1).previewUrl"
               :src="getSlotFile(slotIndex - 1).previewUrl"
               :alt="getSlotFile(slotIndex - 1).fileName"
-              class="w-full h-full object-cover"
+              class="w-full h-full object-cover transition"
+              :class="getSlotFile(slotIndex - 1).isRemoved ? 'opacity-40 grayscale' : ''"
             />
+
             <!-- File icon for non-images -->
             <div
               v-else
               class="w-full h-full flex flex-col items-center justify-center text-gray-500"
+              :class="getSlotFile(slotIndex - 1).isRemoved ? 'opacity-40 grayscale' : ''"
             >
               <span class="text-xs font-medium mb-1">FILE</span>
               <span class="text-xs truncate px-2">{{ getSlotFile(slotIndex - 1).fileName }}</span>
             </div>
 
+            <!-- Overlay เมื่อถูก mark ลบ (Fixed) -->
+            <div
+              v-show="getSlotFile(slotIndex - 1)?.isRemoved === true"
+              class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+              style="z-index: 10"
+            >
+              <div class="bg-red-500 text-white px-3 py-1 rounded-lg font-bold text-sm">
+                Marked for Delete
+              </div>
+            </div>
+
             <!-- File info overlay -->
             <div
               class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+              style="z-index: 5"
             >
               <p class="text-xs truncate font-medium" :class="`itbms-picture-file${slotIndex}`">
                 {{ getSlotFile(slotIndex - 1).fileName }}
@@ -91,6 +106,7 @@
             <div
               v-if="getSlotFile(slotIndex - 1).error"
               class="absolute inset-0 bg-red-500 bg-opacity-20 flex items-center justify-center"
+              style="z-index: 8"
             >
               <div class="bg-red-500 text-white text-xs px-2 py-1 rounded">Error</div>
             </div>
@@ -98,6 +114,7 @@
             <!-- Action buttons -->
             <div
               class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+              style="z-index: 15"
             >
               <!-- Move left -->
               <button
@@ -126,8 +143,8 @@
                 type="button"
                 class="bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
                 :class="`itbms-picture-file${slotIndex}-clear`"
-                title="Remove"
-                @click="removeFromSlot(slotIndex - 1)"
+                :title="getSlotFile(slotIndex - 1).isRemoved ? 'Restore' : 'Remove'"
+                @click="toggleRemove(slotIndex - 1)"
               >
                 ×
               </button>
@@ -248,7 +265,7 @@ const props = defineProps({
   className: { type: String, default: '' },
 })
 
-const emit = defineEmits(['update:modelValue', 'change', 'error'])
+const emit = defineEmits(['update:modelValue', 'change', 'error', 'removed'])
 
 const inputEl = ref(null)
 const isDragging = ref(false)
@@ -282,9 +299,6 @@ onBeforeUnmount(revokePreviewUrls)
 watch(
   () => props.modelValue,
   (val) => {
-    // Revoke old URLs
-    // revokePreviewUrls()
-
     if (props.maxSlots) {
       // Initialize slots array with null values
       const newFiles = new Array(props.maxSlots).fill(null)
@@ -298,7 +312,6 @@ watch(
 
           let previewUrl = null
 
-          console.log('Item', item)
           if (item.previewUrl) {
             previewUrl = item.previewUrl
           } else if (isFile && isPreviewable(item.imageFile)) {
@@ -308,10 +321,11 @@ watch(
           newFiles[slotIndex] = {
             id: item.id || makeId(),
             imageFile: isFile ? item.imageFile : null,
-            fileName: item.fileName || item.name,
+            fileName: item.originalFilename || item.file,
             slotIndex,
             previewUrl,
             error: null,
+            isRemoved: item.isRemoved || false, // รับค่า isRemoved จาก parent
           }
         }
       })
@@ -335,6 +349,7 @@ watch(
           fileName: item.fileName || item.name,
           previewUrl,
           error: null,
+          isRemoved: item.isRemoved || false,
         }
       })
     }
@@ -354,6 +369,31 @@ function getSlotFile(slotIndex) {
   return files.value[slotIndex] || null
 }
 
+const removedFiles = ref([])
+
+function toggleRemove(slotIndex) {
+  const file = files.value[slotIndex]
+  if (!file) return
+
+  // สร้าง array ใหม่ทั้งหมดเพื่อให้ Vue detect การเปลี่ยนแปลง
+  const newFiles = [...files.value]
+  newFiles[slotIndex] = {
+    ...file,
+    isRemoved: !file.isRemoved,
+  }
+  files.value = newFiles
+
+  // จัดการรายการ removedFiles เพื่อส่งกลับ parent
+  if (newFiles[slotIndex].isRemoved) {
+    removedFiles.value.push(file.id || file.fileName)
+  } else {
+    removedFiles.value = removedFiles.value.filter((f) => f !== (file.id || file.fileName))
+  }
+
+  emitValidFiles()
+  emit('removed', removedFiles.value)
+}
+
 function open() {
   inputEl.value && inputEl.value.click()
 }
@@ -361,6 +401,7 @@ function open() {
 function onInputChange(e) {
   const list = Array.from(e.target.files || [])
   addFiles(list)
+  console.log('onInputChange')
   e.target.value = ''
 }
 
@@ -375,6 +416,7 @@ function onDrop(e) {
   const dt = e.dataTransfer
   const dropped = Array.from(dt?.files || [])
   addFiles(dropped)
+  console.log('onDrop')
 }
 
 function addFiles(incoming) {
@@ -382,7 +424,7 @@ function addFiles(incoming) {
 
   if (props.maxSlots) {
     // Slot-based upload
-    const availableSlots = files.value.filter((f) => !f).length
+    const availableSlots = files.value.filter((f) => !f || f.isRemoved).length
     if (availableSlots === 0) {
       const msg = `All ${props.maxSlots} slots are occupied.`
       errors.value.push(msg)
@@ -398,18 +440,21 @@ function addFiles(incoming) {
     }
 
     // Add files to empty slots
-    let fileIndex = 0
+
     for (
-      let slotIndex = 0;
+      let slotIndex = 0, fileIndex = 0;
       slotIndex < props.maxSlots && fileIndex < incoming.length;
       slotIndex++
     ) {
-      if (!files.value[slotIndex]) {
+      if (!files.value[slotIndex] || files.value[slotIndex].isRemoved) {
         const file = incoming[fileIndex]
         const error = validateFile(file)
 
         if (error) {
           emit('error', error)
+          fileIndex++ // move on to the next incoming file
+          slotIndex-- // retry the SAME slot on next iteration
+          continue
         }
 
         files.value[slotIndex] = {
@@ -419,7 +464,8 @@ function addFiles(incoming) {
           slotIndex,
           order: slotIndex + 1,
           previewUrl: isPreviewable(file) ? URL.createObjectURL(file) : null,
-          error,
+          error: null,
+          isRemoved: false,
         }
         fileIndex++
       }
@@ -438,6 +484,7 @@ function addFiles(incoming) {
 
       if (error) {
         emit('error', error)
+        return
       }
 
       return {
@@ -447,6 +494,7 @@ function addFiles(incoming) {
         order: null,
         previewUrl: isPreviewable(file) ? URL.createObjectURL(file) : null,
         error,
+        isRemoved: false, // เพิ่ม default value
       }
     })
 
@@ -509,39 +557,20 @@ function moveDown(index) {
 }
 
 function emitValidFiles() {
-  let validFiles
-
-  if (props.maxSlots) {
-    // For slot-based upload, include slot information
-    validFiles = files.value
-      .map((f, slotIndex) => {
-        if (!f || f.error) return null
-        return {
-          id: f.id,
-          imageFile: f.imageFile,
-          fileName: f.fileName,
-          previewUrl: f.previewUrl,
-          slotIndex,
-          order: slotIndex, // Use slot index as order
-        }
-      })
-      .filter(Boolean) // Remove null entries
-
-    console.log('Valid Files', validFiles)
-  } else {
-    // Original behavior for non-slot mode
-    validFiles = files.value
-      .filter((f) => !f.error)
-      .map((f) => ({
+  const validFiles = files.value
+    .map((f, slotIndex) => {
+      if (!f) return null
+      return {
         id: f.id,
+        fileName: f.fileName,
         imageFile: f.imageFile,
         previewUrl: f.previewUrl,
-        fileName: f.fileName,
-        order: f.order,
-      }))
-  }
-
-  console.log('Emitting valid files:', validFiles)
+        imageUrl: f.imageUrl,
+        slotIndex,
+        isRemoved: f.isRemoved || false,
+      }
+    })
+    .filter(Boolean)
 
   emit('update:modelValue', validFiles)
   emit('change', validFiles)

@@ -135,7 +135,7 @@ import XInput from '@/components/common/form/XInput.vue'
 import XSelector from '@/components/common/form/XSelector.vue'
 import XButton from '@/components/common/XButton.vue'
 import XUpload from '@/components/common/XUpload.vue'
-// import { parseNumber } from '@/utils/NumberUtils'
+import { parseNumber } from '@/utils/NumberUtils'
 import { getImageUrl } from '@/utils'
 
 const props = defineProps({
@@ -292,6 +292,7 @@ const fetchBrands = async () => {
       const imagesWithPreview =
         val.saleItemImages?.map((img) => ({
           ...img,
+          fileName: img.originalFilename || img.fileName,
           previewUrl: getImageUrl(img.imageUrl), // assuming the backend returns a 'url' for the image
         })) || []
 
@@ -333,61 +334,6 @@ const isFormValid = computed(() => {
   )
 })
 
-// const handleSave = async () => {
-//   Object.keys(touchedFields.value).forEach((f) => {
-//     touchedFields.value[f] = true
-//     validateField(f)
-//   })
-
-//   if (!isFormValid.value) {
-//     toast.add({ message: 'Please fix the errors in the form.', type: 'error' })
-//     return
-//   }
-
-//   const formData = new FormData()
-
-//   formData.append('brand.id', form.value.brandId)
-
-//   // Scalars
-//   formData.append('model', form.value.model.trim())
-//   formData.append('price', form.value.price)
-//   formData.append('ramGb', form.value.ramGb)
-//   formData.append('screenSizeInch', parseNumber(form.value.screenSizeInch))
-//   formData.append('storageGb', form.value.storageGb)
-//   formData.append('color', form.value.color?.trim() || '')
-//   formData.append('quantity', form.value.quantity)
-//   formData.append('description', form.value.description.trim())
-
-//   const sortedImages = form.value.images
-//     .filter((img) => img.fileName) // remove empty images
-//     .sort((a, b) => a.order - b.order) // sort by existing order
-//     .map((img, index) => ({
-//       // reassign consecutive order numbers
-//       ...img,
-//       order: index + 1,
-//     }))
-
-//   // ImageInfos (list of objects)
-//   sortedImages.forEach((img, index) => {
-//     const prefix = `imageInfos[${index}]`
-//     formData.append(`${prefix}.order`, img.order)
-//     formData.append(`${prefix}.fileName`, img.fileName)
-//     // formData.append(`${prefix}.status`, img.status)
-
-//     if (img.imageFile) {
-//       formData.append(`${prefix}.imageFile`, img.imageFile)
-//     }
-//   })
-
-//   // for (const [key, value] of formData.entries()) {
-//   //   console.log(key, value)
-//   // }
-
-//   isSaving.value = true
-//   await props.onSubmit(formData)
-//   isSaving.value = false
-// }
-
 const handleSave = async () => {
   Object.keys(touchedFields.value).forEach((f) => {
     touchedFields.value[f] = true
@@ -399,33 +345,45 @@ const handleSave = async () => {
     return
   }
 
-  const saleItem = {
-    brand: { id: form.value.brandId },
-    model: form.value.model.trim(),
-    price: form.value.price,
-    ramGb: form.value.ramGb,
-    screenSizeInch: form.value.screenSizeInch,
-    storageGb: form.value.storageGb,
-    color: form.value.color?.trim() || null,
-    quantity: form.value.quantity,
-    description: form.value.description.trim(),
-    imageInfos: form.value.images
-      .filter((img) => img.fileName)
-      .sort((a, b) => a.order - b.order)
-      .map((img, index) => ({
-        order: index + 1,
-        fileName: img.fileName,
-      })),
-  }
-
   const formData = new FormData()
-  formData.append('saleItem', JSON.stringify(saleItem))
 
-  form.value.images.forEach((img) => {
+  formData.append('brand.id', form.value.brandId)
+
+  // Scalars
+  formData.append('model', form.value.model.trim())
+  formData.append('price', form.value.price)
+  formData.append('ramGb', form.value.ramGb)
+  formData.append('screenSizeInch', parseNumber(form.value.screenSizeInch))
+  formData.append('storageGb', form.value.storageGb)
+  formData.append('color', form.value.color?.trim() || '')
+  formData.append('quantity', form.value.quantity)
+  formData.append('description', form.value.description.trim())
+
+  const sortedImages = form.value.images
+    .filter((img) => img.fileName) // remove empty images
+    .filter((img) => !img.isRemoved)
+    .sort((a, b) => a.order - b.order) // sort by existing order
+    .map((img, index) => ({
+      // reassign consecutive order numbers
+      ...img,
+      order: index + 1,
+    }))
+
+  // ImageInfos (list of objects)
+  sortedImages.forEach((img, index) => {
+    const prefix = `imageInfos[${index}]`
+    formData.append(`${prefix}.order`, img.order)
+    formData.append(`${prefix}.fileName`, img.fileName)
+    // formData.append(`${prefix}.status`, img.status)
+
     if (img.imageFile) {
-      formData.append('imageInfos', img.imageFile) // ← ต้องใช้ชื่อ array field ตาม controller
+      formData.append(`${prefix}.imageFile`, img.imageFile)
     }
   })
+
+  // for (const [key, value] of formData.entries()) {
+  //   console.log(key, value)
+  // }
 
   isSaving.value = true
   await props.onSubmit(formData)
