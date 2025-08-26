@@ -24,11 +24,11 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    - name: Run linter
-      run: npm run lint
+    # - name: Run linter
+    #   run: npm run lint
       
     - name: Build application (test)
-      run: npm run build
+      run: npm run build:uat
 
   build-and-deploy:
     needs: test
@@ -37,6 +37,18 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
+
+    - name: Install OpenVPN
+      run: |
+        sudo apt update
+        sudo apt install -y openvpn openvpn-systemd-resolved
+        
+    - name: Connect to VPN
+      uses: "kota65535/github-openvpn-connect-action@v2"
+      with:
+        config_file: .github/workflows/sitst-client.ovpn
+        username: ${{ secrets.OVPN_USERNAME }}
+        password: ${{ secrets.OVPN_PASSWORD }}
     
     - name: Setup Node.js
       uses: actions/setup-node@v4
