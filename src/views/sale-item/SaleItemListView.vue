@@ -44,7 +44,7 @@ const pagination = reactive({
 
 const filterOptions = reactive({
   filteredBrands: undefined,
-  sortField: 'createdOn', // 'brand.name' or 'null'
+  sortBy: 'createdOn', // 'brand.name' or 'null'
   sortOrder: 'asc', // 'asc', 'desc', or null
 })
 
@@ -52,7 +52,7 @@ const searchParamsObj = computed(() => {
   return {
     page: pagination.currentPage - 1,
     size: pagination.pageSize,
-    sortField: filterOptions.sortField,
+    sortBy: filterOptions.sortBy,
     sortDirection: filterOptions.sortOrder,
     filterBrands: filterOptions.filteredBrands,
   }
@@ -64,7 +64,7 @@ onMounted(async () => {
 
     pagination.currentPage = parseInt(parsedParams.page) || 1
     pagination.pageSize = parseInt(parsedParams.size) || 5
-    filterOptions.sortField = parsedParams.sortField || 'createdOn'
+    filterOptions.sortBy = parsedParams.sortBy || 'createdOn'
     filterOptions.sortOrder = parsedParams.sortDirection || 'desc'
     filterOptions.filteredBrands = parsedParams.filterBrands
       ? parsedParams.filterBrands.split(',')
@@ -99,7 +99,7 @@ watchEffect(async () => {
       ...route.query,
       page: pagination.currentPage,
       size: pagination.pageSize,
-      sortField: filterOptions.sortField,
+      sortBy: filterOptions.sortBy,
       sortDirection: filterOptions.sortOrder,
       filterBrands: filterOptions.filteredBrands?.join(','),
     },
