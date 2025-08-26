@@ -1,12 +1,12 @@
-version: "3.8"
+version: '3.8'
 
 services:
   backend:
     build: ../Integrated-BE
     ports:
-      - "8080:8080"
+      - '8080:8080'
     environment:
-      SPRING_PROFILES_ACTIVE: uat  # หรือ dev, prod ตามโปรไฟล์ที่ตั้งใน Spring
+      SPRING_PROFILES_ACTIVE: uat # หรือ dev, prod ตามโปรไฟล์ที่ตั้งใน Spring
     depends_on:
       db:
         condition: service_healthy
@@ -15,7 +15,7 @@ services:
         aliases:
           - backend
     volumes:
-      - ../uploads:/app/uploads  # กรณี Spring ใช้ uploads directory เดียวกัน
+      - ../uploads:/app/uploads # กรณี Spring ใช้ uploads directory เดียวกัน
     restart: unless-stopped
 
   db:
@@ -28,15 +28,15 @@ services:
       MYSQL_PASSWORD: ecommerce123
       TZ: Asia/Bangkok
     ports:
-      - "3306:3306"
+      - '3306:3306'
     volumes:
       - db-data:/var/lib/mysql
-      - ../db/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ../db/my.cnf:/etc/mysql/my.cnf
+      - ../Integrated-BE/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../Integrated-BE/db/my.cnf:/etc/mysql/my.cnf
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
       interval: 10s
       timeout: 5s
       retries: 10
@@ -46,16 +46,16 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - '80:80'
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ../Integrated-BE/uploads:/usr/share/nginx/html/uploads  # ทำให้ Nginx เห็นไฟล์ที่ backend อัปโหลด
+      - ../Integrated-BE/uploads:/usr/share/nginx/html/uploads # ทำให้ Nginx เห็นไฟล์ที่ backend อัปโหลด
     depends_on:
       - backend
     networks:
       - app-network
     environment:
-      ALLOWED_ORIGINS: "http://intproj24.sit.kmutt.ac.th|http://ip24ssa1.sit.kmutt.ac.th"
+      ALLOWED_ORIGINS: 'http://intproj24.sit.kmutt.ac.th|http://ip24ssa1.sit.kmutt.ac.th'
     restart: unless-stopped
 
 networks:
