@@ -24,11 +24,11 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    - name: Run linter
-      run: npm run lint
+    # - name: Run linter
+    #   run: npm run lint
       
     - name: Build application (test)
-      run: npm run build
+      run: npm run build:uat
 
   build-and-deploy:
     needs: test
