@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: integrated-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-ecommerce}
+      MYSQL_USER: ${MYSQL_USER:-ecommerce_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-ecommerce_pass}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ../integrated-be/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../integrated-be/db/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - integrated-network
+
+  backend:
+    image: integrated-be:latest
+    container_name: integrated-backend
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-ecommerce}
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-ecommerce_user}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-ecommerce_pass}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - integrated-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    image: integrated-fe:latest
+    container_name: integrated-frontend
+    restart: unless-stopped
+    volumes:
+      - frontend-build:/app/build
+    networks:
+      - integrated-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: integrated-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../integrated-fe/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - frontend-build:/usr/share/nginx/html
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - integrated-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  mysql_data:
+    driver: local
+  frontend-build:
+    driver: local
+
+networks:
+  integrated-network:
+    driver: bridge

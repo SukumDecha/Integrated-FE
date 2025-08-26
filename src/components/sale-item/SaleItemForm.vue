@@ -1,5 +1,8 @@
 <template>
-  <form class="form-grid" @submit.prevent="handleSave">
+  <form
+    class="form-grid"
+    @submit.prevent="handleSave"
+  >
     <label class="block text-sm font-medium text-gray-700 mb-1">
       Brand
       <span class="text-red-500">*</span>
@@ -120,7 +123,11 @@
         Save
       </XButton>
 
-      <XButton variant="danger" class="itbms-cancel-button" @click="emit('cancel')">
+      <XButton
+        variant="danger"
+        class="itbms-cancel-button"
+        @click="emit('cancel')"
+      >
         Cancel
       </XButton>
     </div>
@@ -414,7 +421,7 @@ const isImageChanged = computed(() => {
 
   const initialImages =
     props.initialData.saleItemImages?.map((img) => ({
-      fileName: img.fileName,
+      fileName: img.originalFilename,
       imageViewOrder: img.imageViewOrder,
     })) ?? []
   const currentImages =
