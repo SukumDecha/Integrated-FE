@@ -321,7 +321,7 @@ watch(
           newFiles[slotIndex] = {
             id: item.id || makeId(),
             imageFile: isFile ? item.imageFile : null,
-            fileName: item.originalFilename || item.file,
+            fileName: item.originalFilename || item.fileName,
             slotIndex,
             previewUrl,
             error: null,
@@ -433,7 +433,7 @@ function addFiles(incoming) {
     }
 
     if (incoming.length > availableSlots) {
-      const msg = `Maximum ${availableSlots} pictures are allowed.`
+      const msg = `Maximum ${props.maxSlots} pictures are allowed.`
       errors.value.push(msg)
       emit('error', msg)
       incoming = incoming.slice(0, availableSlots)
@@ -571,7 +571,6 @@ function emitValidFiles() {
       }
     })
     .filter(Boolean)
-
   emit('update:modelValue', validFiles)
   emit('change', validFiles)
 }
