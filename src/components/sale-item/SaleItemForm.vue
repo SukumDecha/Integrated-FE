@@ -191,7 +191,7 @@ const touchedFields = ref({
 })
 
 const brands = ref([])
-const storageOptions = ref([])
+// const storageOptions = ref([])
 const isSaving = ref(false)
 
 function onBlur(field) {
@@ -249,14 +249,12 @@ function validateField(field) {
       break
     }
 
-case 'screenSizeInch':
-  fieldErrors.value.screenSizeInch =
-    val != null &&
-    val !== '' &&
-    (val <= 0 || !/^\d{1,2}(\.\d{1,2})?$/.test(val.toString()))
-      ? 'Screen size must be positive number with at most 2 decimal points or not specified.'
-      : ''
-  break
+    case 'screenSizeInch':
+      fieldErrors.value.screenSizeInch =
+        val != null && val !== '' && (val <= 0 || !/^\d{1,2}(\.\d{1,2})?$/.test(val.toString()))
+          ? 'Screen size must be positive number with at most 2 decimal points or not specified.'
+          : ''
+      break
 
     case 'storageGb': {
       const raw = val
@@ -294,6 +292,7 @@ const fetchBrands = async () => {
       const imagesWithPreview =
         val.saleItemImages?.map((img) => ({
           ...img,
+          fileName: img.originalFilename || img.fileName,
           previewUrl: getImageUrl(img.imageUrl), // assuming the backend returns a 'url' for the image
         })) || []
 
@@ -362,6 +361,7 @@ const handleSave = async () => {
 
   const sortedImages = form.value.images
     .filter((img) => img.fileName) // remove empty images
+    .filter((img) => !img.isRemoved)
     .sort((a, b) => a.order - b.order) // sort by existing order
     .map((img, index) => ({
       // reassign consecutive order numbers

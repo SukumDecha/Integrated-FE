@@ -18,11 +18,6 @@ const breadcrumbs = [
 
 const handleSubmit = async (data) => {
   try {
-    console.log(' FormData before send:')
-    for (const [key, value] of data.entries()) {
-      console.log(`${key}:`, value)
-    }
-
     const res = await SaleItemService.addSaleItem(data)
 
     if (res?.error) {

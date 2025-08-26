@@ -40,17 +40,17 @@ const request = async (
       let errorMessage = `HTTP error! Status: ${res.status}`
       try {
         const body = await res.json()
-        if (body?.message) {
-          errorMessage = body.message
+        if (body?.message || body?.errorMessage) {
+          errorMessage = body.message || body.errorMessage
         }
       } catch (error) {
         console.error('Error parsing response body:', error)
       }
 
       if (isPaginated) {
-        return new PaginationResponse().error(getErrorMessage(new Error(errorMessage))).build();
+        return new PaginationResponse().error(errorMessage).build();
       } else {
-        return new BaseResponse().error(getErrorMessage(new Error(errorMessage))).build();
+        return new BaseResponse().error(errorMessage).build();
       }
     }
 

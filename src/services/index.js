@@ -1,7 +1,9 @@
 import SaleItemService from './sale-item.service.js'
 import BrandService from './brand.service.js'
+import UserService from './user.service.js'
 
 export {
   SaleItemService,
-  BrandService, 
+  BrandService,
+  UserService,
 }

@@ -47,6 +47,8 @@ const SaleItemService = {
     filterStorages = [],
     priceMin = undefined,
     priceMax = undefined,
+    filterSearch = undefined,
+
   }) {
     //brand
     const normalizedFilterBrands = Array.isArray(filterBrands)
@@ -128,6 +130,7 @@ const SaleItemService = {
       filterPrices: normalizedFilterPrices,
       filterPriceLower: lower,
       filterPriceUpper: upper,
+      filterSearch: filterSearch?.trim() || undefined,
     })
 
     const url = `${BASE_URL_V2}?${searchParams}`
