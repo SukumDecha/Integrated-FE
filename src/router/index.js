@@ -20,6 +20,11 @@ const router = createRouter({
           name: 'user-register',
           component: () => import('../views/user/UserRegisterView.vue'),
         },
+        // {
+        //   path: '/login',
+        //   name: 'user-login',
+        //   component: () => import('../views/user/UserLoginView.vue'),
+        // },
         {
           path: '/verify-email',
           name: 'verify-email',
@@ -85,6 +90,11 @@ const router = createRouter({
           ],
         },
       ],
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../views/NotFoundView.vue'),
     },
   ],
 })

@@ -1,6 +1,6 @@
 <script setup>
 import { NAVBAR_MENU } from '@/constants/navbar.constant';
-import { Menu, Search, ShoppingBag, ShoppingCart, User, X } from 'lucide-vue-next';
+import { Menu, ShoppingBag, ShoppingCart, X } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -70,13 +70,19 @@ const closeMobileMenu = () => {
             <Search class="h-6 w-6" />
           </button> -->
 
-          <button
-            type="button"
-            class="p-1 rounded-full text-gray-500 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition-colors duration-200"
-            aria-label="User Profile"
+          <router-link
+            to="/login"
+            class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
           >
-            <User class="h-6 w-6" />
-          </button>
+            Login
+          </router-link>
+
+          <router-link
+            to="/register"
+            class="px-3 py-2 rounded-md text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors duration-200"
+          >
+            Sign Up
+          </router-link>
 
           <router-link
             to="/cart"
@@ -140,25 +146,25 @@ const closeMobileMenu = () => {
 
         <!-- Mobile Action Buttons -->
         <div class="pt-4 pb-3 border-t border-gray-200">
-          <div class="flex items-center justify-around px-4">
-            <button
-              type="button"
-              class="p-2 rounded-full text-gray-500 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-200"
-              aria-label="Search"
+          <div class="flex items-center justify-between px-4 mb-3">
+            <router-link
+              to="/login"
+              class="px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-200"
               @click="closeMobileMenu"
             >
-              <Search class="h-6 w-6" />
-            </button>
+              Login
+            </router-link>
 
-            <button
-              type="button"
-              class="p-2 rounded-full text-gray-500 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-200"
-              aria-label="User Profile"
+            <router-link
+              to="/register"
+              class="px-4 py-2 rounded-md text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors duration-200"
               @click="closeMobileMenu"
             >
-              <User class="h-6 w-6" />
-            </button>
+              Sign Up
+            </router-link>
+          </div>
 
+          <div class="flex items-center justify-center px-4">
             <router-link
               to="/cart"
               class="relative p-2 rounded-full text-gray-500 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-200"
