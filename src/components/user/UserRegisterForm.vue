@@ -250,7 +250,7 @@ const handleSubmit = async () => {
 
   const data = {
     type: props.mode,
-    nickName: form.nickName.trim(),
+    nickname: form.nickName.trim(),
     email: form.email.trim(),
     password: form.password.trim(),
     fullName: form.fullName.trim(),
@@ -272,6 +272,7 @@ const handleSubmit = async () => {
     formData.append('idCardImageFront', form.nationalIdFrontImage[0].imageFile)
     formData.append('idCardImageBack', form.nationalIdBackImage[0].imageFile)
   }
+  console.log(formData);
 
   const response = await UserService.registerUser(formData)
 
