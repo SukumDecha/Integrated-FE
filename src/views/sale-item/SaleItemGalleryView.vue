@@ -27,7 +27,7 @@ const searchOptions = reactive({
   currentPage: 1,
   pageSize: 10,
   totalItems: 0,
-  sortField: undefined,
+  sortBy: undefined,
   sortOrder: undefined,
   filteredBrands: [],
   filteredPrices: null,
@@ -80,7 +80,7 @@ const onSearch = async () => {
       search: trimmed || undefined,
     },
   })
-    
+
   await fetchSaleItems()
 }
 
@@ -101,7 +101,7 @@ const clearSearch = async () => {
 // โหลดค่า search จาก query ตอนเปิดหน้า
 if (route.query.search) {
   searchKeyword.value = route.query.search
-  searchOptions.filterSearch = route.query.search 
+  searchOptions.filterSearch = route.query.search
 }
 
 const customPrice = reactive({
@@ -125,7 +125,7 @@ const searchParams = computed(() => {
   return {
     page: searchOptions.currentPage - 1,
     size: searchOptions.pageSize,
-    sortField: searchOptions.sortField,
+    sortBy: searchOptions.sortBy,
     sortDirection: searchOptions.sortOrder,
     filterBrands: searchOptions.filteredBrands,
     filterPrices: searchOptions.filteredPrices,
@@ -170,7 +170,7 @@ const initializeStateFromRouteOrStorage = () => {
     parseInt(q.size, 10) || loadFromLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION, {}).pageSize || 10
 
   // Sort
-  searchOptions.sortField = q.sortField || loadFromLocalStorage(LOCAL_STORAGE_KEYS.SORT, {}).field
+  searchOptions.sortBy = q.sortBy || loadFromLocalStorage(LOCAL_STORAGE_KEYS.SORT, {}).field
   searchOptions.sortOrder =
     q.sortDirection || loadFromLocalStorage(LOCAL_STORAGE_KEYS.SORT, {}).order
 
@@ -214,7 +214,7 @@ const updateRouteQuery = () => {
   if (searchOptions.currentPage) query.page = searchOptions.currentPage
   if (searchOptions.pageSize) query.size = searchOptions.pageSize
 
-  if (searchOptions.sortField) query.sortField = searchOptions.sortField
+  if (searchOptions.sortBy) query.sortBy = searchOptions.sortBy
   if (searchOptions.sortOrder) query.sortDirection = searchOptions.sortOrder
 
   if (searchOptions.filteredBrands.length > 0)
@@ -263,7 +263,7 @@ watch(
     await fetchSaleItems()
   },
   { immediate: true,
-     flush: 'post', 
+     flush: 'post',
    },
 )
 
@@ -313,7 +313,7 @@ const handlePaginationChange = async ({ currentPage, pageSize }) => {
 }
 
 const setSort = (field, order) => {
-  searchOptions.sortField = field
+  searchOptions.sortBy = field
   searchOptions.sortOrder = order
   if (field && order) {
     saveToLocalStorage(LOCAL_STORAGE_KEYS.SORT, { field, order })
@@ -482,7 +482,7 @@ watch(
           <XButton
             class-name="itbms-brand-none"
             variant="info"
-            :disabled="!searchOptions.sortField && !searchOptions.sortOrder"
+            :disabled="!searchOptions.sortBy && !searchOptions.sortOrder"
             @click="clearSort"
           >
             <AlignJustify />
@@ -491,7 +491,7 @@ watch(
             class-name="itbms-brand-asc"
             variant="info"
             :disabled="
-              searchOptions.sortField === 'brand.name' && searchOptions.sortOrder === 'asc'
+              searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'asc'
             "
             @click="sortAscByName"
           >
@@ -501,7 +501,7 @@ watch(
             class-name="itbms-brand-desc"
             variant="info"
             :disabled="
-              searchOptions.sortField === 'brand.name' && searchOptions.sortOrder === 'desc'
+              searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'desc'
             "
             @click="sortDescByName"
           >

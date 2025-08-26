@@ -40,7 +40,7 @@ const SaleItemService = {
   async getSaleItemListPaginated({
     page = 1,
     size = 10,
-    sortField = undefined,
+    sortBy = undefined,
     sortDirection = undefined,
     filterBrands = [],
     filterPrices = undefined,
@@ -121,7 +121,7 @@ const SaleItemService = {
     const searchParams = buildSearchParams({
       page,
       size,
-      sortField,
+      sortBy,
       sortDirection,
       filterBrands:
         normalizedFilterBrands.length > 0 ? normalizedFilterBrands.join(',') : undefined,
