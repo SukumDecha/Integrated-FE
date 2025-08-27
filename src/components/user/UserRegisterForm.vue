@@ -5,13 +5,13 @@
   >
     <!-- Nickname -->
     <XInput
-      v-model="form.nickName"
+      v-model="form.nickname"
       label="Nickname"
       required
-      :error-message="touchedFields.nickName ? errors.nickName : ''"
+      :error-message="touchedFields.nickname ? errors.nickname : ''"
       placeholder="e.g. Somsuk"
-      class="itbms-nickName"
-      @blur="onBlur('nickName')"
+      class="itbms-nickname"
+      @blur="onBlur('nickname')"
     />
 
     <!-- Email -->
@@ -164,7 +164,7 @@ const props = defineProps({
 const loading = ref(false)
 
 const form = reactive({
-  nickName: '',
+  nickname: '',
   email: '',
   password: '',
   fullName: '',
@@ -177,7 +177,7 @@ const form = reactive({
 })
 
 const errors = reactive({
-  nickName: '',
+  nickname: '',
   email: '',
   password: '',
   fullName: '',
@@ -201,7 +201,7 @@ function onBlur(field) {
 function validateForm() {
   Object.keys(errors).forEach((key) => (errors[key] = ''))
 
-  if (!form.nickName) errors.nickName = 'Nickname is required.'
+  if (!form.nickname) errors.nickname = 'Nickname is required.'
   if (!form.email) errors.email = 'Email is required.'
   if (!form.password) {
     errors.password = 'Password is required.'
@@ -250,10 +250,10 @@ const handleSubmit = async () => {
 
   const data = {
     type: props.mode,
-    nickname: form.nickName.trim(),
+    nickname: form.nickname.trim(),
     email: form.email.trim(),
     password: form.password.trim(),
-    fullName: form.fullName.trim(),
+    fullname: form.fullName.trim(),
     userType: props.mode === "SELLER" ? "SELLER" : "BUYER",
   }
 
