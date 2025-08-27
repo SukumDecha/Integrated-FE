@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
 
 jobs:
   test:
@@ -24,8 +24,8 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    # - name: Run linter
-    #   run: npm run lint
+    - name: Run linter
+      run: npm run lint
       
     - name: Build application (test)
       run: npm run build:uat
@@ -67,13 +67,13 @@ jobs:
           npm run build:uat
         fi
         
-    - name: Build Docker image
+    - name: Build Docker image (nginx with static files)
       run: |
-        docker build -t integrated-fe:${{ github.sha }} .
-        docker tag integrated-fe:${{ github.sha }} integrated-fe:latest
+        docker build -t integrated-nginx:${{ github.sha }} .
+        docker tag integrated-nginx:${{ github.sha }} integrated-nginx:latest
         
     - name: Save Docker image
-      run: docker save integrated-fe:latest | gzip > integrated-fe.tar.gz
+      run: docker save integrated-nginx:latest | gzip > integrated-nginx.tar.gz
       
     - name: Deploy to VM
       uses: appleboy/ssh-action@v1.0.3
@@ -83,17 +83,14 @@ jobs:
         key: ${{ secrets.VM_SSH_KEY }}
         script: |
           # Create directory if not exists
-          mkdir -p ~/integrated-fe
+          mkdir -p ~/integrated-deployment
           
           # Stop existing containers
-          cd ~/integrated-fe
+          cd ~/integrated-deployment
           docker-compose down || true
           
           # Remove old images
           docker image prune -f
-          
-          # Ensure backend db files are available
-          mkdir -p ~/integrated-be/db
           
     - name: Copy files to VM
       uses: appleboy/scp-action@v0.1.7
@@ -101,8 +98,8 @@ jobs:
         host: ${{ secrets.VM_HOST }}
         username: ${{ secrets.VM_USER }}
         key: ${{ secrets.VM_SSH_KEY }}
-        source: "integrated-fe.tar.gz,docker-compose.yml,nginx/"
-        target: "~/integrated-fe/"
+        source: "integrated-nginx.tar.gz,docker-compose.yml"
+        target: "~/integrated-deployment/"
         
     - name: Deploy on VM
       uses: appleboy/ssh-action@v1.0.3
@@ -111,22 +108,22 @@ jobs:
         username: ${{ secrets.VM_USER }}
         key: ${{ secrets.VM_SSH_KEY }}
         script: |
-          cd ~/integrated-fe
+          cd ~/integrated-deployment
           
           # Load Docker image
-          docker load < integrated-fe.tar.gz
-          rm integrated-fe.tar.gz
+          docker load < integrated-nginx.tar.gz
+          rm integrated-nginx.tar.gz
           
-          # Start services (including database from docker-compose)
-          docker-compose up -d
+          # Start only nginx service (contains static files)
+          docker-compose up -d nginx
           
-          # Wait for services to be ready
-          sleep 30
+          # Wait for nginx to be ready
+          sleep 15
           
           # Verify deployment
-          docker-compose ps
+          docker-compose ps nginx
           
-          # Test frontend availability
+          # Test frontend availability through nginx
           curl -f http://localhost || echo "Frontend not yet ready"
           
           # Clean up old images
