@@ -2,15 +2,15 @@ name: Deploy Frontend
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ production, uat, dev ]
   pull_request:
-    branches: [ main ]
-
+    branches: [ production, uat, dev ]
+    
 env:
   NODE_VERSION: '20'
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -31,9 +31,9 @@ jobs:
       run: npm run build:uat
 
   build-and-deploy:
-    needs: test
+    needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
+    if: github.ref == 'refs/heads/production' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/uat'
     
     steps:
     - uses: actions/checkout@v4
@@ -49,27 +49,19 @@ jobs:
         config_file: .github/workflows/sitst-client.ovpn
         username: ${{ secrets.OVPN_USERNAME }}
         password: ${{ secrets.OVPN_PASSWORD }}
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build for environment
-      run: |
-        if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-          npm run build:prod
-        else
-          npm run build:uat
-        fi
         
     - name: Build Docker image (nginx with static files)
       run: |
-        docker build -t integrated-nginx:${{ github.sha }} .
+        if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+          BUILD_ENV=prod
+        elif [ "${{ github.ref }}" = "refs/heads/uat" ]; then
+          BUILD_ENV=uat
+        else
+          BUILD_ENV=dev
+        fi
+        
+        docker build --build-arg BUILD_ENV=$BUILD_ENV -t integrated-nginx:${{ github.sha }} .
+        docker tag integrated-nginx:${{ github.sha }} integrated-nginx:latest
         docker tag integrated-nginx:${{ github.sha }} integrated-nginx:latest
         
     - name: Save Docker image
@@ -87,7 +79,7 @@ jobs:
           
           # Stop existing containers
           cd ~/integrated-deployment
-          docker-compose down || true
+          docker-compose stop frontend || true
           
           # Remove old images
           docker image prune -f
@@ -114,6 +106,10 @@ jobs:
           docker load < integrated-nginx.tar.gz
           rm integrated-nginx.tar.gz
           
+          # Create network and volumes if they don't exist
+          docker network create integrated-network || true
+          docker volume create backend_uploads || true
+          
           # Start only nginx service (contains static files)
           docker-compose up -d nginx
           
@@ -128,12 +124,3 @@ jobs:
           
           # Clean up old images
           docker image prune -f
-          
-    - name: Repository Dispatch to Backend
-      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
-      uses: peter-evans/repository-dispatch@v3
-      with:
-        token: ${{ secrets.REPO_ACCESS_TOKEN }}
-        repository: ${{ github.repository_owner }}/Integrated-BE
-        event-type: frontend-deployed
-        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

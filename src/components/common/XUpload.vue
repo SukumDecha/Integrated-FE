@@ -15,13 +15,22 @@
         :accept="accept"
         :multiple="multiple"
         @change="onInputChange"
-      />
+      >
       <div class="text-sm text-gray-600">
         <slot name="label">
           <p class="font-medium">Drop files here or click to upload</p>
-          <p v-if="accept" class="text-xs text-gray-500 mt-1">Accepted: {{ accept }}</p>
-          <p v-if="maxSize" class="text-xs text-gray-500">Max size: {{ prettyBytes(maxSize) }}</p>
-          <p v-if="maxSlots" class="text-xs text-gray-500">
+          <p
+            v-if="accept"
+            class="text-xs text-gray-500 mt-1"
+          >Accepted: {{ accept }}</p>
+          <p
+            v-if="maxSize"
+            class="text-xs text-gray-500"
+          >Max size: {{ prettyBytes(maxSize) }}</p>
+          <p
+            v-if="maxSlots"
+            class="text-xs text-gray-500"
+          >
             Slots: {{ occupiedSlots }}/{{ maxSlots }}
           </p>
         </slot>
@@ -36,7 +45,11 @@
     </label>
 
     <!-- File slots grid -->
-    <div v-if="maxSlots" class="mt-4 grid gap-2" :class="gridClass">
+    <div
+      v-if="maxSlots"
+      class="mt-4 grid gap-2"
+      :class="gridClass"
+    >
       <div
         v-for="slotIndex in maxSlots"
         :key="`slot-${slotIndex}-${getSlotFile(slotIndex - 1)?.id}-${getSlotFile(slotIndex - 1)?.isRemoved}`"
@@ -65,7 +78,7 @@
               :alt="getSlotFile(slotIndex - 1).fileName"
               class="w-full h-full object-cover transition"
               :class="getSlotFile(slotIndex - 1).isRemoved ? 'opacity-40 grayscale' : ''"
-            />
+            >
 
             <!-- File icon for non-images -->
             <div
@@ -93,7 +106,10 @@
               class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity"
               style="z-index: 5"
             >
-              <p class="text-xs truncate font-medium" :class="`itbms-picture-file${slotIndex}`">
+              <p
+                class="text-xs truncate font-medium"
+                :class="`itbms-picture-file${slotIndex}`"
+              >
                 {{ getSlotFile(slotIndex - 1).fileName }}
               </p>
               <p class="text-xs text-gray-300">
@@ -108,7 +124,9 @@
               class="absolute inset-0 bg-red-500 bg-opacity-20 flex items-center justify-center"
               style="z-index: 8"
             >
-              <div class="bg-red-500 text-white text-xs px-2 py-1 rounded">Error</div>
+              <div class="bg-red-500 text-white text-xs px-2 py-1 rounded">
+                Error
+              </div>
             </div>
 
             <!-- Action buttons -->
@@ -160,15 +178,22 @@
             @dragleave.prevent="onSlotDragLeave"
             @drop.prevent="onSlotDrop($event, slotIndex - 1)"
           >
-            <div class="text-2xl mb-1">+</div>
-            <div class="text-xs">Slot {{ slotIndex }}</div>
+            <div class="text-2xl mb-1">
+              +
+            </div>
+            <div class="text-xs">
+              Slot {{ slotIndex }}
+            </div>
           </div>
         </template>
       </div>
     </div>
 
     <!-- Traditional file list (when not using slots) -->
-    <div v-else-if="files.length" class="mt-4 space-y-2">
+    <div
+      v-else-if="files.length"
+      class="mt-4 space-y-2"
+    >
       <div
         v-for="(item, index) in files"
         :key="item.id"
@@ -184,8 +209,11 @@
             :src="item.previewUrl"
             alt=""
             class="w-full h-full object-cover"
-          />
-          <span v-else class="text-xs text-gray-500">FILE</span>
+          >
+          <span
+            v-else
+            class="text-xs text-gray-500"
+          >FILE</span>
         </div>
 
         <!-- File info -->
@@ -204,13 +232,19 @@
           </p>
 
           <!-- Error message for this file -->
-          <p v-if="item.error" class="mt-1 text-xs font-medium text-red-700">
+          <p
+            v-if="item.error"
+            class="mt-1 text-xs font-medium text-red-700"
+          >
             {{ item.error }}
           </p>
         </div>
 
         <!-- Action buttons -->
-        <div v-if="files.length > 1" class="flex items-center gap-1">
+        <div
+          v-if="files.length > 1"
+          class="flex items-center gap-1"
+        >
           <button
             v-if="index !== 0"
             type="button"
@@ -244,7 +278,10 @@
     </div>
 
     <!-- Helper / errors -->
-    <p v-if="errors.length" class="mt-3 text-xs text-red-600">
+    <p
+      v-if="errors.length"
+      class="mt-3 text-xs text-red-600"
+    >
       {{ errors[errors.length - 1] }}
     </p>
   </div>

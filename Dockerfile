@@ -3,7 +3,9 @@ FROM node:20 AS build
 WORKDIR /app
 COPY . .
 RUN npm install
-RUN npm run build:uat
+
+ARG BUILD_ENV=uat
+RUN npm run build:${BUILD_ENV}
 
 # Production stage
 FROM nginx:alpine

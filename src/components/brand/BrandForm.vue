@@ -174,8 +174,15 @@ const handleSave = async () => {
     />
 
     <div class="flex items-center gap-4">
-      <label for="active" class="form-label"> Active </label>
-      <XToggle id="active" v-model="form.isActive" class="itbms-isActive" />
+      <label
+        for="active"
+        class="form-label"
+      > Active </label>
+      <XToggle
+        id="active"
+        v-model="form.isActive"
+        class="itbms-isActive"
+      />
     </div>
 
     <XInput
@@ -192,8 +199,8 @@ const handleSave = async () => {
         label="Save"
         class="itbms-save-button"
         variant="primary"
-        @click="handleSave"
         :disabled="!isFormValid || !isChanged"
+        @click="handleSave"
       />
       <XButton
         label="Cancel"

@@ -4,9 +4,9 @@
     class="toggle appearance-none w-11 h-6 bg-gray-300 rounded-full relative cursor-pointer transition-all duration-300 ease-in-out checked:bg-emerald-600 disabled:opacity-60 disabled:cursor-not-allowed"
     :checked="modelValue"
     :disabled="disabled"
-    @change="$emit('update:modelValue', $event.target.checked)"
     v-bind="$attrs"
-  />
+    @change="$emit('update:modelValue', $event.target.checked)"
+  >
 </template>
 
 <script setup>

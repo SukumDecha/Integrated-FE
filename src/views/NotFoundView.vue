@@ -2,8 +2,12 @@
   <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8 text-center">
       <div>
-        <div class="text-6xl font-bold text-emerald-600 mb-4">404</div>
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Page Not Found</h1>
+        <div class="text-6xl font-bold text-emerald-600 mb-4">
+          404
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+          Page Not Found
+        </h1>
         <p class="text-gray-600 mb-8">
           Sorry, the page you are looking for doesn't exist or has been moved.
         </p>
