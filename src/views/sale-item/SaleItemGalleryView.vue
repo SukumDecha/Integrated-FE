@@ -72,6 +72,7 @@ const onSearch = async () => {
 
   searchOptions.filterSearch = trimmed
   searchOptions.currentPage = 1
+  sessionStorage.setItem(LOCAL_STORAGE_KEYS.FILTER_SEARCH, trimmed)
 
   await router.replace({
     query: {
@@ -92,6 +93,8 @@ const clearSearch = async () => {
   const newQuery = { ...route.query }
   delete newQuery.search //เคลียร์เฉพาะ search
    newQuery.page = 1
+
+  sessionStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_SEARCH)
 
   await router.replace({ query: newQuery }) // ✅ ใช้ replace เพื่อให้ refresh route ทันที
   await nextTick()
@@ -173,6 +176,15 @@ const initializeStateFromRouteOrStorage = () => {
   searchOptions.sortBy = q.sortBy || loadFromLocalStorage(LOCAL_STORAGE_KEYS.SORT, {}).field
   searchOptions.sortOrder =
     q.sortDirection || loadFromLocalStorage(LOCAL_STORAGE_KEYS.SORT, {}).order
+
+    // Search keyword
+searchOptions.filterSearch =
+  q.search ||
+  sessionStorage.getItem(LOCAL_STORAGE_KEYS.FILTER_SEARCH) ||
+  ''
+
+searchKeyword.value = searchOptions.filterSearch
+
 
   // Filter Brands
   searchOptions.filteredBrands = q.filterBrands
