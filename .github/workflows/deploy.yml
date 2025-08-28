@@ -77,12 +77,14 @@ jobs:
           # Create directory if not exists
           mkdir -p ~/integrated-deployment
           
-          # Stop existing containers
+          # Stop and remove frontend containers
           cd ~/integrated-deployment
-          docker-compose stop frontend || true
+          docker-compose stop nginx || true
+          docker-compose rm -f nginx || true
           
-          # Remove old images
-          docker image prune -f
+          # Remove specific old images to prevent corruption
+          docker rmi integrated-nginx:latest || true
+          # docker image prune -f
           
     - name: Copy files to VM
       uses: appleboy/scp-action@v0.1.7
@@ -102,13 +104,16 @@ jobs:
         script: |
           cd ~/integrated-deployment
           
+          # Ensure clean nginx base image
+          docker pull nginx:alpine || true
+          
           # Load Docker image
           docker load < integrated-nginx.tar.gz
           rm integrated-nginx.tar.gz
           
           # Create network and volumes if they don't exist
-          docker network create integrated-network || true
-          docker volume create backend_uploads || true
+          docker network create integrated-network 2>/dev/null || true
+          docker volume create backend_uploads 2>/dev/null || true
           
           # Start only nginx service (contains static files)
           docker-compose up -d nginx
@@ -122,5 +127,3 @@ jobs:
           # Test frontend availability through nginx
           curl -f http://localhost || echo "Frontend not yet ready"
           
-          # Clean up old images
-          docker image prune -f
