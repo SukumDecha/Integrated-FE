@@ -8,7 +8,7 @@ import { RouterView } from 'vue-router'
     <!-- พื้นหลังฝั่งซ้าย -->
     <div
       class="absolute top-0 left-0 w-full md:w-[40%] h-[180px] md:h-full bg-green-custom"
-    ></div>
+    />
 
     <!-- กล่องฟอร์ม -->
     <div

@@ -32,9 +32,15 @@ const onBlur = () => {
 </script>
 
 <template>
-  <label v-if="label" class="block text-sm font-medium text-gray-700 mb-1">
+  <label
+    v-if="label"
+    class="block text-sm font-medium text-gray-700 mb-1"
+  >
     {{ label }}
-    <span v-if="required" class="text-red-500">*</span>
+    <span
+      v-if="required"
+      class="text-red-500"
+    >*</span>
   </label>
 
   <component
@@ -59,7 +65,10 @@ const onBlur = () => {
     @blur="onBlur"
   />
 
-  <p v-if="touched && errorMessage" class="itbms-message text-sm text-red-500 mt-1">
+  <p
+    v-if="touched && errorMessage"
+    class="itbms-message text-sm text-red-500 mt-1"
+  >
     {{ errorMessage }}
   </p>
 </template>

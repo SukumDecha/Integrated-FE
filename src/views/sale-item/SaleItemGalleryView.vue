@@ -72,6 +72,7 @@ const onSearch = async () => {
 
   searchOptions.filterSearch = trimmed
   searchOptions.currentPage = 1
+  sessionStorage.setItem(LOCAL_STORAGE_KEYS.FILTER_SEARCH, trimmed)
 
   await router.replace({
     query: {
@@ -93,8 +94,10 @@ const clearSearch = async () => {
   delete newQuery.search //เคลียร์เฉพาะ search
    newQuery.page = 1
 
+  sessionStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_SEARCH)
+
   await router.replace({ query: newQuery }) // ✅ ใช้ replace เพื่อให้ refresh route ทันที
-  await nextTick()
+
   fetchSaleItems()
 }
 
@@ -173,6 +176,15 @@ const initializeStateFromRouteOrStorage = () => {
   searchOptions.sortBy = q.sortBy || loadFromLocalStorage(LOCAL_STORAGE_KEYS.SORT, {}).field
   searchOptions.sortOrder =
     q.sortDirection || loadFromLocalStorage(LOCAL_STORAGE_KEYS.SORT, {}).order
+
+    // Search keyword
+searchOptions.filterSearch =
+  q.search ||
+  sessionStorage.getItem(LOCAL_STORAGE_KEYS.FILTER_SEARCH) ||
+  ''
+
+searchKeyword.value = searchOptions.filterSearch
+
 
   // Filter Brands
   searchOptions.filteredBrands = q.filterBrands
@@ -376,7 +388,7 @@ onMounted(async () => {
 
 watch(
   searchParams,
-  async (newParams, oldParams) => {
+  async () => {
     // If we use deep check, it won't allow us to fetch the same page
     // if (JSON.stringify(newParams) !== JSON.stringify(oldParams)) {
     //   updateRouteQuery();
@@ -419,15 +431,28 @@ watch(
             @keydown.enter="onSearch"
           />
 
-          <XButton @click="onSearch" color="primary">
-            <template #default> 🔍 </template>
+          <XButton
+            color="primary"
+            @click="onSearch"
+          >
+            <template #default>
+              🔍
+            </template>
           </XButton>
 
-          <XButton class="itbms-search-clear-button" @click="clearSearch"> Clear </XButton>
+          <XButton
+            class="itbms-search-clear-button"
+            @click="clearSearch"
+          >
+            Clear
+          </XButton>
         </div>
 
         <!-- Add Sale Item  -->
-        <XButton class-name="itbms-sale-item-add" @click="$router.push('/sale-items/add')">
+        <XButton
+          class-name="itbms-sale-item-add"
+          @click="$router.push('/sale-items/add')"
+        >
           <PlusIcon class="h-5 w-5 mr-2" /> Add Sale Item
         </XButton>
       </div>
@@ -473,7 +498,12 @@ watch(
               @update:model-value="() => resetPagination(false)"
             />
           </div>
-          <XButton class-name="itbms-brand-filter-clear" @click="clearAllFilter"> Clear </XButton>
+          <XButton
+            class-name="itbms-brand-filter-clear"
+            @click="clearAllFilter"
+          >
+            Clear
+          </XButton>
         </div>
 
         <div class="flex flex-wrap items-center gap-2 p-4 pt-0 rounded-md" />
@@ -538,8 +568,12 @@ watch(
       </div>
 
       <div class="space-y-2">
-        <h2 class="text-3xl font-extrabold tracking-tight text-gray-900">Featured Products</h2>
-        <p class="text-gray-500">Check out our most popular items this season.</p>
+        <h2 class="text-3xl font-extrabold tracking-tight text-gray-900">
+          Featured Products
+        </h2>
+        <p class="text-gray-500">
+          Check out our most popular items this season.
+        </p>
       </div>
 
       <div class="mt-10">
@@ -573,7 +607,9 @@ watch(
         v-if="!loading.items && saleItems.length === 0 && !error.items"
         class="text-center py-10 itbms-row"
       >
-        <p class="text-lg text-gray-500">no sale item</p>
+        <p class="text-lg text-gray-500">
+          no sale item
+        </p>
       </div>
     </div>
   </div>

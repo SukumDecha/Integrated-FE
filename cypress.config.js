@@ -8,7 +8,7 @@ export default defineConfig({
     // baseUrl: 'http://localhost:5173',
     // baseAPI: 'http://localhost:8080',
     experimentalRunAllSpecs: true,
-    setupNodeEvents(on, config) {
+    setupNodeEvents() {
       // implement node event listeners here
     },
   },
