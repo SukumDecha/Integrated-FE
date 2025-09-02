@@ -1,4 +1,4 @@
-describe(`TC-FE-PBI22-VALIDATE-MATCH-PASSWORD-1\n 
+describe(`TC-FE-PBI22-VALIDATE-MATCH-PASSWORD-1\n
     Test Scenario : normal - standard email format\n
                            - max-length email and password`, () => {
 
@@ -19,7 +19,7 @@ describe(`TC-FE-PBI22-VALIDATE-MATCH-PASSWORD-1\n
         cy.get('@signin').should(($btn)=>{
             expect($btn.is(':disabled') || $btn.hasClass('disabled')).to.be.true
         })
-    })    
+    })
 
     it('should be enable the Sign In button after type max-length email and max-length password.',()=>{
 
@@ -32,7 +32,7 @@ describe(`TC-FE-PBI22-VALIDATE-MATCH-PASSWORD-1\n
         cy.get('.itbms-signin-button').as('signin') ;
         cy.get('@signin').should(($btn)=>{
             expect($btn.is(':disabled') || $btn.hasClass('disabled')).to.be.false
-        })        
+        })
 
     })
 
@@ -55,6 +55,6 @@ describe(`TC-FE-PBI22-VALIDATE-MATCH-PASSWORD-1\n
             expect(response.statusCode).to.equal(401)
         })
 
-        cy.get('.itbms-message').contains('Email or Pasword is incorrect.')
+        cy.get('.itbms-message').contains('Email or Password is incorrect.')
     })
 })

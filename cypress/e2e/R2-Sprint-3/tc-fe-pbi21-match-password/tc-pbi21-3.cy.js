@@ -1,4 +1,4 @@
-describe(`TC-FE-PBI21-MATCH-PASSWORD-3\n 
+describe(`TC-FE-PBI21-MATCH-PASSWORD-3\n
     Test Scenario : failed - email is incorrect.`, () => {
 
     let resource = '/signin'
@@ -18,7 +18,7 @@ describe(`TC-FE-PBI21-MATCH-PASSWORD-3\n
         cy.get('@signin').should(($btn)=>{
             expect($btn.is(':disabled') || $btn.hasClass('disabled')).to.be.true
         })
-    })    
+    })
 
     it('should be enable the Sign In button after type email and password.',()=>{
 
@@ -31,7 +31,7 @@ describe(`TC-FE-PBI21-MATCH-PASSWORD-3\n
         cy.get('.itbms-signin-button').as('signin') ;
         cy.get('@signin').should(($btn)=>{
             expect($btn.is(':disabled') || $btn.hasClass('disabled')).to.be.false
-        })        
+        })
 
     })
 
@@ -54,6 +54,6 @@ describe(`TC-FE-PBI21-MATCH-PASSWORD-3\n
             expect(response.statusCode).to.equal(401)
         })
 
-        cy.get('.itbms-message').contains('Email or Pasword is incorrect.')
+        cy.get('.itbms-message').contains('Email or Password is incorrect.')
     })
 })

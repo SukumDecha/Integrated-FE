@@ -1,14 +1,12 @@
 <template>
-  <form
-    class="space-y-4"
-    @submit.prevent="handleSubmit"
-  >
+  <form class="space-y-4" @submit.prevent="handleSubmit">
     <XInput
       v-model="form.email"
       label="Email"
-      type="email"
+      type="text"
       required
       :error-message="touched.email ? errors.email : ''"
+      maxlength="50"
       placeholder="Enter your email"
       class="itbms-email"
       @blur="onBlur('email')"
@@ -20,6 +18,7 @@
       type="password"
       required
       :error-message="touched.password ? errors.password : ''"
+      maxlength="14"
       placeholder="Enter your password"
       class="itbms-password"
       @blur="onBlur('password')"
@@ -80,12 +79,13 @@ const onBlur = (field) => {
 
 const validateField = (field) => {
   errors[field] = ''
-  const value = form[field]?.trim()
+  const value = form[field]
 
   if (!value) {
     errors[field] = `${field === 'email' ? 'Email' : 'Password'} is required.`
   }
 }
+
 
 const validateForm = () => {
   validateField('email')
@@ -93,7 +93,14 @@ const validateForm = () => {
   return !errors.email && !errors.password
 }
 
-const isValid = computed(() => validateForm())
+const isValid = computed(() => {
+  return (
+    form.email.length > 0 &&
+    form.password.length > 0 &&
+    !errors.email &&
+    !errors.password
+  )
+})
 
 const handleSubmit = async () => {
   touched.email = true
@@ -107,7 +114,10 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    const res = await UserService.login(form)
+    const res = await UserService.login({
+      email: form.email.trim(),
+      password: form.password.trim(),
+    })
     console.log('login response', res)
 
     if (!res.success) {
@@ -117,7 +127,10 @@ const handleSubmit = async () => {
       if (message.includes('401') || message.includes('incorrect')) {
         toast.add({ type: 'error', message: 'Email or Password is incorrect.' })
       } else if (message.includes('activate')) {
-        toast.add({ type: 'error', message: 'You need to activate your account before signing in.' })
+        toast.add({
+          type: 'error',
+          message: 'You need to activate your account before signing in.',
+        })
       } else {
         toast.add({ type: 'error', message: rawMessage })
       }
@@ -135,7 +148,6 @@ const handleSubmit = async () => {
     } else {
       toast.add({ type: 'error', message: 'Login failed. Invalid token response.' })
     }
-
   } catch (err) {
     console.error('Login error:', err)
     toast.add({ type: 'error', message: 'Unexpected error occurred during login.' + err })
@@ -143,43 +155,6 @@ const handleSubmit = async () => {
     loading.value = false
   }
 }
-
-// const handleSubmit = async () => {
-//   touched.email = true
-//   touched.password = true
-
-//   if (!validateForm()) {
-//     toast.add({ type: 'error', message: 'Please fill in all required fields.' })
-//     return
-//   }
-
-//   try {
-//     loading.value = true
-//     const res = await UserService.login(form)
-
-//     const accessToken = res.data?.access_token
-//     const refreshToken = res.data?.refresh_token
-
-//     if (accessToken && refreshToken) {
-//       authStore.login(accessToken)
-//       toast.add({ type: 'success', message: 'Login successful' })
-//       router.push('/')
-//     }
-//   } catch (err) {
-//     const status = err.response?.status
-//     // const errorMessage = err.response?.data?.errorMessage || 'Unknown error'
-
-//     if (status === 400 || status === 401) {
-//       toast.add({ type: 'error', message: 'Email or Password is incorrect.' })
-//     } else if (status === 403) {
-//       toast.add({ type: 'error', message: 'You need to activate your account before signing in.' })
-//     } else {
-//       toast.add({ type: 'error', message: 'There is a problem. Please try again later.' })
-//     }
-//   } finally {
-//     loading.value = false
-//   }
-// }
 
 const handleCancel = () => {
   form.email = ''
