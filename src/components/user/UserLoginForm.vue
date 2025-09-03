@@ -3,7 +3,7 @@
     <XInput
       v-model="form.email"
       label="Email"
-      type="text"
+      type="email"
       required
       :error-message="touched.email ? errors.email : ''"
       maxlength="50"
