@@ -3,6 +3,7 @@
     <transition-group
       name="fade"
       tag="div"
+      class="space-y-2"
     >
       <div
         v-for="toast in toasts"

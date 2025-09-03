@@ -86,7 +86,6 @@ const validateField = (field) => {
   }
 }
 
-
 const validateForm = () => {
   validateField('email')
   validateField('password')
@@ -94,12 +93,7 @@ const validateForm = () => {
 }
 
 const isValid = computed(() => {
-  return (
-    form.email.length > 0 &&
-    form.password.length > 0 &&
-    !errors.email &&
-    !errors.password
-  )
+  return form.email.length > 0 && form.password.length > 0 && !errors.email && !errors.password
 })
 
 const handleSubmit = async () => {
@@ -118,23 +112,21 @@ const handleSubmit = async () => {
       email: form.email.trim(),
       password: form.password.trim(),
     })
+
     console.log('login response', res)
 
-    if (!res.success) {
-      const rawMessage = res.message || res.error || 'There is a problem. Please try again later.'
-      const message = rawMessage.toLowerCase()
+    // if (res.status === 404) {
+    //   toast.add({ type: 'error', message: 'Service not found. Please try again later.' })
+    //   return
+    // } else if (res.status === 500) {
+    //   toast.add({ type: 'error', message: 'Internal Server Error. Please contact support.' })
+    //   return
+    // }
 
-      if (message.includes('401') || message.includes('incorrect')) {
-        toast.add({ type: 'error', message: 'Email or Password is incorrect.' })
-      } else if (message.includes('activate')) {
-        toast.add({
-          type: 'error',
-          message: 'You need to activate your account before signing in.',
-        })
-      } else {
-        toast.add({ type: 'error', message: rawMessage })
-      }
-
+    if (res.error !== null) {
+      const message =
+        res.message?.trim() || res.error?.trim() || 'There is a problem. Please try again later.'
+      toast.add({ type: 'error', message })
       return
     }
 
@@ -143,14 +135,20 @@ const handleSubmit = async () => {
 
     if (accessToken && refreshToken) {
       authStore.login(accessToken)
-      toast.add({ type: 'success', message: 'Login successful' })
+      toast.add({ type: 'success', message: res.message || 'Login successful' })
+      console.log("log in success");
+
       router.push('/')
     } else {
       toast.add({ type: 'error', message: 'Login failed. Invalid token response.' })
     }
+
   } catch (err) {
     console.error('Login error:', err)
-    toast.add({ type: 'error', message: 'Unexpected error occurred during login.' + err })
+
+    // จริง ๆ แล้ว block นี้จะไม่ถูกเรียกเพราะ UserService.login ไม่ throw
+    const message = err?.message || 'Unexpected error occurred during login.'
+    toast.add({ type: 'error', message })
   } finally {
     loading.value = false
   }
