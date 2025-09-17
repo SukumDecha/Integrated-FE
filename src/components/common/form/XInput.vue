@@ -11,7 +11,8 @@ const props = defineProps({
   type: { type: String, default: 'text' }, // 'text' | 'number' | 'textarea'
   step: [Number, String],
   rows: { type: Number, default: 3 },
-  errorMessage: { type: String, default: '' }
+  errorMessage: { type: String, default: '' },
+  maxlength: { type: [String, Number], default: null },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -32,15 +33,9 @@ const onBlur = () => {
 </script>
 
 <template>
-  <label
-    v-if="label"
-    class="block text-sm font-medium text-gray-700 mb-1"
-  >
+  <label v-if="label" class="block text-sm font-medium text-gray-700 mb-1">
     {{ label }}
-    <span
-      v-if="required"
-      class="text-red-500"
-    >*</span>
+    <span v-if="required" class="text-red-500">*</span>
   </label>
 
   <component
@@ -51,13 +46,14 @@ const onBlur = () => {
     :disabled="disabled"
     :step="step"
     :rows="rows"
+    :maxlength="maxlength"
     :class="[
       'w-full px-4 py-3 rounded-lg text-gray-800 border transition-all duration-200',
       touched && errorMessage
         ? 'border-red-500 focus:ring-red-300 focus:border-red-500'
         : 'border-black-400 focus:ring-blue-300 focus:border-blue-500',
       disabled ? 'bg-gray-100 cursor-not-allowed' : '',
-      props.class
+      props.class,
     ]"
     v-bind="$attrs"
     v-on="$attrs"
@@ -65,10 +61,7 @@ const onBlur = () => {
     @blur="onBlur"
   />
 
-  <p
-    v-if="touched && errorMessage"
-    class="itbms-message text-sm text-red-500 mt-1"
-  >
+  <p v-if="touched && errorMessage" class="itbms-message text-sm text-red-500 mt-1">
     {{ errorMessage }}
   </p>
 </template>
