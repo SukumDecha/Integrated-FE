@@ -147,7 +147,7 @@ import XButton from '@/components/common/XButton.vue'
 import XUpload from '@/components/common/XUpload.vue'
 import XPasswordInput from '../common/form/XPasswordInput.vue'
 import { useToastStore } from '@/stores/toast.store'
-import { UserService } from '@/services'
+import { AuthService } from '@/services'
 import { useRouter } from 'vue-router'
 
 const toast = useToastStore()
@@ -274,7 +274,7 @@ const handleSubmit = async () => {
   }
   console.log(formData);
 
-  const response = await UserService.registerUser(formData)
+  const response = await AuthService.registerUser(formData)
 
   if (response.error) {
     toast.add({ type: 'error', message: response.error })
