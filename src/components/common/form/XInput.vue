@@ -17,13 +17,10 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const inputTag = computed(() => (props.type === 'textarea' ? 'textarea' : 'input'))
-
 const touched = ref(false)
 
 const handleInput = (e) => {
-  const raw = e.target.value
-  // emit('update:modelValue', props.type === 'number' ? (raw === '' ? null : +raw) : raw)
-  emit('update:modelValue', raw)
+  emit('update:modelValue', e.target.value)
 }
 
 const onBlur = () => {
@@ -32,43 +29,47 @@ const onBlur = () => {
 </script>
 
 <template>
-  <label
-    v-if="label"
-    class="block text-sm font-medium text-gray-700 mb-1"
-  >
-    {{ label }}
-    <span
-      v-if="required"
-      class="text-red-500"
-    >*</span>
-  </label>
+  <div class="flex flex-col">
+    <label
+      v-if="label"
+      class="mb-1 text-sm font-medium text-gray-700"
+    >
+      {{ label }}
+      <span
+        v-if="required"
+        class="text-red-500"
+      >*</span>
+    </label>
 
-  <component
-    :is="inputTag"
-    :type="type"
-    :value="modelValue"
-    :placeholder="placeholder"
-    :disabled="disabled"
-    :step="step"
-    :rows="rows"
-    :class="[
-      'w-full px-4 py-3 rounded-lg text-gray-800 border transition-all duration-200',
-      touched && errorMessage
-        ? 'border-red-500 focus:ring-red-300 focus:border-red-500'
-        : 'border-black-400 focus:ring-blue-300 focus:border-blue-500',
-      disabled ? 'bg-gray-100 cursor-not-allowed' : '',
-      props.class
-    ]"
-    v-bind="$attrs"
-    v-on="$attrs"
-    @input="handleInput"
-    @blur="onBlur"
-  />
+    <component
+      :is="inputTag"
+      :type="type"
+      :value="modelValue"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :step="step"
+      :rows="rows"
+      :class="[
+        'w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-800',
+        'placeholder-gray-400 transition-colors duration-200',
+        'focus:outline-none focus:ring-1',
+        touched && errorMessage
+          ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
+          : 'border-gray-300 hover:border-gray-400 focus:border-blue-500 focus:ring-blue-500',
+        disabled ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : '',
+        props.class
+      ]"
+      v-bind="$attrs"
+      v-on="$attrs"
+      @input="handleInput"
+      @blur="onBlur"
+    />
 
-  <p
-    v-if="touched && errorMessage"
-    class="itbms-message text-sm text-red-500 mt-1"
-  >
-    {{ errorMessage }}
-  </p>
+    <p
+      v-if="touched && errorMessage"
+      class="mt-1 text-xs text-red-500"
+    >
+      {{ errorMessage }}
+    </p>
+  </div>
 </template>

@@ -1,4 +1,4 @@
-import {  post, } from './helper/api'
+import {  get, post, put, } from './helper/api'
 
 const BASE_URL = '/v2/users'
 
@@ -7,9 +7,13 @@ const UserService = {
   //   return await get(`${BASE_URL}`)
   // },
 
-  // async getUserById(id) {
-  //   return await get(`${BASE_URL}/${id}`)
-  // },
+  async getCurrentUser() {
+    return await get(`${BASE_URL}/current`)
+  },
+
+  async getUserById(id) {
+    return await get(`${BASE_URL}/${id}`)
+  },
 
   async registerUser(data) {
     return await post(`${BASE_URL}/register`, data, {
@@ -25,15 +29,15 @@ const UserService = {
 
   async resendVerification(data) {
     return await post(`${BASE_URL}/resend-verification`, data)
-  }
+  },
 
-  // async updateUser(id, data) {
-  //   return await put(`${BASE_URL}/${id}`, data, {
-  //     headers: {
-  //       'Content-Type': 'multipart/form-data',
-  //     },
-  //   })
-  // },
+  async updateUser(id, data) {
+    return await put(`${BASE_URL}/${id}`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+  },
 
   // async deleteUser(id) {
   //   return await remove(`${BASE_URL}/${id}`)

@@ -37,6 +37,10 @@ const router = createRouter({
       component: DefaultLayout,
       children: [
         {
+          path: 'profile',
+          component: () => import('../views/user/UserProfileView.vue'),
+        },
+        {
           path: 'sale-items',
           children: [
             {
