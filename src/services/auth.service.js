@@ -3,6 +3,9 @@ import { get, post } from './helper/api'
 const BASE_URL = '/v2/auth'
 
 const AuthService = {
+  async login(data) {
+    return await post(`${BASE_URL}/authenticate`, data)
+  },
 
   async registerUser(data) {
     return await post(`${BASE_URL}/register`, data, {
