@@ -19,9 +19,7 @@ const UserService = {
     })
   },
 
-  // async deleteUser(id) {
-  //   return await remove(`${BASE_URL}/${id}`)
-  // },
+
 }
 
 export default UserService

@@ -25,8 +25,7 @@ const request = async (
   }
 
   if (payload instanceof FormData) {
-    // ❌ Do not set Content-Type at all
-    delete httpOptions.headers['Content-Type'];
+    delete httpOptions.headers['Content-Type']; // ❌ Do not set manually
     httpOptions.body = payload;
   } else if (payload && httpOptions.headers['Content-Type'] === 'application/json') {
     httpOptions.body = JSON.stringify(payload);
@@ -36,7 +35,6 @@ const request = async (
     const res = await fetch(`${API_BASE_URL}${url}`, httpOptions)
 
     if (!res.ok) {
-      // 🔥 อ่าน message จาก body หากมี
       let errorMessage = `HTTP error! Status: ${res.status}`
       try {
         const body = await res.json()
@@ -47,18 +45,31 @@ const request = async (
         console.error('Error parsing response body:', error)
       }
 
+      // ✅ Add res.status to response
       if (isPaginated) {
-        return new PaginationResponse().error(errorMessage).build();
+        return new PaginationResponse()
+          .error(errorMessage)
+          .status(res.status)
+          .build()
       } else {
-        return new BaseResponse().error(errorMessage).build();
+        return new BaseResponse()
+          .error(errorMessage)
+          .status(res.status)
+          .build()
       }
     }
 
     if (method === 'DELETE') {
       if (isPaginated) {
-        return new PaginationResponse().message(BaseResponseMessage.Success).build();
+        return new PaginationResponse()
+          .message(BaseResponseMessage.Success)
+          .status(200)
+          .build()
       } else {
-        return new BaseResponse().message(BaseResponseMessage.Success).build();
+        return new BaseResponse()
+          .message(BaseResponseMessage.Success)
+          .status(200)
+          .build()
       }
     }
 
@@ -67,7 +78,8 @@ const request = async (
     if (isPaginated) {
       const paginatedResponse = new PaginationResponse()
         .data(item.content)
-        .message(BaseResponseMessage.Success);
+        .message(BaseResponseMessage.Success)
+        .status(res.status)
 
       paginatedResponse.page(item.page)
       paginatedResponse.perPage(item.size)
@@ -80,43 +92,36 @@ const request = async (
         paginatedResponse.sortOrder(splitedSort[1])
       }
 
-      return paginatedResponse.build();
+      return paginatedResponse.build()
     } else {
       return new BaseResponse()
         .data(item)
         .message(item.message || BaseResponseMessage.Success)
-        .build();
+        .status(res.status)
+        .build()
     }
   } catch (err) {
     const errorMessage = getErrorMessage(err)
 
+    // ✅ status 0 = fetch failed, network error
     if (isPaginated) {
-      return new PaginationResponse().error(errorMessage).build();
+      return new PaginationResponse()
+        .error(errorMessage)
+        .status(0)
+        .build()
     } else {
-      return new BaseResponse().error(errorMessage).build();
+      return new BaseResponse()
+        .error(errorMessage)
+        .status(0)
+        .build()
     }
   }
 }
 
-const get = async (url, options) => {
-  return request(url, 'GET', null, options)
-}
-
-const post = async (url, payload, options) => {
-  return request(url, 'POST', payload, options)
-}
-
-const patch = async (url, payload, options) => {
-  return request(url, 'PATCH', payload, options)
-}
-
-const put = async (url, payload, options) => {
-  return request(url, 'PUT', payload, options)
-}
-
-const remove = async (url) => {
-  return request(url, 'DELETE')
-}
+const get = async (url, options) => request(url, 'GET', null, options)
+const post = async (url, payload, options) => request(url, 'POST', payload, options)
+const patch = async (url, payload, options) => request(url, 'PATCH', payload, options)
+const put = async (url, payload, options) => request(url, 'PUT', payload, options)
+const remove = async (url) => request(url, 'DELETE')
 
 export { get, post, patch, put, remove }
-

@@ -11,7 +11,8 @@ const props = defineProps({
   type: { type: String, default: 'text' }, // 'text' | 'number' | 'textarea'
   step: [Number, String],
   rows: { type: Number, default: 3 },
-  errorMessage: { type: String, default: '' }
+  errorMessage: { type: String, default: '' },
+  maxlength: { type: [String, Number], default: null },
 })
 
 const emit = defineEmits(['update:modelValue'])
