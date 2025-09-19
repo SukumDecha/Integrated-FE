@@ -1,4 +1,4 @@
-import { post } from './helper/api'
+import { get, post } from './helper/api'
 
 const BASE_URL = '/v2/auth'
 
@@ -10,6 +10,10 @@ const AuthService = {
         'Content-Type': 'multipart/form-data',
       },
     })
+  },
+
+  async getCurrentUser() {
+    return await get(`${BASE_URL}/me`)
   },
 
   async verifyEmail(token) {

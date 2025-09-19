@@ -7,10 +7,6 @@ const UserService = {
   //   return await get(`${BASE_URL}`)
   // },
 
-  async getCurrentUser() {
-    return await get(`${BASE_URL}/current`)
-  },
-
   async getUserById(id) {
     return await get(`${BASE_URL}/${id}`)
   },

@@ -22,21 +22,25 @@
     <!-- Content -->
     <div class="grid grid-cols-2 gap-4 p-2">
       <XInput
+        v-model="form.name"
         label="Full Name"
         placeholder="e.g. Japan"
       />
 
       <XInput
+        v-model="form.name"
         label="Nickname"
         placeholder="e.g. Japan"
       />
 
       <XInput
+        v-model="form.name"
         label="Email"
         placeholder="e.g. Japan"
       />
 
       <XInput
+        v-model="form.name"
         label="Password"
         placeholder="e.g. Japan"
       />
@@ -47,21 +51,25 @@
     <div class="grid grid-cols-2 gap-4 p-2">
       <!-- Seller Only -->
       <XInput
+        v-model="form.name"
         label="Mobile Number"
         placeholder="e.g. Japan"
       />
 
       <XInput
+        v-model="form.name"
         label="Bank Account Number"
         placeholder="e.g. Japan"
       />
 
       <XInput
+        v-model="form.name"
         label="Nation ID"
         placeholder="e.g. Japan"
       />
 
       <XInput
+        v-model="profile.bankName"
         label="Bank Name"
         placeholder="e.g. Japan"
       />
@@ -72,7 +80,7 @@
 <script setup>
 import XButton from '@/components/common/XButton.vue';
 import XInput from '@/components/common/form/XInput.vue';
-import { UserService } from '@/services';
+import { AuthService } from '@/services';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -80,7 +88,7 @@ const router = useRouter()
 const profile = ref({});
 
 const doSearchProfile = async () => {
-  const response = await UserService.getCurrentUser()
+  const response = await AuthService.getCurrentUser()
   profile.value = response;
 }
 

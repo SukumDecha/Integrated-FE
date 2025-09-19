@@ -1,289 +1,305 @@
 <template>
-  <div :class="['w-full', className]">
-    <!-- Dropzone -->
+  <div class="flex flex-col ">
     <label
-      class="itbms-upload-button flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed p-6 text-center cursor-pointer transition hover:border-gray-400"
-      :class="isDragging ? 'border-gray-500 bg-gray-50' : 'border-gray-300'"
-      @dragover.prevent="onDragOver"
-      @dragleave.prevent="onDragLeave"
-      @drop.prevent="onDrop"
+      v-if="label"
+      class="mb-1 text-sm font-medium text-gray-700"
     >
-      <input
-        ref="inputEl"
-        type="file"
-        class="hidden"
-        :accept="accept"
-        :multiple="multiple"
-        @change="onInputChange"
-      >
-      <div class="text-sm text-gray-600">
-        <slot name="label">
-          <p class="font-medium">Drop files here or click to upload</p>
-          <p
-            v-if="accept"
-            class="text-xs text-gray-500 mt-1"
-          >Accepted: {{ accept }}</p>
-          <p
-            v-if="maxSize"
-            class="text-xs text-gray-500"
-          >Max size: {{ prettyBytes(maxSize) }}</p>
-          <p
-            v-if="maxSlots"
-            class="text-xs text-gray-500"
-          >
-            Slots: {{ occupiedSlots }}/{{ maxSlots }}
-          </p>
-        </slot>
-      </div>
-      <button
-        type="button"
-        class="mt-2 rounded-xl border px-3 py-1.5 text-sm"
-        @click.prevent="open"
-      >
-        Browse…
-      </button>
+      {{ label }}
+      <span
+        v-if="required"
+        class="text-red-500"
+      >*</span>
     </label>
 
-    <!-- File slots grid -->
-    <div
-      v-if="maxSlots"
-      class="mt-4 grid gap-2"
-      :class="gridClass"
-    >
+    <div :class="['w-full', className]">
+      <!-- Dropzone -->
+      <label
+        class="itbms-upload-button flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed p-6 text-center cursor-pointer transition hover:border-gray-400"
+        :class="isDragging ? 'border-gray-500 bg-gray-50' : 'border-gray-300'"
+        @dragover.prevent="onDragOver"
+        @dragleave.prevent="onDragLeave"
+        @drop.prevent="onDrop"
+      >
+        <input
+          ref="inputEl"
+          type="file"
+          class="hidden"
+          :accept="accept"
+          :multiple="multiple"
+          @change="onInputChange"
+        >
+        <div class="text-sm text-gray-600">
+          <slot name="label">
+            <p class="font-medium">Drop files here or click to upload</p>
+            <p
+              v-if="accept"
+              class="text-xs text-gray-500 mt-1"
+            >Accepted: {{ accept }}</p>
+            <p
+              v-if="maxSize"
+              class="text-xs text-gray-500"
+            >Max size: {{ prettyBytes(maxSize) }}</p>
+            <p
+              v-if="maxSlots"
+              class="text-xs text-gray-500"
+            >
+              Slots: {{ occupiedSlots }}/{{ maxSlots }}
+            </p>
+          </slot>
+        </div>
+        <button
+          type="button"
+          class="mt-2 rounded-xl border px-3 py-1.5 text-sm"
+          @click.prevent="open"
+        >
+          Browse…
+        </button>
+      </label>
+
+      <!-- File slots grid -->
       <div
-        v-for="slotIndex in maxSlots"
-        :key="`slot-${slotIndex}-${getSlotFile(slotIndex - 1)?.id}-${getSlotFile(slotIndex - 1)?.isRemoved}`"
-        class="aspect-square rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden relative group"
+        v-if="maxSlots"
+        class="mt-4 grid gap-2"
         :class="[
-          getSlotFile(slotIndex - 1)
-            ? 'border-solid border-gray-300 bg-white'
-            : 'hover:border-gray-300',
-          dropTargetSlotIndex === slotIndex - 1 && draggedSlotIndex !== null
-            ? 'border-blue-400 bg-blue-50'
-            : '',
+          maxSlots === 1 && occupiedSlots > 0 ? '' : 'mt-4 grid',
+          maxSlots === 1 ? 'w-64 h-64' : gridClass
         ]"
       >
-        <!-- File content -->
-        <template v-if="getSlotFile(slotIndex - 1)">
-          <div
-            class="w-full h-full relative cursor-move"
-            draggable="true"
-            @dragstart="onFileDragStart($event, slotIndex - 1)"
-            @dragend="onFileDragEnd"
-          >
-            <!-- Image preview -->
-            <img
-              v-if="getSlotFile(slotIndex - 1).previewUrl"
-              :src="getSlotFile(slotIndex - 1).previewUrl"
-              :alt="getSlotFile(slotIndex - 1).fileName"
-              class="w-full h-full object-cover transition"
-              :class="getSlotFile(slotIndex - 1).isRemoved ? 'opacity-40 grayscale' : ''"
-            >
-
-            <!-- File icon for non-images -->
+        <div
+          v-for="slotIndex in maxSlots"
+          :key="`slot-${slotIndex}-${getSlotFile(slotIndex - 1)?.id}-${getSlotFile(slotIndex - 1)?.isRemoved}`"
+          class="aspect-square rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden relative group"
+          :class="[
+            getSlotFile(slotIndex - 1)
+              ? 'border-solid border-gray-300 bg-white'
+              : 'hover:border-gray-300',
+            dropTargetSlotIndex === slotIndex - 1 && draggedSlotIndex !== null
+              ? 'border-blue-400 bg-blue-50'
+              : '',
+          ]"
+        >
+          <!-- File content -->
+          <template v-if="getSlotFile(slotIndex - 1)">
             <div
-              v-else
-              class="w-full h-full flex flex-col items-center justify-center text-gray-500"
-              :class="getSlotFile(slotIndex - 1).isRemoved ? 'opacity-40 grayscale' : ''"
+              class="w-full h-full relative cursor-move"
+              draggable="true"
+              @dragstart="onFileDragStart($event, slotIndex - 1)"
+              @dragend="onFileDragEnd"
             >
-              <span class="text-xs font-medium mb-1">FILE</span>
-              <span class="text-xs truncate px-2">{{ getSlotFile(slotIndex - 1).fileName }}</span>
-            </div>
+              <!-- Image preview -->
+              <img
+                v-if="getSlotFile(slotIndex - 1).previewUrl"
+                :src="getSlotFile(slotIndex - 1).previewUrl"
+                :alt="getSlotFile(slotIndex - 1).fileName"
+                class="w-full h-full object-cover transition"
+                :class="getSlotFile(slotIndex - 1).isRemoved ? 'opacity-40 grayscale' : ''"
+              >
 
-            <!-- Overlay เมื่อถูก mark ลบ (Fixed) -->
-            <div
-              v-show="getSlotFile(slotIndex - 1)?.isRemoved === true"
-              class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"
-              style="z-index: 10"
-            >
-              <div class="bg-red-500 text-white px-3 py-1 rounded-lg font-bold text-sm">
-                Marked for Delete
+              <!-- File icon for non-images -->
+              <div
+                v-else
+                class="w-full h-full flex flex-col items-center justify-center text-gray-500"
+                :class="getSlotFile(slotIndex - 1).isRemoved ? 'opacity-40 grayscale' : ''"
+              >
+                <span class="text-xs font-medium mb-1">FILE</span>
+                <span class="text-xs truncate px-2">{{ getSlotFile(slotIndex - 1).fileName }}</span>
+              </div>
+
+              <!-- Overlay เมื่อถูก mark ลบ (Fixed) -->
+              <div
+                v-show="getSlotFile(slotIndex - 1)?.isRemoved === true"
+                class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+                style="z-index: 10"
+              >
+                <div class="bg-red-500 text-white px-3 py-1 rounded-lg font-bold text-sm">
+                  Marked for Delete
+                </div>
+              </div>
+
+              <!-- File info overlay -->
+              <div
+                class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                style="z-index: 5"
+              >
+                <p
+                  class="text-xs truncate font-medium"
+                  :class="`itbms-picture-file${slotIndex}`"
+                >
+                  {{ getSlotFile(slotIndex - 1).fileName }}
+                </p>
+                <p class="text-xs text-gray-300">
+                  {{ getSlotFile(slotIndex - 1).imageFile?.type || '—' }} •
+                  {{ prettyBytes(getSlotFile(slotIndex - 1).imageFile?.size) }}
+                </p>
+              </div>
+
+              <!-- Error indicator -->
+              <div
+                v-if="getSlotFile(slotIndex - 1).error"
+                class="absolute inset-0 bg-red-500 bg-opacity-20 flex items-center justify-center"
+                style="z-index: 8"
+              >
+                <div class="bg-red-500 text-white text-xs px-2 py-1 rounded">
+                  Error
+                </div>
+              </div>
+
+              <!-- Action buttons -->
+              <div
+                class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                style="z-index: 15"
+              >
+                <!-- Move left -->
+                <button
+                  v-if="slotIndex > 1 && canMoveLeft(slotIndex - 1)"
+                  type="button"
+                  class="bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                  :class="`itbms-picture-file${slotIndex}-up`"
+                  title="Move left"
+                  @click="moveSlotLeft(slotIndex - 1)"
+                >
+                  ←
+                </button>
+                <!-- Move right -->
+                <button
+                  v-if="slotIndex < maxSlots && canMoveRight(slotIndex - 1)"
+                  type="button"
+                  class="bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                  :class="`itbms-picture-file${slotIndex}-down`"
+                  title="Move right"
+                  @click="moveSlotRight(slotIndex - 1)"
+                >
+                  →
+                </button>
+                <!-- Remove -->
+                <button
+                  type="button"
+                  class="bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                  :class="`itbms-picture-file${slotIndex}-clear`"
+                  :title="getSlotFile(slotIndex - 1).isRemoved ? 'Restore' : 'Remove'"
+                  @click="toggleRemove(slotIndex - 1)"
+                >
+                  ×
+                </button>
               </div>
             </div>
+          </template>
 
-            <!-- File info overlay -->
+          <!-- Empty slot with drop target -->
+          <template v-else>
             <div
-              class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity"
-              style="z-index: 5"
+              class="text-gray-400 text-center h-full w-full flex flex-col items-center justify-center"
+              @dragover.prevent="onSlotDragOver($event, slotIndex - 1)"
+              @dragleave.prevent="onSlotDragLeave"
+              @drop.prevent="onSlotDrop($event, slotIndex - 1)"
             >
-              <p
-                class="text-xs truncate font-medium"
-                :class="`itbms-picture-file${slotIndex}`"
-              >
-                {{ getSlotFile(slotIndex - 1).fileName }}
-              </p>
-              <p class="text-xs text-gray-300">
-                {{ getSlotFile(slotIndex - 1).imageFile?.type || '—' }} •
-                {{ prettyBytes(getSlotFile(slotIndex - 1).imageFile?.size) }}
-              </p>
-            </div>
-
-            <!-- Error indicator -->
-            <div
-              v-if="getSlotFile(slotIndex - 1).error"
-              class="absolute inset-0 bg-red-500 bg-opacity-20 flex items-center justify-center"
-              style="z-index: 8"
-            >
-              <div class="bg-red-500 text-white text-xs px-2 py-1 rounded">
-                Error
+              <div class="text-2xl mb-1">
+                +
+              </div>
+              <div class="text-xs">
+                Slot {{ slotIndex }}
               </div>
             </div>
-
-            <!-- Action buttons -->
-            <div
-              class="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-              style="z-index: 15"
-            >
-              <!-- Move left -->
-              <button
-                v-if="slotIndex > 1 && canMoveLeft(slotIndex - 1)"
-                type="button"
-                class="bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                :class="`itbms-picture-file${slotIndex}-up`"
-                title="Move left"
-                @click="moveSlotLeft(slotIndex - 1)"
-              >
-                ←
-              </button>
-              <!-- Move right -->
-              <button
-                v-if="slotIndex < maxSlots && canMoveRight(slotIndex - 1)"
-                type="button"
-                class="bg-blue-500 hover:bg-blue-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                :class="`itbms-picture-file${slotIndex}-down`"
-                title="Move right"
-                @click="moveSlotRight(slotIndex - 1)"
-              >
-                →
-              </button>
-              <!-- Remove -->
-              <button
-                type="button"
-                class="bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                :class="`itbms-picture-file${slotIndex}-clear`"
-                :title="getSlotFile(slotIndex - 1).isRemoved ? 'Restore' : 'Remove'"
-                @click="toggleRemove(slotIndex - 1)"
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        </template>
-
-        <!-- Empty slot with drop target -->
-        <template v-else>
-          <div
-            class="text-gray-400 text-center h-full w-full flex flex-col items-center justify-center"
-            @dragover.prevent="onSlotDragOver($event, slotIndex - 1)"
-            @dragleave.prevent="onSlotDragLeave"
-            @drop.prevent="onSlotDrop($event, slotIndex - 1)"
-          >
-            <div class="text-2xl mb-1">
-              +
-            </div>
-            <div class="text-xs">
-              Slot {{ slotIndex }}
-            </div>
-          </div>
-        </template>
+          </template>
+        </div>
       </div>
-    </div>
 
-    <!-- Traditional file list (when not using slots) -->
-    <div
-      v-else-if="files.length"
-      class="mt-4 space-y-2"
-    >
+      <!-- Traditional file list (when not using slots) -->
       <div
-        v-for="(item, index) in files"
-        :key="item.id"
-        class="flex items-center gap-3 rounded-xl border p-3"
-        :class="item.error ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white'"
+        v-else-if="files.length"
+        class="mt-4 space-y-2"
       >
-        <!-- Thumbnail -->
         <div
-          class="w-12 h-12 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center shrink-0"
+          v-for="(item, index) in files"
+          :key="item.id"
+          class="flex items-center gap-3 rounded-xl border p-3"
+          :class="item.error ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-white'"
         >
-          <img
-            v-if="item.previewUrl"
-            :src="item.previewUrl"
-            alt=""
-            class="w-full h-full object-cover"
+          <!-- Thumbnail -->
+          <div
+            class="w-12 h-12 rounded-md overflow-hidden bg-gray-100 flex items-center justify-center shrink-0"
           >
-          <span
-            v-else
-            class="text-xs text-gray-500"
-          >FILE</span>
-        </div>
+            <img
+              v-if="item.previewUrl"
+              :src="item.previewUrl"
+              alt=""
+              class="w-full h-full object-cover"
+            >
+            <span
+              v-else
+              class="text-xs text-gray-500"
+            >FILE</span>
+          </div>
 
-        <!-- File info -->
-        <div class="min-w-0 flex-1">
-          <p
-            :class="[
-              'truncate text-sm font-medium',
-              item.error ? 'text-red-600' : 'text-gray-900',
-              `itbms-picture-file${index + 1}`,
-            ]"
-          >
-            {{ item.fileName }}
-          </p>
-          <p class="text-xs text-gray-500">
-            {{ item.imageFile?.type || '—' }} • {{ prettyBytes(item.imageFile?.size) }}
-          </p>
+          <!-- File info -->
+          <div class="min-w-0 flex-1">
+            <p
+              :class="[
+                'truncate text-sm font-medium',
+                item.error ? 'text-red-600' : 'text-gray-900',
+                `itbms-picture-file${index + 1}`,
+              ]"
+            >
+              {{ item.fileName }}
+            </p>
+            <p class="text-xs text-gray-500">
+              {{ item.imageFile?.type || '—' }} • {{ prettyBytes(item.imageFile?.size) }}
+            </p>
 
-          <!-- Error message for this file -->
-          <p
-            v-if="item.error"
-            class="mt-1 text-xs font-medium text-red-700"
-          >
-            {{ item.error }}
-          </p>
-        </div>
+            <!-- Error message for this file -->
+            <p
+              v-if="item.error"
+              class="mt-1 text-xs font-medium text-red-700"
+            >
+              {{ item.error }}
+            </p>
+          </div>
 
-        <!-- Action buttons -->
-        <div
-          v-if="files.length > 1"
-          class="flex items-center gap-1"
-        >
-          <button
-            v-if="index !== 0"
-            type="button"
-            class="text-xs rounded-lg border px-2 py-1 hover:bg-green-50 hover:border-green-400 hover:text-green-400"
-            :class="`itbms-picture-file${index + 1}-up`"
-            :disabled="index === 0"
-            @click="moveUp(index)"
+          <!-- Action buttons -->
+          <div
+            v-if="files.length > 1"
+            class="flex items-center gap-1"
           >
-            ↑
-          </button>
-          <button
-            v-if="index !== files.length - 1"
-            type="button"
-            class="text-xs rounded-lg border px-2 py-1 hover:bg-green-50 hover:border-green-400 hover:text-green-400"
-            :class="`itbms-picture-file${index + 1}-down`"
-            :disabled="index === files.length - 1"
-            @click="moveDown(index)"
-          >
-            ↓
-          </button>
-          <button
-            type="button"
-            class="group text-xs rounded-lg border px-2 py-1 hover:bg-red-50 hover:border-red-400"
-            :class="`itbms-picture-file${index + 1}-clear`"
-            @click="remove(item.id)"
-          >
-            <TrashIcon class="h-4 w-4 text-gray-500 group-hover:text-red-400" />
-          </button>
+            <button
+              v-if="index !== 0"
+              type="button"
+              class="text-xs rounded-lg border px-2 py-1 hover:bg-green-50 hover:border-green-400 hover:text-green-400"
+              :class="`itbms-picture-file${index + 1}-up`"
+              :disabled="index === 0"
+              @click="moveUp(index)"
+            >
+              ↑
+            </button>
+            <button
+              v-if="index !== files.length - 1"
+              type="button"
+              class="text-xs rounded-lg border px-2 py-1 hover:bg-green-50 hover:border-green-400 hover:text-green-400"
+              :class="`itbms-picture-file${index + 1}-down`"
+              :disabled="index === files.length - 1"
+              @click="moveDown(index)"
+            >
+              ↓
+            </button>
+            <button
+              type="button"
+              class="group text-xs rounded-lg border px-2 py-1 hover:bg-red-50 hover:border-red-400"
+              :class="`itbms-picture-file${index + 1}-clear`"
+              @click="remove(item.id)"
+            >
+              <TrashIcon class="h-4 w-4 text-gray-500 group-hover:text-red-400" />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Helper / errors -->
-    <p
-      v-if="errors.length"
-      class="mt-3 text-xs text-red-600"
-    >
-      {{ errors[errors.length - 1] }}
-    </p>
+      <!-- Helper / errors -->
+      <p
+        v-if="errors.length"
+        class="mt-3 text-xs text-red-600"
+      >
+        {{ errors[errors.length - 1] }}
+      </p>
+    </div>
   </div>
 </template>
 
@@ -293,6 +309,8 @@ import { ref, watch, onBeforeUnmount, computed } from 'vue'
 
 const props = defineProps({
   modelValue: { type: Array, default: () => [] },
+  label: { type: String, default: null},
+  required: { type: Boolean, default: false },
   accept: { type: String, default: '' },
   multiple: { type: Boolean, default: true },
   maxSize: { type: Number, default: null },
