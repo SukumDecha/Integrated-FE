@@ -1,12 +1,10 @@
 import { getErrorMessage } from '@/utils/ErrorUtils'
 import { BaseResponse, BaseResponseMessage } from '../models/api.response'
 import { PaginationResponse } from '../models/paginated.response'
+import { useAuthStore } from '@/stores/userAuth.store'
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`
 
-const httpHeaders = {
-  'Content-Type': 'application/json',
-}
 
 const request = async (
   url,
@@ -14,8 +12,24 @@ const request = async (
   payload,
   options = {
     isPaginated: false,
-  }
+  },
 ) => {
+  const { isPaginated = false } = options
+
+  const authStore = useAuthStore()
+  const token = authStore.token
+
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` }),
+  }
+
+  const httpOptions = {
+    method,
+    headers,
+    credentials: 'include', 
+    ...options,
+    
   const { isPaginated } = options;
 
   const ResponseBuilder = isPaginated ? PaginationResponse : BaseResponse;
@@ -32,10 +46,10 @@ const request = async (
   }
 
   if (payload instanceof FormData) {
-    delete httpOptions.headers['Content-Type'];
-    httpOptions.body = payload;
+    delete httpOptions.headers['Content-Type']
+    httpOptions.body = payload
   } else if (payload && httpOptions.headers['Content-Type'] === 'application/json') {
-    httpOptions.body = JSON.stringify(payload);
+    httpOptions.body = JSON.stringify(payload)
   }
 
   try {
@@ -88,7 +102,6 @@ const request = async (
     return response.build();
   } catch (err) {
     const errorMessage = getErrorMessage(err)
-
      return new ResponseBuilder()
       .error(errorMessage)
       .status(0)

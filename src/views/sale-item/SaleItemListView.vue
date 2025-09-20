@@ -8,17 +8,20 @@ import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { SaleItemService } from '@/services'
 import { formatPrice, displayOrDash } from '@/utils/TextUtils'
 import { useToastStore } from '@/stores/toast.store'
+import { useAuthStore } from '@/stores/userAuth.store'
 import { loadFromSessionStorage, saveToSessionStorage } from '@/utils/StorageUtils'
 import { SALE_ITEM_STORAGE_KEYS } from '@/constants/sale-item.constant'
 
 const router = useRouter()
 const route = useRoute()
 const toast = useToastStore()
+const authStore = useAuthStore()
 
 const saleItems = reactive([])
 
 const itemToDelete = ref(null)
 const showConfirm = ref(false)
+
 
 const breadcrumbs = [
   { text: 'Home', path: '/' },
@@ -81,9 +84,13 @@ watchEffect(() => {
 })
 
 watchEffect(async () => {
-  const response = await SaleItemService.getSaleItemListPaginated({
-    ...searchParamsObj.value,
-  })
+  const sellerId = authStore.user?.id
+  if (!sellerId) return
+
+  const response = await SaleItemService.getSaleItemListBySellerId(
+    sellerId,
+    searchParamsObj.value
+  )
 
   if (response.error) {
     console.error('Error fetching Sale Items with filters:', response.error)

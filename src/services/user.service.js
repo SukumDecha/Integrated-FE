@@ -11,6 +11,12 @@ const UserService = {
     return await get(`${BASE_URL_V2}/${id}`)
   },
 
+  async login(credentials) {
+    return await post(`${BASE_URL}/authentications`, credentials, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
   async updateUser(id, data) {
     return await put(`${BASE_URL_V2}/${id}`, data)
   },

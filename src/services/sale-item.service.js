@@ -3,6 +3,7 @@ import { get, post, put, remove } from './helper/api'
 
 const BASE_URL_V1 = '/v1/sale-items'
 const BASE_URL_V2 = '/v2/sale-items'
+// const BASE_URL_V3
 
 const SaleItemService = {
   async getAllSaleItems() {
@@ -48,7 +49,6 @@ const SaleItemService = {
     priceMin = undefined,
     priceMax = undefined,
     filterSearch = undefined,
-
   }) {
     //brand
     const normalizedFilterBrands = Array.isArray(filterBrands)
@@ -141,7 +141,15 @@ const SaleItemService = {
 
   async getStorageSizes() {
     return await get(`${BASE_URL_V2}/storage-sizes`)
-  }
+  },
+
+  async getSaleItemListBySellerId(id, paginationParams) {
+    const searchParams = buildSearchParams(paginationParams)
+    const url = `/v2/sellers/${id}/sale-items?${searchParams}`
+    return await get(url, {
+      isPaginated: true,
+    })
+  },
 }
 
 export default SaleItemService
