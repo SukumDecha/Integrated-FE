@@ -29,6 +29,20 @@ const request = async (
     headers,
     credentials: 'include', 
     ...options,
+    
+  const { isPaginated } = options;
+
+  const ResponseBuilder = isPaginated ? PaginationResponse : BaseResponse;
+
+  const httpOptions = {
+    method,
+    headers: { ...httpHeaders },
+    ...options
+  }
+
+  const token = localStorage.getItem('token')
+  if (token) {
+    httpOptions.headers['Authorization'] = `Bearer ${token}`
   }
 
   if (payload instanceof FormData) {
@@ -46,60 +60,52 @@ const request = async (
       try {
         const body = await res.json()
         if (body?.message || body?.errorMessage) {
-          errorMessage = body.message || body.errorMessage
+          errorMessage = body.message || body.errorMessage || errorMessage
         }
       } catch (error) {
         console.error('Error parsing response body:', error)
       }
 
-      if (isPaginated) {
-        return new PaginationResponse().error(errorMessage).build()
-      } else {
-        return new BaseResponse().error(errorMessage).build()
-      }
+      return new ResponseBuilder()
+        .error(errorMessage)
+        .status(res.status)
+        .build();
     }
 
-    if (method === 'DELETE') {
-      if (isPaginated) {
-        return new PaginationResponse().message(BaseResponseMessage.Success).build()
-      } else {
-        return new BaseResponse().message(BaseResponseMessage.Success).build()
-      }
+    if (res.status === 204 || method === 'DELETE') {
+      return new ResponseBuilder()
+        .message(BaseResponseMessage.Success)
+        .status(res.status)
+        .build();
     }
 
     const item = await res.json()
+    const response = new ResponseBuilder()
+      .data(isPaginated ? item.content : item)
+      .message(item.message || BaseResponseMessage.Success)
+      .status(res.status);
 
-    if (isPaginated) {
-      const paginatedResponse = new PaginationResponse()
-        .data(item.content)
-        .message(BaseResponseMessage.Success)
+    // If it's a paginated response, add pagination details
+    if (response instanceof PaginationResponse) {
+      response
+        .page(item.page)
+        .perPage(item.size)
+        .totalPages(item.totalPages)
+        .totalItems(item.totalElements);
 
-      paginatedResponse.page(item.page)
-      paginatedResponse.perPage(item.size)
-      paginatedResponse.totalPages(item.totalPages)
-      paginatedResponse.totalItems(item.totalElements)
-
-      const splitedSort = item.sort ? item.sort.split(': ') : []
-      if (splitedSort.length === 2) {
-        paginatedResponse.sortBy(splitedSort[0])
-        paginatedResponse.sortOrder(splitedSort[1])
+      const [sortBy, sortOrder] = item.sort ? item.sort.split(': ') : [];
+      if (sortBy && sortOrder) {
+        response.sortBy(sortBy).sortOrder(sortOrder);
       }
-
-      return paginatedResponse.build()
-    } else {
-      return new BaseResponse()
-        .data(item)
-        .message(item.message || BaseResponseMessage.Success)
-        .build()
     }
+
+    return response.build();
   } catch (err) {
     const errorMessage = getErrorMessage(err)
-
-    if (isPaginated) {
-      return new PaginationResponse().error(errorMessage).build()
-    } else {
-      return new BaseResponse().error(errorMessage).build()
-    }
+     return new ResponseBuilder()
+      .error(errorMessage)
+      .status(0)
+      .build();
   }
 }
 
