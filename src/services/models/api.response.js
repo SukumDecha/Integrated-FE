@@ -3,7 +3,6 @@ export class BaseResponse {
     this._message = ''
     this._data = null
     this._error = null
-    this._status = null
   }
 
   message(message) {
@@ -21,17 +20,11 @@ export class BaseResponse {
     return this
   }
 
-  status(code) {
-    this._status = code
-    return this
-  }
-
   build() {
     return {
       message: this._message,
       data: this._data,
       error: this._error,
-      status: this._status,
     }
   }
 }

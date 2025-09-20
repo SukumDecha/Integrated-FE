@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import AuthLayout from '@/components/layout/AuthLayout.vue'
+import { useAuthStore } from '@/stores/userAuth.store'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -65,6 +66,10 @@ const router = createRouter({
               path: 'list',
               name: 'sale-item-list',
               component: () => import('../views/sale-item/SaleItemListView.vue'),
+              meta: {
+                requiresAuth: true,
+                roles: ['SELLER'],
+              },
             },
           ],
         },
@@ -97,6 +102,27 @@ const router = createRouter({
       component: () => import('../views/NotFoundView.vue'),
     },
   ],
+})
+
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  const user = authStore.user
+
+  if (to.meta.requiresAuth && to.meta.roles) {
+    if (!user) {
+      return next({ name: 'user-login' })
+    }
+
+    if (!to.meta.roles.includes(user.role)) {
+      if (user.role === 'BUYER') {
+        return next({ name: 'sale-items-gallery' })
+      }
+
+      return next({ name: 'home' })
+    }
+  }
+
+  return next()
 })
 
 export default router

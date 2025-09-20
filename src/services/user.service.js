@@ -20,7 +20,7 @@ const UserService = {
   },
 
   async login(credentials) {
-    return await post(`${BASE_URL}/login`, credentials, {
+    return await post(`${BASE_URL}/authentications`, credentials, {
       headers: {
         'Content-Type': 'application/json',
       },

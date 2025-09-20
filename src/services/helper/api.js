@@ -1,12 +1,10 @@
 import { getErrorMessage } from '@/utils/ErrorUtils'
 import { BaseResponse, BaseResponseMessage } from '../models/api.response'
 import { PaginationResponse } from '../models/paginated.response'
+import { useAuthStore } from '@/stores/userAuth.store'
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`
 
-const httpHeaders = {
-  'Content-Type': 'application/json',
-}
 
 const request = async (
   url,
@@ -14,21 +12,30 @@ const request = async (
   payload,
   options = {
     isPaginated: false,
-  }
+  },
 ) => {
-  const { isPaginated = false } = options;
+  const { isPaginated = false } = options
+
+  const authStore = useAuthStore()
+  const token = authStore.token
+
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token && { Authorization: `Bearer ${token}` }),
+  }
 
   const httpOptions = {
     method,
-    headers: httpHeaders,
-    ...options
+    headers,
+    credentials: 'include', 
+    ...options,
   }
 
   if (payload instanceof FormData) {
-    delete httpOptions.headers['Content-Type']; // ❌ Do not set manually
-    httpOptions.body = payload;
+    delete httpOptions.headers['Content-Type']
+    httpOptions.body = payload
   } else if (payload && httpOptions.headers['Content-Type'] === 'application/json') {
-    httpOptions.body = JSON.stringify(payload);
+    httpOptions.body = JSON.stringify(payload)
   }
 
   try {
@@ -45,31 +52,18 @@ const request = async (
         console.error('Error parsing response body:', error)
       }
 
-      // ✅ Add res.status to response
       if (isPaginated) {
-        return new PaginationResponse()
-          .error(errorMessage)
-          .status(res.status)
-          .build()
+        return new PaginationResponse().error(errorMessage).build()
       } else {
-        return new BaseResponse()
-          .error(errorMessage)
-          .status(res.status)
-          .build()
+        return new BaseResponse().error(errorMessage).build()
       }
     }
 
     if (method === 'DELETE') {
       if (isPaginated) {
-        return new PaginationResponse()
-          .message(BaseResponseMessage.Success)
-          .status(200)
-          .build()
+        return new PaginationResponse().message(BaseResponseMessage.Success).build()
       } else {
-        return new BaseResponse()
-          .message(BaseResponseMessage.Success)
-          .status(200)
-          .build()
+        return new BaseResponse().message(BaseResponseMessage.Success).build()
       }
     }
 
@@ -79,14 +73,13 @@ const request = async (
       const paginatedResponse = new PaginationResponse()
         .data(item.content)
         .message(BaseResponseMessage.Success)
-        .status(res.status)
 
       paginatedResponse.page(item.page)
       paginatedResponse.perPage(item.size)
       paginatedResponse.totalPages(item.totalPages)
       paginatedResponse.totalItems(item.totalElements)
 
-      const splitedSort = item.sort ? item.sort.split(': ') : [];
+      const splitedSort = item.sort ? item.sort.split(': ') : []
       if (splitedSort.length === 2) {
         paginatedResponse.sortBy(splitedSort[0])
         paginatedResponse.sortOrder(splitedSort[1])
@@ -97,23 +90,15 @@ const request = async (
       return new BaseResponse()
         .data(item)
         .message(item.message || BaseResponseMessage.Success)
-        .status(res.status)
         .build()
     }
   } catch (err) {
     const errorMessage = getErrorMessage(err)
 
-    // ✅ status 0 = fetch failed, network error
     if (isPaginated) {
-      return new PaginationResponse()
-        .error(errorMessage)
-        .status(0)
-        .build()
+      return new PaginationResponse().error(errorMessage).build()
     } else {
-      return new BaseResponse()
-        .error(errorMessage)
-        .status(0)
-        .build()
+      return new BaseResponse().error(errorMessage).build()
     }
   }
 }

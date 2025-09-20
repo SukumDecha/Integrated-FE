@@ -10,15 +10,18 @@ import { formatPrice, displayOrDash } from '@/utils/TextUtils'
 import { useToastStore } from '@/stores/toast.store'
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils'
 import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item.constant'
+import { useAuthStore } from '@/stores/userAuth.store'
 
 const router = useRouter()
 const route = useRoute()
 const toast = useToastStore()
+const authStore = useAuthStore()
 
 const saleItems = reactive([])
 
 const itemToDelete = ref(null)
 const showConfirm = ref(false)
+
 
 const breadcrumbs = [
   { text: 'Home', path: '/' },
@@ -81,9 +84,13 @@ watchEffect(() => {
 })
 
 watchEffect(async () => {
-  const response = await SaleItemService.getSaleItemListPaginated({
-    ...searchParamsObj.value,
-  })
+  const sellerId = authStore.user?.id
+  if (!sellerId) return
+
+  const response = await SaleItemService.getSaleItemListBySellerId(
+    sellerId,
+    searchParamsObj.value
+  )
 
   if (response.error) {
     console.error('Error fetching Sale Items with filters:', response.error)
