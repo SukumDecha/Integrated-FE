@@ -41,6 +41,10 @@ const router = createRouter({
           component: () => import('../views/user/UserProfileView.vue'),
         },
         {
+          path: 'profile/edit',
+          component: () => import('../views/user/UserEditProfileView.vue'),
+        },
+        {
           path: 'sale-items',
           children: [
             {

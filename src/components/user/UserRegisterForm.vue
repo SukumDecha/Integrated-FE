@@ -40,10 +40,10 @@
 
     <!-- Fullname -->
     <XInput
-      v-model="form.fullName"
+      v-model="form.fullname"
       label="Full Name"
       required
-      :error-message="touchedFields.fullName ? errors.fullName : ''"
+      :error-message="touchedFields.fullname ? errors.fullname : ''"
       placeholder="e.g. Somsuk Decha"
       class="itbms-fullName"
       @blur="onBlur('fullName')"
@@ -210,10 +210,10 @@ function validateForm() {
   } else if (!isValidPassword(form.password)) {
     errors.password = 'Password must contain upper, lower, digit, symbol and be 8+ chars.'
   }
-  if (!form.fullName) {
-    errors.fullName = 'Fullname is required.'
-  } else if (form.fullName.length < 4 || form.fullName.length > 40) {
-    errors.fullName = 'Fullname must be between 4 and 40 characters.'
+  if (!form.fullname) {
+    errors.fullname = 'Fullname is required.'
+  } else if (form.fullname.length < 4 || form.fullname.length > 40) {
+    errors.fullname = 'Fullname must be between 4 and 40 characters.'
   }
 
   if (props.mode === 'SELLER') {
@@ -255,7 +255,7 @@ const handleSubmit = async () => {
     nickname: form.nickname.trim(),
     email: form.email.trim(),
     password: form.password.trim(),
-    fullname: form.fullName.trim(),
+    fullname: form.fullname.trim(),
     userType: props.mode === "SELLER" ? "SELLER" : "BUYER",
   }
 

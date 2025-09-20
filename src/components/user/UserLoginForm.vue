@@ -51,7 +51,7 @@ import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/userAuth.store'
 import { useToastStore } from '@/stores/toast.store'
-import { UserService } from '@/services'
+import { AuthService } from '@/services'
 import XInput from '@/components/common/form/XInput.vue'
 import XButton from '@/components/common/XButton.vue'
 
@@ -111,7 +111,7 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    const res = await UserService.login({
+    const res = await AuthService.login({
       email: form.email.trim(),
       password: form.password.trim(),
     })

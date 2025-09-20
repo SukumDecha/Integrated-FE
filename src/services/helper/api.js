@@ -24,8 +24,13 @@ const request = async (
     ...options
   }
 
+  const token = localStorage.getItem('token')
+  if (token) {
+    httpOptions.headers['Authorization'] = `Bearer ${token}`
+  }
+
   if (payload instanceof FormData) {
-    delete httpOptions.headers['Content-Type']; // ❌ Do not set manually
+    delete httpOptions.headers['Content-Type'];
     httpOptions.body = payload;
   } else if (payload && httpOptions.headers['Content-Type'] === 'application/json') {
     httpOptions.body = JSON.stringify(payload);
