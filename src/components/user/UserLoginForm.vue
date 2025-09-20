@@ -1,5 +1,8 @@
 <template>
-  <form class="space-y-4" @submit.prevent="handleSubmit">
+  <form
+    class="space-y-4"
+    @submit.prevent="handleSubmit"
+  >
     <XInput
       v-model="form.email"
       label="Email"
@@ -48,7 +51,7 @@ import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/userAuth.store'
 import { useToastStore } from '@/stores/toast.store'
-import { UserService } from '@/services'
+import { AuthService } from '@/services'
 import XInput from '@/components/common/form/XInput.vue'
 import XButton from '@/components/common/XButton.vue'
 
@@ -108,20 +111,10 @@ const handleSubmit = async () => {
   loading.value = true
 
   try {
-    const res = await UserService.login({
+    const res = await AuthService.login({
       email: form.email.trim(),
       password: form.password.trim(),
     })
-
-    console.log('login response', res)
-
-    // if (res.status === 404) {
-    //   toast.add({ type: 'error', message: 'Service not found. Please try again later.' })
-    //   return
-    // } else if (res.status === 500) {
-    //   toast.add({ type: 'error', message: 'Internal Server Error. Please contact support.' })
-    //   return
-    // }
 
     if (res.error !== null) {
       const message =
@@ -131,9 +124,8 @@ const handleSubmit = async () => {
     }
 
     const accessToken = res.data?.access_token
-    const refreshToken = res.data?.refresh_token
 
-    if (accessToken && refreshToken) {
+    if (accessToken) {
       authStore.login(accessToken)
       toast.add({ type: 'success', message: res.message || 'Login successful' })
       console.log("log in success");

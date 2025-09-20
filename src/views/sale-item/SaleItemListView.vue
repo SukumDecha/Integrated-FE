@@ -8,8 +8,8 @@ import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { SaleItemService } from '@/services'
 import { formatPrice, displayOrDash } from '@/utils/TextUtils'
 import { useToastStore } from '@/stores/toast.store'
-import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils'
-import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item.constant'
+import { loadFromSessionStorage, saveToSessionStorage } from '@/utils/StorageUtils'
+import { SALE_ITEM_STORAGE_KEYS } from '@/constants/sale-item.constant'
 
 const router = useRouter()
 const route = useRoute()
@@ -147,9 +147,9 @@ async function confirmDeleteItem() {
   itemToDelete.value = null
   showConfirm.value = false
 
-  const paginationState = loadFromLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION)
+  const paginationState = loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION)
 
-  saveToLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION, {
+  saveToSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {
     ...paginationState,
     currentPage: 1,
   })
