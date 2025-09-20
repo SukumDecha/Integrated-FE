@@ -59,7 +59,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { UserService } from '@/services'
+import { AuthService } from '@/services'
 import { useToastStore } from '@/stores/toast.store'
 
 const route = useRoute()
@@ -80,7 +80,7 @@ let cooldownInterval = null
 // ฟังก์ชันตรวจสอบ token และ activate user
 const verifyEmail = async () => {
   loading.value = true;
-  const response = await UserService.verifyEmail(token)
+  const response = await AuthService.verifyEmail(token)
 
     if (response.error) {
       loading.value = false
@@ -112,7 +112,7 @@ const resendVerification = async () => {
   resendLoading.value = true
   resendSuccess.value = false
   try {
-    await UserService.resendVerification({ token })
+    await AuthService.resendVerification({ token })
     resendSuccess.value = true
     toast.success('New verification email sent!')
 

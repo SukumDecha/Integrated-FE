@@ -4,8 +4,8 @@ import { SaleItemService } from '@/services'
 import { useToastStore } from '@/stores/toast.store'
 import SaleItemDetail from '@/components/sale-item/SaleItemDetail.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
-import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils'
-import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item.constant'
+import { loadFromSessionStorage, saveToSessionStorage } from '@/utils/StorageUtils'
+import { SALE_ITEM_STORAGE_KEYS } from '@/constants/sale-item.constant'
 
 const router = useRouter()
 const toast = useToastStore()
@@ -27,8 +27,8 @@ const handleSubmit = async (data) => {
 
     router.push({ path: '/sale-items/list', query: { toast: 'created' } })
 
-    const paginationState = loadFromLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION)
-    saveToLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION, {
+    const paginationState = loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION)
+    saveToSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {
       ...paginationState,
       currentPage: 1,
     })

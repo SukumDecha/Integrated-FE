@@ -13,8 +13,8 @@ import XInput from '@/components/common/form/XInput.vue'
 import { AlignJustify, ArrowDownWideNarrow, ArrowUpWideNarrow, PlusIcon } from 'lucide-vue-next'
 
 import { SaleItemService, BrandService } from '@/services'
-import { loadFromLocalStorage, saveToLocalStorage } from '@/utils/StorageUtils'
-import { LOCAL_STORAGE_KEYS } from '@/constants/sale-item.constant'
+import { loadFromSessionStorage, saveToSessionStorage } from '@/utils/StorageUtils'
+import { SALE_ITEM_STORAGE_KEYS } from '@/constants/sale-item.constant'
 
 
 const route = useRoute()
@@ -72,7 +72,7 @@ const onSearch = async () => {
 
   searchOptions.filterSearch = trimmed
   searchOptions.currentPage = 1
-  sessionStorage.setItem(LOCAL_STORAGE_KEYS.FILTER_SEARCH, trimmed)
+  sessionStorage.setItem(SALE_ITEM_STORAGE_KEYS.FILTER_SEARCH, trimmed)
 
   await router.replace({
     query: {
@@ -94,7 +94,7 @@ const clearSearch = async () => {
   delete newQuery.search //เคลียร์เฉพาะ search
    newQuery.page = 1
 
-  sessionStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_SEARCH)
+  sessionStorage.removeItem(SALE_ITEM_STORAGE_KEYS.FILTER_SEARCH)
 
   await router.replace({ query: newQuery }) // ✅ ใช้ replace เพื่อให้ refresh route ทันที
 
@@ -143,7 +143,7 @@ const searchParams = computed(() => {
 watch(
   () => ({ min: customPrice.min, max: customPrice.max }),
   (value) => {
-    saveToLocalStorage(LOCAL_STORAGE_KEYS.CUSTOM_PRICE, value)
+    saveToSessionStorage(SALE_ITEM_STORAGE_KEYS.CUSTOM_PRICE, value)
   },
   { deep: true },
 )
@@ -151,7 +151,7 @@ watch(
 watch(
   () => searchOptions.filteredStorages,
   (value) => {
-    saveToLocalStorage(LOCAL_STORAGE_KEYS.FILTER_STORAGES, value)
+    saveToSessionStorage(SALE_ITEM_STORAGE_KEYS.FILTER_STORAGES, value)
   },
   { deep: true },
 )
@@ -159,7 +159,7 @@ watch(
 watch(
   () => searchOptions.filteredPrices,
   (value) => {
-    saveToLocalStorage(LOCAL_STORAGE_KEYS.FILTER_PRICES, value)
+    saveToSessionStorage(SALE_ITEM_STORAGE_KEYS.FILTER_PRICES, value)
   },
 )
 
@@ -168,19 +168,19 @@ const initializeStateFromRouteOrStorage = () => {
 
   // Pagination
   searchOptions.currentPage =
-    parseInt(q.page, 10) || loadFromLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION, {}).currentPage || 1
+    parseInt(q.page, 10) || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {}).currentPage || 1
   searchOptions.pageSize =
-    parseInt(q.size, 10) || loadFromLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION, {}).pageSize || 10
+    parseInt(q.size, 10) || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {}).pageSize || 10
 
   // Sort
-  searchOptions.sortBy = q.sortBy || loadFromLocalStorage(LOCAL_STORAGE_KEYS.SORT, {}).field
+  searchOptions.sortBy = q.sortBy || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).field
   searchOptions.sortOrder =
-    q.sortDirection || loadFromLocalStorage(LOCAL_STORAGE_KEYS.SORT, {}).order
+    q.sortDirection || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).order
 
     // Search keyword
 searchOptions.filterSearch =
   q.search ||
-  sessionStorage.getItem(LOCAL_STORAGE_KEYS.FILTER_SEARCH) ||
+  sessionStorage.getItem(SALE_ITEM_STORAGE_KEYS.FILTER_SEARCH) ||
   ''
 
 searchKeyword.value = searchOptions.filterSearch
@@ -189,17 +189,17 @@ searchKeyword.value = searchOptions.filterSearch
   // Filter Brands
   searchOptions.filteredBrands = q.filterBrands
     ? q.filterBrands.split(',')
-    : loadFromLocalStorage(LOCAL_STORAGE_KEYS.FILTER_BRANDS, [])
+    : loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.FILTER_BRANDS, [])
 
   // Filter Prices
-  let priceFromLS = loadFromLocalStorage(LOCAL_STORAGE_KEYS.FILTER_PRICES, null)
+  let priceFromLS = loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.FILTER_PRICES, null)
   if (Array.isArray(priceFromLS)) priceFromLS = priceFromLS[0] ?? null
 
   searchOptions.filteredPrices =
     typeof priceFromLS === 'string' && priceFromLS !== '' ? priceFromLS : null
 
   // Custom price min/max
-  const customPriceLS = loadFromLocalStorage(LOCAL_STORAGE_KEYS.CUSTOM_PRICE, {
+  const customPriceLS = loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.CUSTOM_PRICE, {
     min: '',
     max: '',
   })
@@ -209,7 +209,7 @@ searchKeyword.value = searchOptions.filterSearch
   // Filter Storages
   searchOptions.filteredStorages = q.filterStorages
     ? q.filterStorages.split(',').map(Number)
-    : loadFromLocalStorage(LOCAL_STORAGE_KEYS.FILTER_STORAGES, [])
+    : loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.FILTER_STORAGES, [])
 
   // Active Only
   searchOptions.activeOnly = q.activeOnly === 'true' || false
@@ -321,16 +321,16 @@ const handlePaginationChange = async ({ currentPage, pageSize }) => {
     await fetchSaleItems()
   }
 
-  saveToLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION, { currentPage, pageSize })
+  saveToSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, { currentPage, pageSize })
 }
 
 const setSort = (field, order) => {
   searchOptions.sortBy = field
   searchOptions.sortOrder = order
   if (field && order) {
-    saveToLocalStorage(LOCAL_STORAGE_KEYS.SORT, { field, order })
+    saveToSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, { field, order })
   } else {
-    sessionStorage.removeItem(LOCAL_STORAGE_KEYS.SORT)
+    sessionStorage.removeItem(SALE_ITEM_STORAGE_KEYS.SORT)
   }
 }
 
@@ -340,13 +340,13 @@ const clearSort = () => setSort(undefined, undefined)
 
 const handleBrandSelect = (selectedBrands) => {
   searchOptions.filteredBrands = [...selectedBrands]
-  saveToLocalStorage(LOCAL_STORAGE_KEYS.FILTER_BRANDS, selectedBrands)
+  saveToSessionStorage(SALE_ITEM_STORAGE_KEYS.FILTER_BRANDS, selectedBrands)
   resetPagination(false)
 }
 
 const handleBrandRemove = (brandToRemove) => {
   searchOptions.filteredBrands = searchOptions.filteredBrands.filter((b) => b !== brandToRemove)
-  saveToLocalStorage(LOCAL_STORAGE_KEYS.FILTER_BRANDS, searchOptions.filteredBrands)
+  saveToSessionStorage(SALE_ITEM_STORAGE_KEYS.FILTER_BRANDS, searchOptions.filteredBrands)
   resetPagination(false)
 }
 
@@ -358,10 +358,10 @@ const clearAllFilter = () => {
   customPrice.min = ''
   customPrice.max = ''
 
-  sessionStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_BRANDS)
-  sessionStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_PRICES)
-  sessionStorage.removeItem(LOCAL_STORAGE_KEYS.FILTER_STORAGES)
-  sessionStorage.removeItem(LOCAL_STORAGE_KEYS.CUSTOM_PRICE)
+  sessionStorage.removeItem(SALE_ITEM_STORAGE_KEYS.FILTER_BRANDS)
+  sessionStorage.removeItem(SALE_ITEM_STORAGE_KEYS.FILTER_PRICES)
+  sessionStorage.removeItem(SALE_ITEM_STORAGE_KEYS.FILTER_STORAGES)
+  sessionStorage.removeItem(SALE_ITEM_STORAGE_KEYS.CUSTOM_PRICE)
 
   resetPagination(false)
 }
@@ -373,7 +373,7 @@ const resetPagination = (resetPageSize) => {
     searchOptions.pageSize = 5
   }
 
-  saveToLocalStorage(LOCAL_STORAGE_KEYS.PAGINATION, {
+  saveToSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {
     currentPage: searchOptions.currentPage,
     pageSize: searchOptions.pageSize,
   })
