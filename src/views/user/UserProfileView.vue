@@ -1,4 +1,6 @@
 <template>
+  <XBreadcrumb :items="breadcrumbs" />
+
   <div class="max-w-3xl mx-auto space-y-2">
     <!-- Header -->
     <div class="flex justify-between items-center">
@@ -87,12 +89,21 @@
         />
       </div>
     </div>
+
+    <!-- User Role Display (cannot be changed) -->
+    <div class="text-center text-sm text-gray-500 pt-2 border-t">
+      Account Type: <strong>{{ profile.userType || 'BUYER' }}</strong>
+      <div class="text-xs text-gray-400 mt-1">
+        User role cannot be changed
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import XButton from '@/components/common/XButton.vue';
 import XInput from '@/components/common/form/XInput.vue';
+import XBreadcrumb from '@/components/layout/XBreadcrumb.vue';
 import { AuthService } from '@/services';
 import { useToastStore } from '@/stores/toast.store';
 import { maskNumber } from '@/utils';
@@ -102,6 +113,11 @@ import { useRouter } from 'vue-router';
 const router = useRouter()
 const profile = ref({});
 const toast = useToastStore()
+
+const breadcrumbs = [
+  { text: 'Home', path: '/' },
+  { text: 'Profile', active: true },
+]
 
 const maskedPassword = computed(() => {
   return '••••••••';
