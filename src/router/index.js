@@ -115,17 +115,14 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   const user = authStore.user
-
   if (to.meta.requiresAuth && to.meta.roles) {
     if (!user) {
       return next({ name: 'user-login' })
     }
-
     if (!to.meta.roles.includes(user.role)) {
       if (user.role === 'BUYER') {
         return next({ name: 'sale-items-gallery' })
       }
-
       return next({ name: 'home' })
     }
   }
