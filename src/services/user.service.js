@@ -1,4 +1,4 @@
-import {  get, put, } from './helper/api'
+import {  get, put, post } from './helper/api'
 
 const BASE_URL_V2 = '/v2/users'
 
@@ -12,15 +12,16 @@ const UserService = {
   },
 
   async login(credentials) {
-    return await post(`${BASE_URL}/authentications`, credentials, {
+    return await post(`${BASE_URL_V2}/authentications`, credentials, {
       headers: {
         'Content-Type': 'application/json',
       },
     })
+  },
+
   async updateUser(id, data) {
     return await put(`${BASE_URL_V2}/${id}`, data)
   },
-
 
 }
 
