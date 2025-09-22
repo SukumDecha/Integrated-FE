@@ -1,4 +1,6 @@
 <template>
+  <XBreadcrumb :items="breadcrumbs" />
+
   <div class="max-w-3xl mx-auto space-y-4">
     <!-- Header -->
     <div class="flex justify-between items-center">
@@ -167,6 +169,11 @@ const errors = reactive({
 });
 const isSaving = ref(false);
 const showSuccessMessage = ref(false);
+
+const breadcrumbs = [
+  { text: 'Home', path: '/' },
+  { text: 'Profile', active: true },
+]
 
 const maskedMobileNo = computed(() => {
   if (!originalProfile.value.mobileNumber) return '';
