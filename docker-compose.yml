@@ -12,8 +12,8 @@ services:
       - backend_uploads:/usr/share/nginx/html/uploads
     networks:
       - integrated-network
-    external_links:
-      - integrated-backend:backend
+    # external_links:
+    #   - integrated-backend:backend
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
