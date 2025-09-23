@@ -3,7 +3,7 @@ import { NAVBAR_MENU } from '@/constants/navbar.constant'
 import { Menu, ShoppingBag, ShoppingCart, X, ChevronDown } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/userAuth.store'
+import { useAuthStore } from '@/stores/auth.store'
 import { nextTick } from 'vue'
 
 

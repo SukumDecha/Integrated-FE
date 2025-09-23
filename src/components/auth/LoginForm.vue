@@ -1,5 +1,8 @@
 <template>
-  <form class="space-y-4" @submit.prevent="handleSubmit">
+  <form
+    class="space-y-4"
+    @submit.prevent="handleSubmit"
+  >
     <XInput
       v-model="form.email"
       label="Email"
@@ -46,7 +49,7 @@
 <script setup>
 import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/userAuth.store'
+import { useAuthStore } from '@/stores/auth.store'
 import { useToastStore } from '@/stores/toast.store'
 import { AuthService } from '@/services'
 import XInput from '@/components/common/form/XInput.vue'
@@ -131,7 +134,7 @@ const handleSubmit = async () => {
       if (userRole === 'SELLER' || userRole === 'seller') {
         router.push('/sale-items/list')
       } else {
-        router.push('/') // Other roles go to home
+        router.push('/sale-items') // Other roles go to home
       }
 
     } else {
