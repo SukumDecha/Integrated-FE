@@ -8,10 +8,10 @@
     </p>
 
     <!-- Sign In Form -->
-    <UserLoginForm />
+    <LoginForm />
   </div>
 </template>
 
 <script setup>
-import UserLoginForm from  '@/components/user/UserLoginForm.vue'
+import LoginForm from  '@/components/auth/LoginForm.vue'
 </script>
