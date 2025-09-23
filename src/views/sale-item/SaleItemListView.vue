@@ -44,7 +44,7 @@ const searchOptions = reactive({
   pageSize: 10,
   totalItems: 0,
   sortBy: 'createdOn',
-  sortOrder: 'desc',
+  sortOrder: 'asc',
 })
 
 const loading = reactive({
@@ -76,7 +76,7 @@ const initializeStateFromRouteOrStorage = () => {
   // Sort
   searchOptions.sortBy = q.sortBy || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).field || 'createdOn'
   searchOptions.sortOrder =
-    q.sortDirection || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).order || 'desc'
+    q.sortDirection || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).order || 'asc'
 
   updateRouteQuery()
 }

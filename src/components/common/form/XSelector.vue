@@ -89,7 +89,6 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
-console.log(props.options)
 </script>
 
 <template>
