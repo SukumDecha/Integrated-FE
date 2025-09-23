@@ -1,7 +1,7 @@
 import { getErrorMessage } from '@/utils/ErrorUtils'
 import { BaseResponse, BaseResponseMessage } from '../models/api.response'
 import { PaginationResponse } from '../models/paginated.response'
-import { useAuthStore } from '@/stores/userAuth.store'
+import { useAuthStore } from '@/stores/auth.store'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 

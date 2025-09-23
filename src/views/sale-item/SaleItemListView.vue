@@ -9,7 +9,7 @@ import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { SaleItemService } from '@/services'
 import { formatPrice, displayOrDash } from '@/utils/TextUtils'
 import { useToastStore } from '@/stores/toast.store'
-import { useAuthStore } from '@/stores/userAuth.store'
+import { useAuthStore } from '@/stores/auth.store'
 import { loadFromSessionStorage, saveToSessionStorage } from '@/utils/StorageUtils'
 import { SALE_ITEM_STORAGE_KEYS } from '@/constants/sale-item.constant'
 
