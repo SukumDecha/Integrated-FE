@@ -1,8 +1,5 @@
 <template>
-  <form
-    class="space-y-4"
-    @submit.prevent="handleSubmit"
-  >
+  <form class="space-y-4" @submit.prevent="handleSubmit">
     <XInput
       v-model="form.email"
       label="Email"
@@ -128,13 +125,18 @@ const handleSubmit = async () => {
     if (accessToken) {
       authStore.login(accessToken)
       toast.add({ type: 'success', message: res.message || 'Login successful' })
-      console.log("log in success");
+      console.log('log in success')
+      const userRole = authStore.user?.role || res.data?.user?.role
 
-      router.push('/')
+      if (userRole === 'SELLER' || userRole === 'seller') {
+        router.push('/sale-items/list')
+      } else {
+        router.push('/') // Other roles go to home
+      }
+
     } else {
       toast.add({ type: 'error', message: 'Login failed. Invalid token response.' })
     }
-
   } catch (err) {
     console.error('Login error:', err)
 

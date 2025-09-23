@@ -4,6 +4,8 @@ import { Menu, ShoppingBag, ShoppingCart, X, ChevronDown } from 'lucide-vue-next
 import { ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/userAuth.store'
+import { nextTick } from 'vue'
+
 
 defineProps({
   cartCount: {
@@ -38,11 +40,13 @@ const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
 }
 
-const handleLogout = () => {
+const handleLogout = async () => {
   authStore.logout()
   isDropdownOpen.value = false
   closeMobileMenu()
+  await nextTick()
   router.push('/signin')
+  console.log("logout and redirect to signin")
 }
 </script>
 
@@ -104,13 +108,12 @@ const handleLogout = () => {
                   >
                     Profile
                   </router-link>
-                  <router-link
-                    to="/logout"
-                    class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
+                  <button
+                    class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
                     @click="handleLogout"
                   >
                     Logout
-                  </router-link>
+                  </button>
                 </div>
               </transition>
             </div>
@@ -206,13 +209,13 @@ const handleLogout = () => {
             >
               Profile
             </router-link>
-            <router-link
-              to="/logout"
-              class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
-              @click="closeMobileMenu"
+            <!-- ✅ Use button instead of router-link for mobile too -->
+            <button
+              class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
+              @click="handleLogout"
             >
               Logout
-            </router-link>
+            </button>
           </template>
 
           <template v-else>
