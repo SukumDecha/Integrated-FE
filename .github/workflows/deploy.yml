@@ -81,6 +81,7 @@ jobs:
           cd ~/integrated-deployment
           docker-compose stop nginx || true
           docker-compose rm -f nginx || true
+          docker rm -f integrated-nginx || true
           
           # Remove specific old images to prevent corruption
           docker rmi integrated-nginx:latest || true
@@ -116,7 +117,7 @@ jobs:
           docker volume create backend_uploads 2>/dev/null || true
           
           # Start only nginx service (contains static files)
-          docker-compose up -d nginx
+          docker-compose up -d --build nginx
           
           # Wait for nginx to be ready
           sleep 15
