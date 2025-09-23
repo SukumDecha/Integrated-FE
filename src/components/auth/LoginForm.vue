@@ -49,7 +49,7 @@
 <script setup>
 import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/userAuth.store'
+import { useAuthStore } from '@/stores/auth.store'
 import { useToastStore } from '@/stores/toast.store'
 import { AuthService } from '@/services'
 import XInput from '@/components/common/form/XInput.vue'
@@ -128,13 +128,18 @@ const handleSubmit = async () => {
     if (accessToken) {
       authStore.login(accessToken)
       toast.add({ type: 'success', message: res.message || 'Login successful' })
-      console.log("log in success");
+      console.log('log in success')
+      const userRole = authStore.user?.role || res.data?.user?.role
 
-      router.push('/')
+      if (userRole === 'SELLER' || userRole === 'seller') {
+        router.push('/sale-items/list')
+      } else {
+        router.push('/sale-items') // Other roles go to home
+      }
+
     } else {
       toast.add({ type: 'error', message: 'Login failed. Invalid token response.' })
     }
-
   } catch (err) {
     console.error('Login error:', err)
 

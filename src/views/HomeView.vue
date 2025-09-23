@@ -34,7 +34,6 @@
             :storage-gb="product.storageGb"
             :price="product.price"
             :is-loading="loading"
-            :error="error"
           />
         </div>
       </div>
@@ -59,7 +58,7 @@ const storeName = ref('GreenCart')
 
 const products = ref([])
 const loading = ref(true)
-const error = ref(null)
+// const error = ref(null)
 
 const loaderStore = useLoaderStore();
 

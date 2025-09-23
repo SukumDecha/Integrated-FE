@@ -2,9 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { jwtDecode } from 'jwt-decode'
 
-export const useAuthStore = defineStore('auth', () => {
-  const token = ref(localStorage.getItem('token') || null)
-    const parseToken = (jwt) => {
+const parseToken = (jwt) => {
     try {
       const decoded = jwtDecode(jwt)
       return {
@@ -18,6 +16,10 @@ export const useAuthStore = defineStore('auth', () => {
       return null
     }
   }
+
+export const useAuthStore = defineStore('auth', () => {
+  const token = ref(localStorage.getItem('token') || null)
+
   const user = ref(token.value ? parseToken(token.value) : null)
 
   const login = (jwt) => {
@@ -40,6 +42,10 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const setUser = (userData) => {
+    user.value = userData
+  }
+
   const isLoggedIn = computed(() => !!user.value)
   const userId = computed(() => user.value?.id || null)
   const userNickname = computed(() => user.value?.nickname || '')
@@ -55,5 +61,6 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     logout,
     setUserFromToken,
+    setUser,
   }
 })

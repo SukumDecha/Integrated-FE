@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import AuthLayout from '@/components/layout/AuthLayout.vue'
-import { useAuthStore } from '@/stores/userAuth.store'
+import { useAuthStore } from '@/stores/auth.store'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,17 +19,17 @@ const router = createRouter({
         {
           path: '/register',
           name: 'user-register',
-          component: () => import('../views/user/UserRegisterView.vue'),
+          component: () => import('../views/auth/RegisterView.vue'),
         },
         {
           path: '/signin',
           name: 'user-login',
-          component: () => import('../views/user/UserLoginView.vue'),
+          component: () => import('../views/auth/LoginView.vue'),
         },
         {
           path: '/verify-email',
           name: 'verify-email',
-          component: () => import('../views/user/VerifyEmailView.vue'),
+          component: () => import('../views/auth/VerifyEmailView.vue'),
         },
       ],
     },

@@ -75,12 +75,14 @@ jobs:
         key: ${{ secrets.VM_SSH_KEY }}
         script: |
           # Create directory if not exists
-          mkdir -p ~/integrated-deployment
+          mkdir -p ~/integrated-deployment/frontend
           
           # Stop and remove frontend containers
-          cd ~/integrated-deployment
+          cd ~/integrated-deployment/frontend
+
           docker-compose stop nginx || true
           docker-compose rm -f nginx || true
+          docker rm -f integrated-nginx || true
           
           # Remove specific old images to prevent corruption
           docker rmi integrated-nginx:latest || true
@@ -93,7 +95,7 @@ jobs:
         username: ${{ secrets.VM_USER }}
         key: ${{ secrets.VM_SSH_KEY }}
         source: "integrated-nginx.tar.gz,docker-compose.yml"
-        target: "~/integrated-deployment/"
+        target: "~/integrated-deployment/frontend/"
         
     - name: Deploy on VM
       uses: appleboy/ssh-action@v1.0.3
@@ -102,7 +104,7 @@ jobs:
         username: ${{ secrets.VM_USER }}
         key: ${{ secrets.VM_SSH_KEY }}
         script: |
-          cd ~/integrated-deployment
+          cd ~/integrated-deployment/frontend
           
           # Ensure clean nginx base image
           docker pull nginx:alpine || true
@@ -116,7 +118,7 @@ jobs:
           docker volume create backend_uploads 2>/dev/null || true
           
           # Start only nginx service (contains static files)
-          docker-compose up -d nginx
+          docker-compose up -d --build nginx
           
           # Wait for nginx to be ready
           sleep 15

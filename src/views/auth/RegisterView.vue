@@ -24,7 +24,7 @@
     </div>
 
     <!-- ฟอร์มลงทะเบียน -->
-    <UserRegisterForm
+    <RegisterForm
       :mode="userType"
       @submitted="handleSuccess"
     />
@@ -34,7 +34,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import UserRegisterForm from '@/components/user/UserRegisterForm.vue'
+import RegisterForm from '@/components/auth/RegisterForm.vue'
 import XButton from '@/components/common/XButton.vue'
 
 const userType = ref('BUYER')
