@@ -384,6 +384,20 @@ onMounted(async () => {
 })
 
 watch(
+  () => route.query.logout,
+  (logoutValue) => {
+    if (logoutValue === 'true') {
+      clearAllFilter()
+
+      const newQuery = { ...route.query }
+      delete newQuery.logout
+      router.replace({ query: newQuery })
+    }
+  },
+  { immediate: true }
+)
+
+watch(
   searchParams,
   async () => {
     // If we use deep check, it won't allow us to fetch the same page
@@ -415,16 +429,15 @@ watch(
 <template>
   <div class="bg-white flex-grow">
     <div class="max-w-7xl mx-auto py-8 px-4 space-y-6">
+      <XBreadcrumb :items="breadcrumbs" />
+
       <div class="flex justify-between items-center mb-6 mx-4">
         <div class="flex items-center gap-x-2 w-full max-w-3xl">
-          <XBreadcrumb :items="breadcrumbs" />
-
           <!-- 🔍 Search section -->
-
           <XInput
             v-model="searchOptions.filterSearch"
             placeholder="Search..."
-            class="pl-4 rounded-md"
+            class="w-full rounded-md"
             @keydown.enter="onSearch"
           />
 
