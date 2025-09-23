@@ -288,16 +288,6 @@ function onManage() {
       @change="handlePaginationChange"
     />
 
-    <!-- No items message -->
-    <div
-      v-if="!loading.items && saleItems.length === 0 && !error.items"
-      class="text-center py-10"
-    >
-      <p class="text-lg text-gray-500">
-        No sale item
-      </p>
-    </div>
-
     <!-- Error message -->
     <div
       v-if="error.items"

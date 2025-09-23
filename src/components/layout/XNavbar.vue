@@ -45,7 +45,7 @@ const handleLogout = async () => {
   isDropdownOpen.value = false
   closeMobileMenu()
   await nextTick()
-  router.push('/signin')
+  router.push('/sale-items')
   console.log("logout and redirect to signin")
 }
 </script>
