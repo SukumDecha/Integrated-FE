@@ -4,7 +4,6 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-1\n
                            - cancel the action`, () => {
 
     let resource = '/signin'
-    let baseAPI = Cypress.config('baseAPI')
 
     beforeEach(()=> {
         cy.visit(resource) ;

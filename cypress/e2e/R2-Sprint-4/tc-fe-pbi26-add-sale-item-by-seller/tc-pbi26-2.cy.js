@@ -1,10 +1,9 @@
-describe(`TC-FE-PB26-ADD-SALE-ITEM-BY-SELLER-1\n 
+describe(`TC-FE-PB26-ADD-SALE-ITEM-BY-SELLER-1\n
     Test Scenario : normal - seller(td-5) with no sale item.\n
                            - all fields
                            - save the action`, () => {
 
     let resource = '/signin'
-    let baseAPI = Cypress.config('baseAPI')
 
     beforeEach(()=> {
         cy.visit(resource) ;
@@ -44,7 +43,8 @@ describe(`TC-FE-PB26-ADD-SALE-ITEM-BY-SELLER-1\n
         should show the new sale item in the sale-items list page
         []`,()=>{
 
-        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton'); 
+
+        cy.get('.itbms-sale-item-add').should('exist').as('addSaleItemButton');
         cy.get('@addSaleItemButton').click();
 
         cy.get('.itbms-save-button').as('save') ;
@@ -104,5 +104,6 @@ describe(`TC-FE-PB26-ADD-SALE-ITEM-BY-SELLER-1\n
         cy.get('@newItem').parent().contains('.itbms-color','Blue Shadow')
         cy.get('@newItem').parent().contains('.itbms-price','64,900') ;
     })
+
 
 })

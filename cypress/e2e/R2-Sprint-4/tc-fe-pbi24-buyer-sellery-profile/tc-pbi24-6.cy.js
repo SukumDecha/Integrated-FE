@@ -1,11 +1,10 @@
-describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-6\n 
+describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-6\n
     Test Scenario : normal - seller\n
                            - view and edit the profile\n
                            - trimmed whitespace\n
                            - save the action`, () => {
 
     let resource = '/signin'
-    let baseAPI = Cypress.config('baseAPI')
 
     beforeEach(()=> {
         cy.visit(resource) ;
@@ -31,10 +30,10 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-6\n
     it(`[step 3] should have "Profile" button and click to open the profile page.\n
         should show the profile data: nickname, email, fullname and account type.\n
         should have "Edit Profile" button".\n`,()=>{
-        // cy.get('.itbms-profile').should('exist').as('profileButton'); 
+        // cy.get('.itbms-profile').should('exist').as('profileButton');
         // cy.get('@profileButton').click();
         // cy.wait(100)
-        cy.visit('/profile') ;  
+        cy.visit('/profile') ;
         cy.wait(100) ;
 
         cy.contains('.itbms-nickname','Saksit') ;
@@ -54,7 +53,7 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-6\n
         [step 5] should change nickname and fullname.\n
         should enable the "Save" button.
         should click the "Save" button`,()=>{
-        cy.visit('/profile') ;  
+        cy.visit('/profile') ;
         cy.wait(100) ;
 
         cy.get('.itbms-profile-button').should('exist').as('editProfileButton');
@@ -64,7 +63,7 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-6\n
         cy.get('input.itbms-nickname').should('have.value','Saksit') ;
         cy.get('input.itbms-email').should('have.value','itbkk.somsak@ad.sit.kmutt.ac.th')
         cy.get('input.itbms-fullname').should('have.value','Saksit Somsak')   ;
-        cy.get('input.itbms-mobile').should('have.value','xxxxxx901x') ; 
+        cy.get('input.itbms-mobile').should('have.value','xxxxxx901x') ;
         cy.get('input.itbms-bankAccount').should('have.value','xxxxxx678x') ;
         cy.get('input.itbms-bankName').should('have.value','Bangkok Bank') ;
 
@@ -97,7 +96,7 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-6\n
         cy.get('@nicknameInput').clear().type('  Somsak  ') ;
 
         cy.get('input.itbms-fullname').as('fullnameInput') ;
-        cy.get('@fullnameInput').clear().type('  Somsak Saksit  ') ;  
+        cy.get('@fullnameInput').clear().type('  Somsak Saksit  ') ;
 
         cy.get('.itbms-save-button').as('save') ;
         cy.get('@save').should(($btn)=>{
@@ -111,10 +110,10 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-6\n
 
     it(`[step 6] should redirect to the profile page after saving the edit.\n
         should change the profile data.`,()=>{
-        // cy.get('.itbms-profile').should('exist').as('profileButton'); 
+        // cy.get('.itbms-profile').should('exist').as('profileButton');
         // cy.get('@profileButton').click();
         // cy.wait(100)
-        cy.visit('/profile') ;  
+        cy.visit('/profile') ;
         cy.wait(100) ;
 
         cy.get('.itbms-nickname').should('have.text','Somsak') ;

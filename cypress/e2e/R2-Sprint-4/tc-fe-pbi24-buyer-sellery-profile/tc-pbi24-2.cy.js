@@ -1,10 +1,9 @@
-describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-2\n 
+describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-2\n
     Test Scenario : normal - buyer\n
                            - view and edit the profile\n
                            - save the action`, () => {
 
     let resource = '/signin'
-    let baseAPI = Cypress.config('baseAPI')
 
     beforeEach(()=> {
         cy.visit(resource) ;
@@ -30,10 +29,10 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-2\n
     it(`[step 3] should have "Profile" button and click to open the profile page.\n
         should show the profile data: nickname, email, fullname and account type.\n
         should have "Edit Profile" button".\n`,()=>{
-        // cy.get('.itbms-profile').should('exist').as('profileButton'); 
+        // cy.get('.itbms-profile').should('exist').as('profileButton');
         // cy.get('@profileButton').click();
         // cy.wait(100)
-        cy.visit('/profile') ;  
+        cy.visit('/profile') ;
         cy.wait(100) ;
 
         cy.contains('.itbms-nickname','Somchai') ;
@@ -50,7 +49,7 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-2\n
         [step 5] should change nickname and fullname.\n
         should enable the "Save" button.
         should click the "Cancel" button`,()=>{
-        cy.visit('/profile') ;  
+        cy.visit('/profile') ;
         cy.wait(100) ;
 
         cy.get('.itbms-profile-button').should('exist').as('editProfileButton');
@@ -75,7 +74,8 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-2\n
         cy.get('@nicknameInput').clear().type('Jaidee') ;
 
         cy.get('input.itbms-fullname').as('fullnameInput') ;
-        cy.get('@fullnameInput').clear().type('Jaidee Somchai') ;  
+
+        cy.get('@fullnameInput').clear().type('Jaidee Somchai') ;
 
         cy.get('.itbms-save-button').as('save') ;
         cy.get('@save').should(($btn)=>{
@@ -88,10 +88,10 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-2\n
 
     it(`[step 6] should redirect to the profile page after canceling the edit.\n
         should change the profile data: Nickname -> Jaidee, Fullname -> Jaidee Somchai.`,()=>{
-        // cy.get('.itbms-profile').should('exist').as('profileButton'); 
+        // cy.get('.itbms-profile').should('exist').as('profileButton');
         // cy.get('@profileButton').click();
         // cy.wait(100)
-        cy.visit('/profile') ;  
+        cy.visit('/profile') ;
         cy.wait(100) ;
 
         cy.contains('.itbms-nickname','Jaidee') ;
@@ -100,4 +100,5 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-2\n
         cy.contains('.itbms-type','Buyer') ;
         cy.get('.itbms-profile-button').should('exist');
     })
+
 })

@@ -1,11 +1,10 @@
-describe(`TC-FE-PB25-VIEW-SALE-ITEM-LIST-BY-SELLER-2\n 
+describe(`TC-FE-PB25-VIEW-SALE-ITEM-LIST-BY-SELLER-2\n
     Test Scenario : normal - seller(td-4)\n
                            - view sale-items list owned by the current logged-in seller\n
                            - edit a sale item
                            - cancel the action`, () => {
 
     let resource = '/signin'
-    let baseAPI = Cypress.config('baseAPI')
 
     beforeEach(()=> {
         cy.visit(resource) ;
@@ -41,7 +40,7 @@ describe(`TC-FE-PB25-VIEW-SALE-ITEM-LIST-BY-SELLER-2\n
         }) ;
     })
 
-    it(`Each sale item contains id, brand, model, ramGb, storageGb, color, price 
+    it(`Each sale item contains id, brand, model, ramGb, storageGb, color, price
         and the edit and delete buttons.`,()=>{
         cy.get('.itbms-row').eq(0).as('row')
         cy.get('@row').find('.itbms-id')
@@ -77,7 +76,7 @@ describe(`TC-FE-PB25-VIEW-SALE-ITEM-LIST-BY-SELLER-2\n
         cy.get('@row').contains('.itbms-price','19,800')
     })
 
-    it(`[step 2] should click the "Edit" button of the first sale item.\n 
+    it(`[step 2] should click the "Edit" button of the first sale item.\n
         should show a form for editing the sale item details.\n
         should disable the "Save" button.`,()=>{
         cy.get('.itbms-row').eq(0).as('row')

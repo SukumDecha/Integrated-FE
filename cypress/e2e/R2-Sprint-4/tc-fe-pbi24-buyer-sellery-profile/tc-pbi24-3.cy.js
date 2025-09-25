@@ -1,11 +1,10 @@
-describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-3\n 
+describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-3\n
     Test Scenario : normal - buyer\n
                            - view and edit the profile\n
                            - trimmed
                            - save the action`, () => {
 
     let resource = '/signin'
-    let baseAPI = Cypress.config('baseAPI')
 
     beforeEach(()=> {
         cy.visit(resource) ;
@@ -31,10 +30,10 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-3\n
     it(`[step 3] should have "Profile" button and click to open the profile page.\n
         should show the profile data: nickname, email, fullname and account type.\n
         should have "Edit Profile" button".\n`,()=>{
-        // cy.get('.itbms-profile').should('exist').as('profileButton'); 
+        // cy.get('.itbms-profile').should('exist').as('profileButton');
         // cy.get('@profileButton').click();
         // cy.wait(100)
-        cy.visit('/profile') ;  
+        cy.visit('/profile') ;
         cy.wait(100) ;
 
         cy.contains('.itbms-nickname','Jaidee') ;
@@ -51,7 +50,7 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-3\n
         [step 5] should change nickname and fullname.\n
         should enable the "Save" button.
         should click the "Cancel" button`,()=>{
-        cy.visit('/profile') ;  
+        cy.visit('/profile') ;
         cy.wait(100) ;
 
         cy.get('.itbms-profile-button').should('exist').as('editProfileButton');
@@ -72,7 +71,7 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-3\n
         cy.get('@nicknameInput').clear().type('  Somchai  ') ;
 
         cy.get('input.itbms-fullname').as('fullnameInput') ;
-        cy.get('@fullnameInput').clear().type('  Somchai Jaidee  ') ;  
+        cy.get('@fullnameInput').clear().type('  Somchai Jaidee  ') ;
 
         cy.get('.itbms-save-button').as('save') ;
         cy.get('@save').should(($btn)=>{
@@ -85,10 +84,10 @@ describe(`TC-FE-PB24-BUYER-SELLER-PROFILE-3\n
 
     it(`[step 6] should redirect to the profile page after canceling the edit.\n
         should change the profile data: Nickname -> Somchai, Fullname -> Somchai Jaidee.`,()=>{
-        // cy.get('.itbms-profile').should('exist').as('profileButton'); 
+        // cy.get('.itbms-profile').should('exist').as('profileButton');
         // cy.get('@profileButton').click();
         // cy.wait(100)
-        cy.visit('/profile') ;  
+        cy.visit('/profile') ;
         cy.wait(100) ;
 
         cy.get('.itbms-nickname').should('have.text','Somchai') ;

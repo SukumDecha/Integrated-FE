@@ -1,8 +1,7 @@
-describe(`TC-FE-PB25-VIEW-SALE-ITEM-LIST-BY-SELLER-4\n 
+describe(`TC-FE-PB25-VIEW-SALE-ITEM-LIST-BY-SELLER-4\n
     Test Scenario : fail - buyer`, () => {
 
     let resource = '/signin'
-    let baseAPI = Cypress.config('baseAPI')
 
     beforeEach(()=> {
         cy.visit(resource) ;
