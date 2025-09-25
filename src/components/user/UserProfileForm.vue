@@ -22,6 +22,7 @@
 
       <XButton
         v-if="!isEditMode"
+        class="itbms-profile-button"
         @click="toggleEditMode"
       >
         Edit Profile
@@ -55,6 +56,7 @@
         placeholder="Enter nickname"
         :disabled="!isEditMode || showSuccessMessage"
         :error="isEditMode ? errors.nickname : ''"
+        class="itbms-nickname"
         @input="onFieldChange"
       />
 
@@ -65,6 +67,7 @@
         placeholder="Enter full name"
         :disabled="!isEditMode || showSuccessMessage"
         :error="isEditMode ? errors.fullname : ''"
+        class="itbms-fullname"
         @input="onFieldChange"
       />
 
@@ -75,6 +78,7 @@
         disabled
         readonly
         :class="isEditMode ? 'bg-gray-50' : ''"
+        class="itbms-email"
       />
 
       <div class="relative">
@@ -163,6 +167,7 @@
       <XButton
         variant="secondary"
         :disabled="isSaving"
+        class="itbms-cancel-button"
         @click="doCancel"
       >
         Cancel
@@ -171,6 +176,7 @@
       <XButton
         :disabled="!canSave || isSaving"
         :loading="isSaving"
+        class="itbms-save-button"
         @click="doSave"
       >
         {{ isSaving ? 'Saving...' : 'Save' }}
@@ -179,7 +185,7 @@
 
     <!-- User Role Display -->
     <div class="text-center text-sm text-gray-500 pt-2 border-t">
-      Account Type: <strong>{{ profile.userType || 'BUYER' }}</strong>
+      Account Type: <strong class="itbms-type">{{ toPascalCase(profile.userType) || 'Buyer' }}</strong>
       <div class="text-xs text-gray-400 mt-1">
         User role cannot be changed
       </div>
@@ -192,7 +198,7 @@ import XButton from '@/components/common/XButton.vue';
 import XInput from '@/components/common/form/XInput.vue';
 import { AuthService, UserService } from '@/services';
 import { useToastStore } from '@/stores/toast.store';
-import { maskNumber } from '@/utils';
+import { maskNumber, toPascalCase } from '@/utils';
 import { onMounted, ref, computed, reactive, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.store';
