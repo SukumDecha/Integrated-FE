@@ -1,7 +1,9 @@
-describe(`TC-FE-PB25-VIEW-SALE-ITEM-LIST-BY-SELLER-3\n 
+describe(`TC-FE-PB25-VIEW-SALE-ITEM-LIST-BY-SELLER-3\n
     Test Scenario : normal - seller(td-5) with no sale item.`, () => {
 
     let resource = '/signin'
+    
+    // eslint-disable-next-line no-unused-vars
     let baseAPI = Cypress.config('baseAPI')
 
     beforeEach(()=> {
