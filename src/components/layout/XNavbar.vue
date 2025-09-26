@@ -40,13 +40,20 @@ const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value
 }
 
+const handleClearStorage = () => {
+  localStorage.clear()
+  sessionStorage.clear()
+}
+
 const handleLogout = async () => {
   authStore.logout()
   isDropdownOpen.value = false
+
   closeMobileMenu()
+  handleClearStorage()
+
   await nextTick()
-  router.push('/signin')
-  console.log("logout and redirect to signin")
+  router.push('/sale-items?logout=true')
 }
 </script>
 

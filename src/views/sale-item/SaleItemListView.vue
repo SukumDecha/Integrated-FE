@@ -44,7 +44,7 @@ const searchOptions = reactive({
   pageSize: 10,
   totalItems: 0,
   sortBy: 'createdOn',
-  sortOrder: 'desc',
+  sortOrder: 'asc',
 })
 
 const loading = reactive({
@@ -76,7 +76,7 @@ const initializeStateFromRouteOrStorage = () => {
   // Sort
   searchOptions.sortBy = q.sortBy || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).field || 'createdOn'
   searchOptions.sortOrder =
-    q.sortDirection || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).order || 'desc'
+    q.sortDirection || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).order || 'asc'
 
   updateRouteQuery()
 }
@@ -287,16 +287,6 @@ function onManage() {
       :show-size-changer="true"
       @change="handlePaginationChange"
     />
-
-    <!-- No items message -->
-    <div
-      v-if="!loading.items && saleItems.length === 0 && !error.items"
-      class="text-center py-10"
-    >
-      <p class="text-lg text-gray-500">
-        No sale item
-      </p>
-    </div>
 
     <!-- Error message -->
     <div

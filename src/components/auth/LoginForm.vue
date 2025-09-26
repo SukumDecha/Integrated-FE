@@ -127,8 +127,11 @@ const handleSubmit = async () => {
 
     if (accessToken) {
       authStore.login(accessToken)
-      toast.add({ type: 'success', message: res.message || 'Login successful' })
-      console.log('log in success')
+      // toast.add({ type: 'success', message: res.message || 'Login successful' })
+      toast.add({ type: 'success', message: 'Login successful' })
+      console.log('log in success') 
+      console.log(res.message);
+
       const userRole = authStore.user?.role || res.data?.user?.role
 
       if (userRole === 'SELLER' || userRole === 'seller') {
@@ -145,6 +148,7 @@ const handleSubmit = async () => {
 
     // จริง ๆ แล้ว block นี้จะไม่ถูกเรียกเพราะ UserService.login ไม่ throw
     const message = err?.message || 'Unexpected error occurred during login.'
+
     toast.add({ type: 'error', message })
   } finally {
     loading.value = false

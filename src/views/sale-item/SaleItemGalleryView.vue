@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, watch, reactive, computed, ref } from 'vue'
+import { onMounted, watch, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToastStore } from '@/stores/toast.store'
 
@@ -33,7 +33,7 @@ const searchOptions = reactive({
   filteredPrices: null,
   filteredStorages: [],
   activeOnly: false,
-  filterSearch: query.search,
+  filterSearch: query.search || null,
 })
 
 const priceOptions = computed(() => [
@@ -65,10 +65,8 @@ const breadcrumbs = [
   { text: 'Sale Items', active: true },
 ]
 
-const searchKeyword = ref('')
-// กด Search หรือ Enter
 const onSearch = async () => {
-  const trimmed = searchKeyword.value?.trim() || ''
+  const trimmed = searchOptions.filterSearch.trim() || ''
 
   searchOptions.filterSearch = trimmed
   searchOptions.currentPage = 1
@@ -87,7 +85,7 @@ const onSearch = async () => {
 
 // Clear Search
 const clearSearch = async () => {
-  searchKeyword.value = ''
+  // searchKeyword.value = ''
   searchOptions.filterSearch = ''
   searchOptions.currentPage = 1
   const newQuery = { ...route.query }
@@ -103,7 +101,7 @@ const clearSearch = async () => {
 
 // โหลดค่า search จาก query ตอนเปิดหน้า
 if (route.query.search) {
-  searchKeyword.value = route.query.search
+  // searchKeyword.value = route.query.search
   searchOptions.filterSearch = route.query.search
 }
 
@@ -178,12 +176,11 @@ const initializeStateFromRouteOrStorage = () => {
     q.sortDirection || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).order
 
     // Search keyword
-searchOptions.filterSearch =
-  q.search ||
+  searchOptions.filterSearch = q.search ||
   sessionStorage.getItem(SALE_ITEM_STORAGE_KEYS.FILTER_SEARCH) ||
   ''
 
-searchKeyword.value = searchOptions.filterSearch
+  // searchKeyword.value = searchOptions.filterSearch
 
 
   // Filter Brands
@@ -387,6 +384,20 @@ onMounted(async () => {
 })
 
 watch(
+  () => route.query.logout,
+  (logoutValue) => {
+    if (logoutValue === 'true') {
+      clearAllFilter()
+
+      const newQuery = { ...route.query }
+      delete newQuery.logout
+      router.replace({ query: newQuery })
+    }
+  },
+  { immediate: true }
+)
+
+watch(
   searchParams,
   async () => {
     // If we use deep check, it won't allow us to fetch the same page
@@ -418,16 +429,15 @@ watch(
 <template>
   <div class="bg-white flex-grow">
     <div class="max-w-7xl mx-auto py-8 px-4 space-y-6">
+      <XBreadcrumb :items="breadcrumbs" />
+
       <div class="flex justify-between items-center mb-6 mx-4">
         <div class="flex items-center gap-x-2 w-full max-w-3xl">
-          <XBreadcrumb :items="breadcrumbs" />
-
           <!-- 🔍 Search section -->
-
           <XInput
-            v-model="searchKeyword"
+            v-model="searchOptions.filterSearch"
             placeholder="Search..."
-            class="pl-4 px-68 rounded-md"
+            class="w-full rounded-md"
             @keydown.enter="onSearch"
           />
 
