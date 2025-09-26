@@ -4,7 +4,7 @@ const BASE_URL = '/v2/auth'
 
 const AuthService = {
   async login(data) {
-    return await post(`${BASE_URL}/authenticate`, data)
+    return await post(`${BASE_URL}/login`, data)
   },
 
   async registerUser(data) {
