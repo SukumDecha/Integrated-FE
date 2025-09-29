@@ -11,7 +11,7 @@ const SaleItemService = {
   },
 
   async getSaleItemById(id) {
-    return await get(`${BASE_URL_V1}/${id}`)
+    return await get(`${BASE_URL_V2}/${id}`)
   },
 
   async addSaleItem(data) {

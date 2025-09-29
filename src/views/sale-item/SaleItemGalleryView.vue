@@ -10,7 +10,7 @@ import XSelector from '@/components/common/form/XSelector.vue'
 import SaleItemCard from '@/components/sale-item/SaleItemCard.vue'
 import XInput from '@/components/common/form/XInput.vue'
 
-import { AlignJustify, ArrowDownWideNarrow, ArrowUpWideNarrow, PlusIcon } from 'lucide-vue-next'
+import { AlignJustify, ArrowDownWideNarrow, ArrowUpWideNarrow } from 'lucide-vue-next'
 
 import { SaleItemService, BrandService } from '@/services'
 import { loadFromSessionStorage, saveToSessionStorage } from '@/utils/StorageUtils'
@@ -457,14 +457,6 @@ watch(
             Clear
           </XButton>
         </div>
-
-        <!-- Add Sale Item  -->
-        <XButton
-          class-name="itbms-sale-item-add"
-          @click="$router.push('/sale-items/add')"
-        >
-          <PlusIcon class="h-5 w-5 mr-2" /> Add Sale Item
-        </XButton>
       </div>
 
       <div class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-md">

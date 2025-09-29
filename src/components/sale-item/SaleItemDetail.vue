@@ -10,6 +10,9 @@ import XButton from '@/components/common/XButton.vue'
 import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { ArrowLeft } from 'lucide-vue-next'
 
+import { useAuthStore } from '@/stores/auth.store'
+import { useCartStore } from '@/stores/cart.store'
+
 const imageUrl = new URL('/assets/fallback-image.jpg', import.meta.url).pathname
 
 defineEmits(['cancel'])
@@ -68,6 +71,42 @@ const deleteProduct = async () => {
     router.push('/sale-items')
   }
 }
+
+const authStore = useAuthStore()
+const cartStore = useCartStore()
+const quantity = ref(1)
+
+const increaseQty = () => {
+  if (quantity.value < (props.product?.quantity || 0)) {
+    quantity.value++
+  }
+}
+
+const decreaseQty = () => {
+  if (quantity.value > 1) {
+    quantity.value--
+  }
+}
+
+const handleAddToCart = () => {
+  if (!authStore.isLoggedIn) {
+    router.push('/signin')
+    return
+  }
+
+  if (authStore.user?.role === 'BUYER') {
+    cartStore.addItem({
+      userid : authStore.userId,
+      id: props.product.id,
+      brand: props.product.brand,
+      model: props.product.model,
+      price: props.product.price,
+      imageUrl: props.product.imageUrl,
+      seller: props.product.seller,
+      quantity: quantity.value,
+    })
+  }
+}
 </script>
 
 <template>
@@ -103,7 +142,7 @@ const deleteProduct = async () => {
                 "
                 alt="Product image"
                 class="w-full h-full object-contain"
-              >
+              />
             </div>
 
             <!-- Thumbnails -->
@@ -122,7 +161,7 @@ const deleteProduct = async () => {
                       getImageUrl(product.saleItemImages[i - 1]?.imageUrl) || imageUrl,
                     )
                   "
-                >
+                />
               </div>
             </div>
           </div>
@@ -137,10 +176,7 @@ const deleteProduct = async () => {
               @cancel="$emit('cancel')"
             />
 
-            <div
-              v-else
-              class="space-y-6"
-            >
+            <div v-else class="space-y-6">
               <!-- Product title section -->
               <div class="space-y-1">
                 <h2 class="text-2xl font-bold text-gray-800 itbms-model">
@@ -169,9 +205,7 @@ const deleteProduct = async () => {
 
               <!-- Description -->
               <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </h3>
+                <h3 class="text-sm font-medium text-gray-700 mb-2">Description</h3>
                 <p class="text-gray-700 itbms-description">
                   {{ product.description }}
                 </p>
@@ -179,9 +213,7 @@ const deleteProduct = async () => {
 
               <!-- Specifications -->
               <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-3">
-                  Specifications
-                </h3>
+                <h3 class="text-sm font-medium text-gray-700 mb-3">Specifications</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
                   <div class="flex justify-between">
                     <span class="text-gray-500">RAM</span>
@@ -213,8 +245,11 @@ const deleteProduct = async () => {
                 </div>
               </div>
 
-              <!-- Action buttons -->
-              <div class="pt-4 border-t border-gray-100 flex gap-3 justify-end">
+              <!-- SELLER -->
+              <div
+                v-if="authStore.user?.role === 'SELLER'"
+                class="pt-4 border-t border-gray-100 flex gap-3 justify-end"
+              >
                 <XButton
                   label="Edit"
                   variant="outline"
@@ -227,6 +262,87 @@ const deleteProduct = async () => {
                   class-name="itbms-delete-button"
                   @click="showConfirm = true"
                 />
+              </div>
+
+              <!-- ไม่ login -->
+              <div v-else-if="!authStore.isLoggedIn" class="mt-4">
+                <p class="text-gray-600 mb-5 -mt-2">
+                  Seller: <span class="font-semibold">{{ product.seller.nickname }}</span>
+                </p>
+                <div class="flex items-center space-x-2">
+                  <!-- ปุ่มลด -->
+                  <XButton
+                    variant="outline"
+                    size="sm"
+                    @click="decreaseQty"
+                    class="itbms-dec-qty-button"
+                  >
+                    -
+                  </XButton>
+
+                  <span class="px-4 itbms-add-to-cart-quantity">{{ quantity }}</span>
+
+                  <!-- ปุ่มเพิ่ม -->
+                  <XButton
+                    variant="outline"
+                    size="sm"
+                    @click="increaseQty"
+                    class="itbms-inc-qty-button"
+                  >
+                    +
+                  </XButton>
+
+                  <!-- ปุ่ม Add to Cart -->
+                  <XButton
+                    variant="primary"
+                    size="sm"
+                    @click="handleAddToCart"
+                    class="itbms-add-to-cart-button ml-5"
+                  >
+                    Add to Cart
+                  </XButton>
+                </div>
+              </div>
+
+              <!-- Buyer -->
+              <div v-else-if="authStore.user?.role === 'BUYER'" class="mt-4">
+                <!-- แสดงชื่อ Seller -->
+                <p class="text-gray-600 mb-5 -mt-2">
+                  Seller: <span class="font-semibold">{{ product.seller.nickname }}</span>
+                </p>
+                <div class="flex items-center space-x-2">
+                  <!-- ปุ่มลด -->
+                  <XButton
+                    variant="outline"
+                    size="sm"
+                    @click="decreaseQty"
+                    class="itbms-dec-qty-button"
+                  >
+                    -
+                  </XButton>
+
+                  <span class="px-4 itbms-add-to-cart-quantity">{{ quantity }}</span>
+
+                  <!-- ปุ่มเพิ่ม -->
+                  <XButton
+                    variant="outline"
+                    size="sm"
+                    @click="increaseQty"
+                    class="itbms-inc-qty-button"
+                  >
+                    +
+                  </XButton>
+
+                  <!-- ปุ่ม Add to Cart -->
+                  <XButton
+                    variant="primary"
+                    size="sm"
+                    @click="handleAddToCart"
+                    class="itbms-add-to-cart-button ml-5"
+                  >
+                    Add to Cart
+                  </XButton>
+                </div>
               </div>
             </div>
           </div>

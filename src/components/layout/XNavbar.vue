@@ -2,23 +2,19 @@
 import { NAVBAR_MENU } from '@/constants/navbar.constant'
 import { Menu, ShoppingBag, ShoppingCart, X, ChevronDown } from 'lucide-vue-next'
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { nextTick } from 'vue'
-
-
-defineProps({
-  cartCount: {
-    type: Number,
-    default: 0,
-  },
-})
+import { useCartStore } from '@/stores/cart.store'
 
 const route = useRoute()
 const router = useRouter()
 const isOpen = ref(false)
 const authStore = useAuthStore()
 const isDropdownOpen = ref(false)
+const cartStore = useCartStore()
+const { totalItems } = storeToRefs(cartStore)
 
 const isActiveRoute = (navItem) => {
   if (navItem.exact) {
@@ -47,6 +43,7 @@ const handleClearStorage = () => {
 
 const handleLogout = async () => {
   authStore.logout()
+  cartStore.clearCart()
   isDropdownOpen.value = false
 
   closeMobileMenu()
@@ -63,10 +60,7 @@ const handleLogout = async () => {
       <div class="flex justify-between h-16">
         <!-- Logo -->
         <div class="flex items-center">
-          <router-link
-            to="/"
-            class="flex-shrink-0 flex items-center"
-          >
+          <router-link to="/" class="flex-shrink-0 flex items-center">
             <ShoppingBag class="h-8 w-8 text-emerald-600" />
             <span class="ml-2 text-xl font-bold text-emerald-800">Green Cart</span>
           </router-link>
@@ -150,10 +144,10 @@ const handleLogout = async () => {
           >
             <ShoppingCart class="h-6 w-6" />
             <span
-              v-if="cartCount > 0"
+              v-if="totalItems > 0"
               class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-emerald-600 rounded-full min-w-[1.25rem] h-5"
             >
-              {{ cartCount }}
+              {{ totalItems }}
             </span>
           </router-link>
         </div>
@@ -167,14 +161,8 @@ const handleLogout = async () => {
             @click="toggleMobileMenu"
           >
             <span class="sr-only">{{ isOpen ? 'Close' : 'Open' }} main menu</span>
-            <Menu
-              v-if="!isOpen"
-              class="block h-6 w-6"
-            />
-            <X
-              v-else
-              class="block h-6 w-6"
-            />
+            <Menu v-if="!isOpen" class="block h-6 w-6" />
+            <X v-else class="block h-6 w-6" />
           </button>
         </div>
       </div>
@@ -182,10 +170,7 @@ const handleLogout = async () => {
 
     <!-- Mobile Menu -->
     <transition name="slide-down">
-      <div
-        v-show="isOpen"
-        class="sm:hidden"
-      >
+      <div v-show="isOpen" class="sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
           <router-link
             v-for="item in NAVBAR_MENU"
@@ -245,16 +230,16 @@ const handleLogout = async () => {
           <!-- Mobile cart -->
           <router-link
             to="/cart"
-            class="relative flex items-center px-4 py-2 text-gray-500 hover:text-gray-600 hover:bg-gray-100 transition rounded-md"
+            class="itbms-cart-quantity relative flex items-center px-4 py-2 text-gray-500 hover:text-gray-600 hover:bg-gray-100 transition rounded-md"
             @click="closeMobileMenu"
           >
             <ShoppingCart class="h-6 w-6 mr-2" />
             <span>Cart</span>
             <span
-              v-if="cartCount > 0"
+              v-if="totalItems > 0"
               class="ml-auto inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-emerald-600 rounded-full min-w-[1.25rem] h-5"
             >
-              {{ cartCount }}
+              {{ totalItems }}
             </span>
           </router-link>
         </div>
