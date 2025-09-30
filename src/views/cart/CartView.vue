@@ -3,6 +3,7 @@ import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import CartSellerGroup from '@/components/cart/CartSellerGroup.vue'
 import CartSummary from '@/components/cart/CartSummary.vue'
 import { CartService } from '@/services'
+import { useCartStore } from '@/stores/cart.store'
 
 const breadcrumbs = [
   { text: 'Home', path: '/' },
@@ -11,8 +12,7 @@ const breadcrumbs = [
 
 const sellerGroups = CartService.getSellerGroups()
 
-
-
+const cartStore = useCartStore()
 </script>
 
 <template>
@@ -30,6 +30,8 @@ const sellerGroups = CartService.getSellerGroups()
         <input
           id="select-all"
           type="checkbox"
+          :checked="cartStore.isAllSelected"
+          @change="cartStore.toggleSelectAll($event.target.checked)"
           class="itbms-select-all h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 cursor-pointer"
         />
         <label

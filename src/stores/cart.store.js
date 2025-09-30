@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref , computed, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils'
 
 export const useCartStore = defineStore('cart', () => {
@@ -7,30 +7,131 @@ export const useCartStore = defineStore('cart', () => {
   const items = ref(loadFromLocalStorage(STORAGE_KEY, []))
 
   const addItem = (item) => {
-    const existing = items.value.find(i => i.id === item.id)
-     if (existing) {
-    existing.quantity += item.quantity
-  } else {
-    items.value.push({ ...item })
-  }
+    const existing = items.value.find((i) => i.id === item.id)
+    if (existing) {
+      if (existing.quantity + item.quantity <= existing.stock) {
+        existing.quantity += item.quantity
+      } else {
+        existing.quantity = existing.stock
+      }
+      existing.selected = true
+    } else {
+      items.value.push({
+        ...item,
+        sellerNickname: item.sellerNickname || 'Unknown',
+        selected: false,
+        stock: item.stock,
+      })
+    }
   }
 
-    const totalItems = computed(() =>
-    items.value.reduce((sum, i) => sum + i.quantity, 0)
-  )
+  const totalItems = computed(() => items.value.reduce((sum, i) => sum + i.quantity, 0))
+
+  const totalPrice = computed(() => items.value.reduce((sum, i) => sum + i.price * i.quantity, 0))
 
   const removeItem = (id) => {
-    items.value = items.value.filter(i => i.id !== id)
+    items.value = items.value.filter((i) => i.id !== id)
   }
 
   const clearCart = () => {
     items.value = []
   }
 
-  watch(items, (newVal) => {
-    saveToLocalStorage(STORAGE_KEY, newVal)
-  }, { deep: true })
-  
+  watch(
+    items,
+    (newVal) => {
+      saveToLocalStorage(STORAGE_KEY, newVal)
+    },
+    { deep: true },
+  )
 
-  return { items, addItem, removeItem, clearCart, totalItems  }
+  const increaseQty = (id) => {
+    const item = items.value.find((i) => i.id === id)
+    if (item && item.quantity < item.stock) {
+      item.quantity++
+    }
+  }
+
+  const decreaseQty = (id) => {
+    const item = items.value.find((i) => i.id === id)
+    if (!item) return false
+
+    if (item.quantity > 1) {
+      item.quantity--
+      return true
+    } else {
+      // quantity = 1 แล้ว
+      return false
+    }
+  }
+
+  // ---------- Select item ----------
+  const toggleItem = (id, value) => {
+    const item = items.value.find((i) => i.id === id)
+    if (item) item.selected = value
+  }
+
+  // ---------- Select seller ----------
+  const toggleSeller = (sellerNickname, value) => {
+    items.value.forEach((i) => {
+      if (i.sellerNickname === sellerNickname) {
+        i.selected = value
+      }
+    })
+  }
+
+  const isSellerAllSelected = (sellerNickname) => {
+    const sellerItems = items.value.filter((i) => i.sellerNickname === sellerNickname)
+    return sellerItems.length > 0 && sellerItems.every((i) => i.selected)
+  }
+
+  // ---------- Select all ----------
+  const isAllSelected = computed(
+    () => items.value.length > 0 && items.value.every((i) => i.selected),
+  )
+
+  const toggleSelectAll = (value) => {
+    items.value.forEach((i) => {
+      i.selected = value
+    })
+  }
+
+  // ---------- Summary (เฉพาะ selected) ----------
+  const selectedItems = computed(() => items.value.filter((i) => i.selected))
+
+  const selectedTotalItems = computed(() =>
+    selectedItems.value.reduce((sum, i) => sum + i.quantity, 0),
+  )
+
+  const selectedTotalPrice = computed(() =>
+    selectedItems.value.reduce((sum, i) => sum + i.price * i.quantity, 0),
+  )
+
+  // ---------- Save to localStorage ----------
+  watch(
+    items,
+    (newVal) => {
+      saveToLocalStorage(STORAGE_KEY, newVal)
+    },
+    { deep: true },
+  )
+
+  return {
+    items,
+    addItem,
+    removeItem,
+    totalPrice,
+    clearCart,
+    totalItems,
+    increaseQty,
+    decreaseQty,
+    toggleItem,
+    toggleSeller,
+    isSellerAllSelected,
+    isAllSelected,
+    toggleSelectAll,
+    selectedItems,
+    selectedTotalItems,
+    selectedTotalPrice,
+  }
 })

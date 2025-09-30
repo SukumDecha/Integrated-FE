@@ -96,14 +96,15 @@ const handleAddToCart = () => {
 
   if (authStore.user?.role === 'BUYER') {
     cartStore.addItem({
-      userid : authStore.userId,
+      userid: authStore.userId,
       id: props.product.id,
       brand: props.product.brand,
       model: props.product.model,
       price: props.product.price,
       imageUrl: props.product.imageUrl,
-      seller: props.product.seller,
+      sellerNickname: props.product.seller?.nickname || 'Unknown',
       quantity: quantity.value,
+      stock: props.product.quantity,
     })
   }
 }

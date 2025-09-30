@@ -16,7 +16,6 @@ import { SaleItemService, BrandService } from '@/services'
 import { loadFromSessionStorage, saveToSessionStorage } from '@/utils/StorageUtils'
 import { SALE_ITEM_STORAGE_KEYS } from '@/constants/sale-item.constant'
 
-
 const route = useRoute()
 const router = useRouter()
 const toast = useToastStore()
@@ -90,7 +89,7 @@ const clearSearch = async () => {
   searchOptions.currentPage = 1
   const newQuery = { ...route.query }
   delete newQuery.search //เคลียร์เฉพาะ search
-   newQuery.page = 1
+  newQuery.page = 1
 
   sessionStorage.removeItem(SALE_ITEM_STORAGE_KEYS.FILTER_SEARCH)
 
@@ -166,22 +165,24 @@ const initializeStateFromRouteOrStorage = () => {
 
   // Pagination
   searchOptions.currentPage =
-    parseInt(q.page, 10) || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {}).currentPage || 1
+    parseInt(q.page, 10) ||
+    loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {}).currentPage ||
+    1
   searchOptions.pageSize =
-    parseInt(q.size, 10) || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {}).pageSize || 10
+    parseInt(q.size, 10) ||
+    loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {}).pageSize ||
+    10
 
   // Sort
   searchOptions.sortBy = q.sortBy || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).field
   searchOptions.sortOrder =
     q.sortDirection || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).order
 
-    // Search keyword
-  searchOptions.filterSearch = q.search ||
-  sessionStorage.getItem(SALE_ITEM_STORAGE_KEYS.FILTER_SEARCH) ||
-  ''
+  // Search keyword
+  searchOptions.filterSearch =
+    q.search || sessionStorage.getItem(SALE_ITEM_STORAGE_KEYS.FILTER_SEARCH) || ''
 
   // searchKeyword.value = searchOptions.filterSearch
-
 
   // Filter Brands
   searchOptions.filteredBrands = q.filterBrands
@@ -271,9 +272,7 @@ watch(
     searchOptions.filterSearch = newQuery.search || ''
     await fetchSaleItems()
   },
-  { immediate: true,
-     flush: 'post',
-   },
+  { immediate: true, flush: 'post' },
 )
 
 const fetchBrands = async () => {
@@ -394,7 +393,7 @@ watch(
       router.replace({ query: newQuery })
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 watch(
@@ -441,21 +440,11 @@ watch(
             @keydown.enter="onSearch"
           />
 
-          <XButton
-            color="primary"
-            @click="onSearch"
-          >
-            <template #default>
-              🔍
-            </template>
+          <XButton color="primary" @click="onSearch">
+            <template #default> 🔍 </template>
           </XButton>
 
-          <XButton
-            class="itbms-search-clear-button"
-            @click="clearSearch"
-          >
-            Clear
-          </XButton>
+          <XButton class="itbms-search-clear-button" @click="clearSearch"> Clear </XButton>
         </div>
       </div>
 
@@ -500,12 +489,7 @@ watch(
               @update:model-value="() => resetPagination(false)"
             />
           </div>
-          <XButton
-            class-name="itbms-brand-filter-clear"
-            @click="clearAllFilter"
-          >
-            Clear
-          </XButton>
+          <XButton class-name="itbms-brand-filter-clear" @click="clearAllFilter"> Clear </XButton>
         </div>
 
         <div class="flex flex-wrap items-center gap-2 p-4 pt-0 rounded-md" />
@@ -522,9 +506,7 @@ watch(
           <XButton
             class-name="itbms-brand-asc"
             variant="info"
-            :disabled="
-              searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'asc'
-            "
+            :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'asc'"
             @click="sortAscByName"
           >
             <ArrowUpWideNarrow />
@@ -532,9 +514,7 @@ watch(
           <XButton
             class-name="itbms-brand-desc"
             variant="info"
-            :disabled="
-              searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'desc'
-            "
+            :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'desc'"
             @click="sortDescByName"
           >
             <ArrowDownWideNarrow />
@@ -570,12 +550,8 @@ watch(
       </div>
 
       <div class="space-y-2">
-        <h2 class="text-3xl font-extrabold tracking-tight text-gray-900">
-          Featured Products
-        </h2>
-        <p class="text-gray-500">
-          Check out our most popular items this season.
-        </p>
+        <h2 class="text-3xl font-extrabold tracking-tight text-gray-900">Featured Products</h2>
+        <p class="text-gray-500">Check out our most popular items this season.</p>
       </div>
 
       <div class="mt-10">
@@ -589,6 +565,7 @@ watch(
             :ram-gb="product.ramGb"
             :storage-gb="product.storageGb"
             :price="product.price"
+            :seller-nickname="product.seller?.nickname"
             :is-loading="loading.items"
           />
         </div>
@@ -609,9 +586,7 @@ watch(
         v-if="!loading.items && saleItems.length === 0 && !error.items"
         class="text-center py-10 itbms-row"
       >
-        <p class="text-lg text-gray-500">
-          no sale item
-        </p>
+        <p class="text-lg text-gray-500">no sale item</p>
       </div>
     </div>
   </div>

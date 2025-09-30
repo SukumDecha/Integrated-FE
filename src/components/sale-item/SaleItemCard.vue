@@ -44,8 +44,12 @@ const props = defineProps({
   },
   id: {
     type: Number,
-    required: false, // Changed to false
+    required: false,
     default: 0,
+  },
+  sellerNickname: {
+    type: String,
+    default: 'Unknown',
   },
 })
 
@@ -66,7 +70,9 @@ const handleAddToCart = () => {
     model: props.model,
     price: props.price,
     imageUrl: props.imageUrl,
+    sellerNickname: props.sellerNickname || 'Unknown',
     quantity: 1,
+    stock: props.quantity,
   })
 }
 </script>
