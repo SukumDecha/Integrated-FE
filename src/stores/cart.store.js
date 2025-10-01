@@ -25,9 +25,38 @@ export const useCartStore = defineStore('cart', () => {
     }
   }
 
+  const getSellerGroups = () => {
+  const cartStore = useCartStore()
+  return computed(() => {
+    const groupsMap = new Map()
+    for (const item of cartStore.items) {
+      const nickname = item?.sellerNickname || 'Unknown'
+      if (!groupsMap.has(nickname)) {
+        groupsMap.set(nickname, [])
+      }
+      groupsMap.get(nickname).push(item)
+    }
+    return Array.from(groupsMap.entries()).map(([sellerNickname, items]) => ({
+      sellerNickname,
+      items,
+    }))
+  })
+}
+
   const totalItems = computed(() => items.value.reduce((sum, i) => sum + i.quantity, 0))
 
   const totalPrice = computed(() => items.value.reduce((sum, i) => sum + i.price * i.quantity, 0))
+
+  const shippingAddress = ref('')
+  const orderNote = ref('')
+
+  const setShippingAddress = (address) => {
+    shippingAddress.value = address
+  }
+
+  const setOrderNote = (note) => {
+    orderNote.value = note
+  }
 
   const removeItem = (id) => {
     items.value = items.value.filter((i) => i.id !== id)
@@ -133,5 +162,10 @@ export const useCartStore = defineStore('cart', () => {
     selectedItems,
     selectedTotalItems,
     selectedTotalPrice,
+    shippingAddress,
+    orderNote,
+    setShippingAddress,
+    setOrderNote,
+    getSellerGroups,
   }
 })

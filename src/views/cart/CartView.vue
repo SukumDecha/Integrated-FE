@@ -2,7 +2,6 @@
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import CartSellerGroup from '@/components/cart/CartSellerGroup.vue'
 import CartSummary from '@/components/cart/CartSummary.vue'
-import { CartService } from '@/services'
 import { useCartStore } from '@/stores/cart.store'
 
 const breadcrumbs = [
@@ -10,9 +9,8 @@ const breadcrumbs = [
   { text: 'Cart', active: true },
 ]
 
-const sellerGroups = CartService.getSellerGroups()
-
 const cartStore = useCartStore()
+const sellerGroups = cartStore.getSellerGroups()
 </script>
 
 <template>
