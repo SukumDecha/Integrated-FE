@@ -566,6 +566,7 @@ watch(
             :storage-gb="product.storageGb"
             :price="product.price"
             :seller-nickname="product.seller?.nickname"
+            :quantity="product.quantity"
             :is-loading="loading.items"
           />
         </div>

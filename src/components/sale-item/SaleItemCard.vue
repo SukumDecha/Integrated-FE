@@ -51,6 +51,10 @@ const props = defineProps({
     type: String,
     default: 'Unknown',
   },
+  quantity: {
+    type: Number,
+    default: 0,
+  },
 })
 
 const router = useRouter()

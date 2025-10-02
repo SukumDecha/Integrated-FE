@@ -34,6 +34,8 @@
             :storage-gb="product.storageGb"
             :price="product.price"
             :is-loading="loading"
+            :quantity="product.quantity"
+            :seller-nickname="product.seller?.nickname"
           />
         </div>
       </div>
