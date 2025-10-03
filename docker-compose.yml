@@ -10,6 +10,7 @@ services:
       - "443:443"
     volumes:
       - backend_uploads:/usr/share/nginx/html/uploads
+      - /home/dohttps/nginx/ssl:/ssl
     networks:
       - integrated-network
     # external_links:
