@@ -36,6 +36,7 @@
             :is-loading="loading"
             :quantity="product.quantity"
             :seller-nickname="product.seller?.nickname"
+            :seller-id="product.seller?.id"
           />
         </div>
       </div>
