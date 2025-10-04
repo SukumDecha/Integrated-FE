@@ -105,6 +105,9 @@ const handleAddToCart = () => {
       sellerNickname: props.product.seller?.nickname || 'Unknown',
       quantity: quantity.value,
       stock: props.product.quantity,
+      storageGb: props.product.storageGb,
+      color: props.product.color,
+      sellerId: props.product.sellerId,
     })
   }
 }

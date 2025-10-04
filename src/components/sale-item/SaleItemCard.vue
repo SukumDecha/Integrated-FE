@@ -40,7 +40,7 @@ const props = defineProps({
   },
   color: {
     type: String,
-    default: 'emerald',
+    default: null,
   },
   id: {
     type: Number,
@@ -69,7 +69,8 @@ const handleAddToCart = () => {
     router.push('/signin')
     return
   }
-  console.log('userId:', authStore.user?.id, 'sellerId:', props.sellerId)
+  console.log("DEBUG props:", props)
+
 
   cartStore.addItem({
     userid: authStore.userId,
@@ -78,12 +79,16 @@ const handleAddToCart = () => {
     model: props.model,
     price: props.price,
     imageUrl: props.imageUrl,
+    storageGb: props.storageGb,
+    color: props.color,
     sellerId: props.sellerId,
     sellerNickname: props.sellerNickname || 'Unknown',
     quantity: 1,
     stock: props.quantity,
   })
 }
+console.log("DEBUG props.color:", props.color)
+
 </script>
 
 <template>

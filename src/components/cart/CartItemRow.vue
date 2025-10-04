@@ -47,7 +47,7 @@ const confirmDelete = () => {
 
     <!-- รายละเอียด -->
     <div class="flex-1 itbms-item-description">
-      <p class="font-medium">{{ props.item.brand }} {{ props.item.model }}</p>
+      <p class="font-medium">{{ props.item.brand }} {{ props.item.model }} ({{ props.item.storageGb }} GB, {{ props.item.color }})</p>
       <p class="font-medium itbms-item-total-price text-emerald-600 font-extrabold">
         Price :
         <span class="itbms-item-total-price text-emerald-600 font-extrabold">{{

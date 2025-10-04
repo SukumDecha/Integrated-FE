@@ -20,7 +20,6 @@ export const useCartStore = defineStore('cart', () => {
       })
       return
     }
-    console.log('CartStore = currentUserId:', userId, 'sellerId:', sellerId)
 
     const existing = items.value.find((i) => i.id === item.id)
     if (existing) {
@@ -37,6 +36,8 @@ export const useCartStore = defineStore('cart', () => {
         sellerNickname: item.sellerNickname || 'Unknown',
         selected: false,
         stock: item.stock,
+        storageGb: item.storageGb,
+        color: item.color,
       })
     }
   }
