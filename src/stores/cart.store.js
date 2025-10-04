@@ -28,7 +28,6 @@ export const useCartStore = defineStore('cart', () => {
       } else {
         existing.quantity = existing.stock
       }
-      existing.selected = true
     } else {
       items.value.push({
         ...item,
