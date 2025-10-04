@@ -55,17 +55,21 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  sellerId: {
+    type: [Number, String],
+    default: null,
+  },
 })
 
 const router = useRouter()
 const authStore = useAuthStore()
 const cartStore = useCartStore()
-
 const handleAddToCart = () => {
   if (!authStore.isLoggedIn) {
     router.push('/signin')
     return
   }
+  console.log('userId:', authStore.user?.id, 'sellerId:', props.sellerId)
 
   cartStore.addItem({
     userid: authStore.userId,
@@ -74,6 +78,7 @@ const handleAddToCart = () => {
     model: props.model,
     price: props.price,
     imageUrl: props.imageUrl,
+    sellerId: props.sellerId,
     sellerNickname: props.sellerNickname || 'Unknown',
     quantity: 1,
     stock: props.quantity,

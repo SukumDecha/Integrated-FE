@@ -565,6 +565,7 @@ watch(
             :ram-gb="product.ramGb"
             :storage-gb="product.storageGb"
             :price="product.price"
+            :seller-id="product.seller?.id"
             :seller-nickname="product.seller?.nickname"
             :quantity="product.quantity"
             :is-loading="loading.items"

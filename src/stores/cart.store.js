@@ -1,12 +1,27 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils'
+import { useAuthStore } from './auth.store'
+import { useToastStore } from './toast.store'
 
 export const useCartStore = defineStore('cart', () => {
   const STORAGE_KEY = 'cart_items'
   const items = ref(loadFromLocalStorage(STORAGE_KEY, []))
+  const authStore = useAuthStore()
+  const toastStore = useToastStore()
 
   const addItem = (item) => {
+    const userId = authStore.user?.id
+    const sellerId = item.sellerId
+    if (sellerId && sellerId === userId) {
+      toastStore.add({
+        type: 'error',
+        message: 'You cannot purchase this item because it belongs to you',
+      })
+      return
+    }
+    console.log('CartStore = currentUserId:', userId, 'sellerId:', sellerId)
+
     const existing = items.value.find((i) => i.id === item.id)
     if (existing) {
       if (existing.quantity + item.quantity <= existing.stock) {
@@ -18,6 +33,7 @@ export const useCartStore = defineStore('cart', () => {
     } else {
       items.value.push({
         ...item,
+        sellerId: sellerId,
         sellerNickname: item.sellerNickname || 'Unknown',
         selected: false,
         stock: item.stock,
@@ -26,22 +42,22 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   const getSellerGroups = () => {
-  const cartStore = useCartStore()
-  return computed(() => {
-    const groupsMap = new Map()
-    for (const item of cartStore.items) {
-      const nickname = item?.sellerNickname || 'Unknown'
-      if (!groupsMap.has(nickname)) {
-        groupsMap.set(nickname, [])
+    const cartStore = useCartStore()
+    return computed(() => {
+      const groupsMap = new Map()
+      for (const item of cartStore.items) {
+        const nickname = item?.sellerNickname || 'Unknown'
+        if (!groupsMap.has(nickname)) {
+          groupsMap.set(nickname, [])
+        }
+        groupsMap.get(nickname).push(item)
       }
-      groupsMap.get(nickname).push(item)
-    }
-    return Array.from(groupsMap.entries()).map(([sellerNickname, items]) => ({
-      sellerNickname,
-      items,
-    }))
-  })
-}
+      return Array.from(groupsMap.entries()).map(([sellerNickname, items]) => ({
+        sellerNickname,
+        items,
+      }))
+    })
+  }
 
   const totalItems = computed(() => items.value.reduce((sum, i) => sum + i.quantity, 0))
 
