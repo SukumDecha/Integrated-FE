@@ -1,0 +1,261 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [ production, uat, dev ]
+  pull_request:
+    branches: [ production, uat, dev ]
+    
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run linter
+      run: npm run lint
+      
+    - name: Build application (test)
+      run: npm run build:uat
+
+  build-and-deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/production' || github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/uat'
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install L2TP/IPsec VPN packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y strongswan xl2tpd ppp
+
+    - name: Configure L2TP/IPsec VPN
+      run: |
+        # Configure IPsec
+        sudo bash -c 'cat > /etc/ipsec.conf << EOF
+        config setup
+
+        conn %default
+            ikelifetime=60m
+            keylife=20m
+            rekeymargin=3m
+            keyingtries=1
+            keyexchange=ikev1
+            authby=secret
+            ike=aes128-sha1-modp1024,3des-sha1-modp1024!
+            esp=aes128-sha1-modp1024,3des-sha1-modp1024!
+
+        conn L2TP-PSK
+            keyexchange=ikev1
+            left=%defaultroute
+            auto=add
+            authby=secret
+            type=transport
+            leftprotoport=17/1701
+            rightprotoport=17/1701
+            right=vpn.kmutt.ac.th
+        EOF'
+
+        # Configure IPsec secrets (PSK)
+        sudo bash -c 'cat > /etc/ipsec.secrets << EOF
+        : PSK "kmutt.ac.th"
+        EOF'
+
+        # Configure xl2tpd
+        sudo bash -c 'cat > /etc/xl2tpd/xl2tpd.conf << EOF
+        [lac myVPN]
+        lns = vpn.kmutt.ac.th
+        ppp debug = yes
+        pppoptfile = /etc/ppp/options.l2tpd.client
+        length bit = yes
+        EOF'
+
+        # Configure PPP options
+        sudo bash -c 'cat > /etc/ppp/options.l2tpd.client << EOF
+        ipcp-accept-local
+        ipcp-accept-remote
+        refuse-eap
+        require-mschap-v2
+        noccp
+        noauth
+        logfile /var/log/xl2tpd.log
+        idle 1800
+        mtu 1410
+        mru 1410
+        defaultroute
+        usepeerdns
+        debug
+        connect-delay 5000
+        name ${{ secrets.VPN_USERNAME }}
+        password ${{ secrets.VPN_PASSWORD }}
+        EOF'
+
+        # Set proper permissions
+        sudo chmod 600 /etc/ipsec.secrets
+        sudo chmod 600 /etc/ppp/options.l2tpd.client
+
+    - name: Connect to L2TP/IPsec VPN
+      run: |
+        # Prepare xl2tpd control directory
+        sudo mkdir -p /var/run/xl2tpd
+        sudo touch /var/run/xl2tpd/l2tp-control
+        
+        # Restart services (Ubuntu/Debian use 'ipsec' not 'strongswan')
+        echo "Restarting VPN services..."
+        sudo service ipsec restart || sudo systemctl restart strongswan-starter
+        sudo service xl2tpd restart
+        sleep 8
+        
+        # Bring up IPsec connection
+        echo "Bringing up IPsec connection..."
+        sudo ipsec up L2TP-PSK
+        sleep 8
+        
+        # Initiate L2TP connection
+        echo "Initiating L2TP connection..."
+        sudo bash -c 'echo "c myVPN" > /var/run/xl2tpd/l2tp-control'
+        sleep 8
+        
+        # Check connection
+        echo "Checking VPN connection..."
+        ifconfig
+        
+        # Verify ppp0 interface exists
+        if ip addr show ppp0 2>/dev/null; then
+          echo "✓ VPN connection established successfully!"
+          ip addr show ppp0
+        else
+          echo "❌ VPN connection failed - ppp0 interface not found"
+          echo ""
+          echo "=== Diagnostics ==="
+          echo "--- IPsec Status ---"
+          sudo ipsec statusall
+          echo ""
+          echo "--- xl2tpd logs ---"
+          cat /var/log/xl2tpd.log || echo "Log file not found"
+          echo ""
+          echo "--- dmesg ---"
+          dmesg | tail -50
+          exit 1
+        fi
+
+    - name: Configure VPN Routing
+      run: |
+        echo "Adding route to VM network through VPN..."
+        # Get the peer IP from ppp0
+        PEER_IP=$(ip address show dev ppp0 | grep -Po '(?<=peer )(\b([0-9]{1,3}\.){3}[0-9]{1,3}\b)')
+        echo "Peer IP: $PEER_IP"
+        
+        # Add route for VM's network (10.4.84.0/24) through VPN
+        sudo ip route add 10.4.84.0/24 via $PEER_IP dev ppp0
+        
+        echo "Current routing table:"
+        ip route
+        
+        echo "Testing VM connectivity..."
+        timeout 10 nc -zv ${{ secrets.VM_HOST }} 22 || exit 1
+        echo "✓ VM is accessible through VPN"
+
+    - name: Build Docker image (nginx with static files)
+      run: |
+        if [ "${{ github.ref }}" = "refs/heads/production" ]; then
+          BUILD_ENV=prod
+        elif [ "${{ github.ref }}" = "refs/heads/uat" ]; then
+          BUILD_ENV=uat
+        else
+          BUILD_ENV=dev
+        fi
+        
+        echo "Building with environment: $BUILD_ENV"
+        
+        docker build --build-arg BUILD_ENV=$BUILD_ENV -t integrated-nginx:${{ github.sha }} .
+        docker tag integrated-nginx:${{ github.sha }} integrated-nginx:latest
+        
+    - name: Save Docker image
+      run: docker save integrated-nginx:latest | gzip > integrated-nginx.tar.gz
+      
+    - name: Deploy to VM
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.VM_SSH_KEY }}
+        script: |
+          # Create directory if not exists
+          mkdir -p ~/integrated-deployment/frontend
+          
+          # Stop and remove frontend containers
+          cd ~/integrated-deployment/frontend
+
+          docker-compose stop nginx || true
+          docker-compose rm -f nginx || true
+          docker rm -f integrated-nginx || true
+          
+          # Remove specific old images to prevent corruption
+          docker rmi integrated-nginx:latest || true
+          # docker image prune -f
+          
+    - name: Copy files to VM
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.VM_SSH_KEY }}
+        source: "integrated-nginx.tar.gz,docker-compose.yml"
+        target: "~/integrated-deployment/frontend/"
+        
+    - name: Deploy on VM
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VM_HOST }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.VM_SSH_KEY }}
+        script: |
+          cd ~/integrated-deployment/frontend
+          
+          # Ensure clean nginx base image
+          docker pull nginx:alpine || true
+          
+          # Load Docker image
+          docker load < integrated-nginx.tar.gz
+          rm integrated-nginx.tar.gz
+          
+          # Create network and volumes if they don't exist
+          docker network create integrated-network 2>/dev/null || true
+          docker volume create backend_uploads 2>/dev/null || true
+          
+          # Start only nginx service (contains static files)
+          docker-compose up -d --build nginx
+          
+          # Wait for nginx to be ready
+          sleep 15
+          
+          # Verify deployment
+          docker-compose ps nginx
+          
+          # Test frontend availability through nginx
+          curl -f http://localhost || echo "Frontend not yet ready"
+
+    - name: Disconnect VPN
+      if: always()
+      run: |
+        # Disconnect L2TP
+        sudo bash -c 'echo "d myVPN" > /var/run/xl2tpd/l2tp-control' || true
+        sleep 2
+        
+        # Disconnect IPsec
+        sudo ipsec down L2TP-PSK || true
