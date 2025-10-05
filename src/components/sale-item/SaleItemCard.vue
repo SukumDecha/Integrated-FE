@@ -1,11 +1,14 @@
 <script setup>
+import { useRouter } from 'vue-router'
 import XButton from '@/components/common/XButton.vue'
-import { displayOrDash, formatPrice } from '@/utils/TextUtils';
-import { EyeIcon } from 'lucide-vue-next'
+import { displayOrDash, formatPrice } from '@/utils/TextUtils'
+import { ShoppingCart } from 'lucide-vue-next'
+import { useAuthStore } from '@/stores/auth.store'
+import { useCartStore } from '@/stores/cart.store'
 
 const fallbackImageUrl = new URL('/assets/sale-item/shopping.webp', import.meta.url).pathname
 
-defineProps({
+const props = defineProps({
   isLoading: {
     type: Boolean,
     default: false,
@@ -37,14 +40,55 @@ defineProps({
   },
   color: {
     type: String,
-    default: 'emerald',
+    default: null,
   },
   id: {
     type: Number,
-    required: false, // Changed to false
+    required: false,
     default: 0,
   },
+  sellerNickname: {
+    type: String,
+    default: 'Unknown',
+  },
+  quantity: {
+    type: Number,
+    default: 0,
+  },
+  sellerId: {
+    type: [Number, String],
+    default: null,
+  },
 })
+
+const router = useRouter()
+const authStore = useAuthStore()
+const cartStore = useCartStore()
+const handleAddToCart = () => {
+  if (!authStore.isLoggedIn) {
+    router.push('/signin')
+    return
+  }
+  console.log("DEBUG props:", props)
+
+
+  cartStore.addItem({
+    userid: authStore.userId,
+    id: props.id,
+    brand: props.brand,
+    model: props.model,
+    price: props.price,
+    imageUrl: props.imageUrl,
+    storageGb: props.storageGb,
+    color: props.color,
+    sellerId: props.sellerId,
+    sellerNickname: props.sellerNickname || 'Unknown',
+    quantity: 1,
+    stock: props.quantity,
+  })
+}
+console.log("DEBUG props.color:", props.color)
+
 </script>
 
 <template>
@@ -73,67 +117,60 @@ defineProps({
     </div>
   </div>
 
-  <router-link
-    v-if="!isLoading && id"
-    :to="`/sale-items/${id}`"
+  <div
     class="itbms-row w-full bg-white rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow h-full flex flex-col"
   >
-    <div class="relative w-full h-64 overflow-hidden">
-      <img
-        :src="imageUrl || fallbackImageUrl"
-        :alt="`${brand} ${model} product image`"
-        class="w-full h-full object-cover object-center rounded-t-xl"
-      >
-      <span
-        class="absolute top-4 left-4 bg-emerald-100 text-emerald-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
-      >
-        In Stock
-      </span>
-    </div>
-
-    <div class="p-4 flex flex-col justify-between flex-grow">
-      <p
-        class="itbms-brand text-gray-700 text-base line-clamp-1"
-        :class="`text-${color}-600`"
-      >
-        {{ brand }}
-      </p>
-
-      <p class="itbms-model text-xl font-semibold text-gray-900 tracking-tight line-clamp-1">
-        {{ model }}
-      </p>
-
-      <div class="text-base text-gray-600 space-y-1">
-        <p class="itbms-ramGb">
-          <span class="mr-2">🧠</span>
-          RAM: {{ displayOrDash(ramGb) }} <span class="itbms-ramGb-unit">GB</span>
-        </p>
-        <p class="itbms-storageGb">
-          <span class="mr-2">💾</span>
-          Storage: {{ displayOrDash(storageGb) }} <span class="itbms-storageGb-unit">GB</span>
-        </p>
-        <p class="mt-3 text-2xl font-bold text-emerald-600">
-          <span class="itbms-price-unit"> Baht </span>
-          <span class="itbms-price">
-            {{ formatPrice(price) }}
-          </span>
-        </p>
-      </div>
-
-      <div class="mt-6">
-        <router-link
-          :to="`/sale-items/${id}`"
+    <router-link v-if="!isLoading && id" :to="`/sale-items/${id}`">
+      <div class="relative w-full h-64 overflow-hidden">
+        <img
+          :src="imageUrl || fallbackImageUrl"
+          :alt="`${brand} ${model} product image`"
+          class="w-full h-full object-cover object-center rounded-t-xl"
+        />
+        <span
+          class="absolute top-4 left-4 bg-emerald-100 text-emerald-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
         >
-          <XButton>
-            <span class="flex items-center">
-              <EyeIcon class="mr-2 h-5 w-5" />
-              View Details
-            </span>
-          </XButton>
-        </router-link>
+          In Stock
+        </span>
       </div>
+
+      <div class="p-4 flex flex-col justify-between flex-grow">
+        <p class="itbms-brand text-gray-700 text-base line-clamp-1" :class="`text-${color}-600`">
+          {{ brand }}
+        </p>
+
+        <p class="itbms-model text-xl font-semibold text-gray-900 tracking-tight line-clamp-1">
+          {{ model }}
+        </p>
+
+        <div class="text-base text-gray-600 space-y-1">
+          <p class="itbms-ramGb">
+            <span class="mr-2">🧠</span>
+            RAM: {{ displayOrDash(ramGb) }} <span class="itbms-ramGb-unit">GB</span>
+          </p>
+          <p class="itbms-storageGb">
+            <span class="mr-2">💾</span>
+            Storage: {{ displayOrDash(storageGb) }} <span class="itbms-storageGb-unit">GB</span>
+          </p>
+          <p class="mt-3 text-2xl font-bold text-emerald-600">
+            <span class="itbms-price-unit"> Baht </span>
+            <span class="itbms-price">
+              {{ formatPrice(price) }}
+            </span>
+          </p>
+        </div>
+      </div>
+    </router-link>
+
+    <div class="p-5 flex justify-center -mt-5">
+      <XButton class="itbms-add-to-cart-button" @click="handleAddToCart">
+        <span class="flex items-center">
+          <ShoppingCart class="mr-2 h-5 w-5" />
+          ADD TO CART
+        </span>
+      </XButton>
     </div>
-  </router-link>
+  </div>
 </template>
 
 <style scoped>

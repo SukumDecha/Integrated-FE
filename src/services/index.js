@@ -7,5 +7,5 @@ export {
   SaleItemService,
   BrandService,
   UserService,
-  AuthService
+  AuthService,
 }

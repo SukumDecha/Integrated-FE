@@ -1,38 +1,78 @@
 <template>
   <teleport to="body">
-    <div
-      v-if="modelValue"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    <!-- Fade overlay -->
+    <transition
+      enter-active-class="transition-opacity duration-300 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition-opacity duration-200 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
     >
-      <div class="bg-white rounded-xl shadow-lg p-6 max-w-sm w-full text-center">
-        <h2 class="text-lg font-bold mb-4">
-          {{ title }}
-        </h2>
-        <p class="itbms-message mb-6">
-          {{ message }}
-        </p>
-        <div class="flex justify-center gap-4">
-          <XButton
-            :label="cancelLabel"
-            variant="outline"
-            class-name="itbms-cancel-button"
-            @click="emitCancel"
-          />
-          <XButton
-            v-if="showConfirm"
-            :label="confirmLabel"
-            variant="primary"
-            class-name="itbms-confirm-button"
-            @click="emitConfirm"
-          />
+      <div
+        v-if="modelValue"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+      ></div>
+    </transition>
+
+    <!-- Scale modal -->
+    <transition
+      enter-active-class="transform transition duration-300 ease-out"
+      enter-from-class="scale-95 opacity-0"
+      enter-to-class="scale-100 opacity-100"
+      leave-active-class="transform transition duration-200 ease-in"
+      leave-from-class="scale-100 opacity-100"
+      leave-to-class="scale-95 opacity-0"
+    >
+      <div
+        v-if="modelValue"
+        class="fixed inset-0 flex items-center justify-center z-50"
+      >
+        <div
+          class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center"
+        >
+          <!-- Icon -->
+          <div class="flex justify-center mb-4">
+            <div
+              class="bg-red-100 text-red-500 w-12 h-12 flex items-center justify-center rounded-full"
+            >
+            <AlertCircle class="w-8 h-8" />
+            </div>
+          </div>
+
+          <!-- Title -->
+          <h2 class="text-xl font-bold text-gray-800 mb-2">
+            {{ title }}
+          </h2>
+          <p class="text-gray-600 mb-6 leading-relaxed">
+            {{ message }}
+          </p>
+
+          <!-- Buttons -->
+          <div class="flex justify-center gap-4">
+            <XButton
+              :label="cancelLabel"
+              variant="outline"
+              class-name="itbms-cancel-button px-6 py-2 rounded-lg"
+              @click="emitCancel"
+            />
+            <XButton
+              v-if="showConfirm"
+              :label="confirmLabel"
+              variant="primary"
+              class-name="itbms-confirm-button px-6 py-2 rounded-lg"
+              @click="emitConfirm"
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </transition>
   </teleport>
 </template>
 
 <script setup>
 import XButton from '../XButton.vue'
+import { AlertCircle } from 'lucide-vue-next'
 
 defineProps({
   modelValue: Boolean,

@@ -32,8 +32,12 @@
             :model="product.model"
             :ram-gb="product.ramGb"
             :storage-gb="product.storageGb"
+            :color="product.color"
             :price="product.price"
             :is-loading="loading"
+            :quantity="product.quantity"
+            :seller-nickname="product.seller?.nickname"
+            :seller-id="product.seller?.id"
           />
         </div>
       </div>
