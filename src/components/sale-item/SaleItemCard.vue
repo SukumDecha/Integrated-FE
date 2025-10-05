@@ -69,7 +69,6 @@ const handleAddToCart = () => {
     router.push('/signin')
     return
   }
-  console.log("DEBUG props:", props)
 
 
   cartStore.addItem({
@@ -87,7 +86,6 @@ const handleAddToCart = () => {
     stock: props.quantity,
   })
 }
-console.log("DEBUG props.color:", props.color)
 
 </script>
 
