@@ -107,7 +107,7 @@ const handleAddToCart = () => {
       stock: props.product.quantity,
       storageGb: props.product.storageGb,
       color: props.product.color,
-      sellerId: props.product.sellerId,
+      sellerId: props.product.seller?.id,
     })
   }
 }

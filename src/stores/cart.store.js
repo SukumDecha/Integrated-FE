@@ -3,9 +3,9 @@ import { ref, computed, watch } from 'vue'
 import { loadFromLocalStorage, saveToLocalStorage } from '@/utils'
 import { useAuthStore } from './auth.store'
 import { useToastStore } from './toast.store'
+import { CART_STORAGE_KEY as STORAGE_KEY, CART_TOAST_MESSAGES } from '@/constants/cart.constant'
 
 export const useCartStore = defineStore('cart', () => {
-  const STORAGE_KEY = 'cart_items'
   const items = ref(loadFromLocalStorage(STORAGE_KEY, []))
   const authStore = useAuthStore()
   const toastStore = useToastStore()
@@ -13,10 +13,30 @@ export const useCartStore = defineStore('cart', () => {
   const addItem = (item) => {
     const userId = authStore.user?.id
     const sellerId = item.sellerId
+
+  //ผู้ใช้ยังไม่ได้ login
+  if (!userId) {
+    toastStore.add({
+      type: 'error',
+      message: CART_TOAST_MESSAGES.LOGIN_REQUIRED,
+    })
+    return
+  }
+
+  //สินค้าไม่มี sellerId (ข้อมูลไม่ครบ)
+  if (!sellerId) {
+    toastStore.add({
+      type: 'error',
+      message: CART_TOAST_MESSAGES.MISSING_SELLER_INFO,
+    })
+    return
+  }
+
+  //พยายามซื้อสินค้าของตัวเอง
     if (sellerId && sellerId === userId) {
       toastStore.add({
         type: 'error',
-        message: 'You cannot purchase this item because it belongs to you',
+        message: CART_TOAST_MESSAGES.OWNER_ERROR,
       })
       return
     }
@@ -150,15 +170,6 @@ export const useCartStore = defineStore('cart', () => {
 
   const selectedTotalPrice = computed(() =>
     selectedItems.value.reduce((sum, i) => sum + i.price * i.quantity, 0),
-  )
-
-  // ---------- Save to localStorage ----------
-  watch(
-    items,
-    (newVal) => {
-      saveToLocalStorage(STORAGE_KEY, newVal)
-    },
-    { deep: true },
   )
 
   return {
