@@ -102,6 +102,14 @@ const router = createRouter({
             },
           ],
         },
+        {
+          path: '/your-orders',
+          name: 'YourOrders',
+          component: () => import('../views/order/OrderHistoryView.vue'),
+          meta: {
+            requiresAuth: true,
+          }
+        },
       ],
     },
     {

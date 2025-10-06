@@ -6,7 +6,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { nextTick } from 'vue'
 
-
 defineProps({
   cartCount: {
     type: Number,
@@ -63,10 +62,7 @@ const handleLogout = async () => {
       <div class="flex justify-between h-16">
         <!-- Logo -->
         <div class="flex items-center">
-          <router-link
-            to="/"
-            class="flex-shrink-0 flex items-center"
-          >
+          <router-link to="/" class="flex-shrink-0 flex items-center">
             <ShoppingBag class="h-8 w-8 text-emerald-600" />
             <span class="ml-2 text-xl font-bold text-emerald-800">Green Cart</span>
           </router-link>
@@ -114,6 +110,13 @@ const handleLogout = async () => {
                     @click="isDropdownOpen = false"
                   >
                     Profile
+                  </router-link>
+                  <router-link
+                    to="/your-orders"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+                    @click="isDropdownOpen = false"
+                  >
+                    Your Order
                   </router-link>
                   <button
                     class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
@@ -167,14 +170,8 @@ const handleLogout = async () => {
             @click="toggleMobileMenu"
           >
             <span class="sr-only">{{ isOpen ? 'Close' : 'Open' }} main menu</span>
-            <Menu
-              v-if="!isOpen"
-              class="block h-6 w-6"
-            />
-            <X
-              v-else
-              class="block h-6 w-6"
-            />
+            <Menu v-if="!isOpen" class="block h-6 w-6" />
+            <X v-else class="block h-6 w-6" />
           </button>
         </div>
       </div>
@@ -182,10 +179,7 @@ const handleLogout = async () => {
 
     <!-- Mobile Menu -->
     <transition name="slide-down">
-      <div
-        v-show="isOpen"
-        class="sm:hidden"
-      >
+      <div v-show="isOpen" class="sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
           <router-link
             v-for="item in NAVBAR_MENU"
@@ -215,6 +209,13 @@ const handleLogout = async () => {
               @click="closeMobileMenu"
             >
               Profile
+            </router-link>
+            <router-link
+              to="/your-orders"
+              class="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+              @click="closeMobileMenu"
+            >
+              Your Order
             </router-link>
             <!-- ✅ Use button instead of router-link for mobile too -->
             <button
