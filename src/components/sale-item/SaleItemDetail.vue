@@ -12,6 +12,7 @@ import { ArrowLeft } from 'lucide-vue-next'
 
 import { useAuthStore } from '@/stores/auth.store'
 import { useCartStore } from '@/stores/cart.store'
+import { computed } from 'vue'
 
 const imageUrl = new URL('/assets/fallback-image.jpg', import.meta.url).pathname
 
@@ -111,6 +112,8 @@ const handleAddToCart = () => {
     })
   }
 }
+const isMinusDisabled = computed(() => quantity.value <= 1)
+const isPlusDisabled = computed(() => quantity.value >= (props.product?.quantity || 0))
 </script>
 
 <template>
@@ -279,6 +282,7 @@ const handleAddToCart = () => {
                     variant="outline"
                     size="sm"
                     @click="decreaseQty"
+                    :disabled="isMinusDisabled"
                     class="itbms-dec-qty-button"
                   >
                     -
@@ -291,6 +295,7 @@ const handleAddToCart = () => {
                     variant="outline"
                     size="sm"
                     @click="increaseQty"
+                    :disabled="isPlusDisabled"
                     class="itbms-inc-qty-button"
                   >
                     +
@@ -320,6 +325,7 @@ const handleAddToCart = () => {
                     variant="outline"
                     size="sm"
                     @click="decreaseQty"
+                    :disabled="isMinusDisabled"
                     class="itbms-dec-qty-button"
                   >
                     -
@@ -332,6 +338,7 @@ const handleAddToCart = () => {
                     variant="outline"
                     size="sm"
                     @click="increaseQty"
+                    :disabled="isPlusDisabled"
                     class="itbms-inc-qty-button"
                   >
                     +

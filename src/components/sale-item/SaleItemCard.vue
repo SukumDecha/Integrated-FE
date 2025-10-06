@@ -69,7 +69,6 @@ const handleAddToCart = () => {
     router.push('/signin')
     return
   }
-  console.log("DEBUG props:", props)
 
 
   cartStore.addItem({
@@ -87,7 +86,6 @@ const handleAddToCart = () => {
     stock: props.quantity,
   })
 }
-console.log("DEBUG props.color:", props.color)
 
 </script>
 
@@ -139,18 +137,22 @@ console.log("DEBUG props.color:", props.color)
           {{ brand }}
         </p>
 
-        <p class="itbms-model text-xl font-semibold text-gray-900 tracking-tight line-clamp-1">
+        <p class="itbms-model text-xl font-semibold text-gray-900 tracking-tight line-clamp-1 mt-1">
           {{ model }}
         </p>
 
         <div class="text-base text-gray-600 space-y-1">
           <p class="itbms-ramGb">
             <span class="mr-2">🧠</span>
-            RAM: {{ displayOrDash(ramGb) }} <span class="itbms-ramGb-unit">GB</span>
+            RAM : {{ displayOrDash(ramGb) }} <span class="itbms-ramGb-unit">GB</span>
           </p>
           <p class="itbms-storageGb">
             <span class="mr-2">💾</span>
-            Storage: {{ displayOrDash(storageGb) }} <span class="itbms-storageGb-unit">GB</span>
+            Storage : {{ displayOrDash(storageGb) }} <span class="itbms-storageGb-unit">GB</span>
+          </p>
+          <p class="itbms-color">
+            <span class="mr-2">🎨</span>
+            Color : {{ displayOrDash(color) }}
           </p>
           <p class="mt-3 text-2xl font-bold text-emerald-600">
             <span class="itbms-price-unit"> Baht </span>
