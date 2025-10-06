@@ -69,6 +69,7 @@ const confirmDelete = () => {
         variant="outline"
         class="itbms-inc-qty-button"
         @click="cartStore.increaseQty(props.item.id)"
+        :disabled="props.item.quantity >= props.item.stock"
         >+</XButton
       >
       <!-- ✅ ปุ่มลบ -->
