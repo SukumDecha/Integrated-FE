@@ -46,6 +46,10 @@ export const useCartStore = defineStore('cart', () => {
       if (existing.quantity + item.quantity <= existing.stock) {
         existing.quantity += item.quantity
       } else {
+         toastStore.add({
+           type: 'warn',
+           message: CART_TOAST_MESSAGES.QUANTITY_EXCEEDS,
+         })
         existing.quantity = existing.stock
       }
     } else {
