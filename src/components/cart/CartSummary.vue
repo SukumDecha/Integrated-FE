@@ -6,10 +6,12 @@ import { useCartStore } from '@/stores/cart.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { useToastStore } from '@/stores/toast.store'
 import { OrderService } from '@/services'
+import { useRouter } from 'vue-router'
 
 const cartStore = useCartStore()
 const authStore = useAuthStore()
 const toastStore = useToastStore()
+const router = useRouter()
 
 const touched = reactive({
   address: false,
@@ -75,7 +77,11 @@ const handlePlaceOrder = async () => {
   try {
     await OrderService.placeOrder(ordersPayload)
     toastStore.add({ type: 'success', message: 'Your order has been successfully processed.' })
-    cartStore.clearCart()
+    cartStore.placeOrder()
+       //redirect ถ้าตะกร้าว่าง
+    if (cartStore.items.length === 0) {
+      router.push({ name: 'sale-items-gallery' })
+    }
   } catch (err) {
     toastStore.add({ type: 'error', message: err?.message || 'Failed to place order' })
   }
