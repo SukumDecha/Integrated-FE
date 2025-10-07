@@ -176,6 +176,16 @@ export const useCartStore = defineStore('cart', () => {
     selectedItems.value.reduce((sum, i) => sum + i.price * i.quantity, 0),
   )
 
+  // ---------- Place order ----------
+const placeOrder = () => {
+  // ลบเฉพาะสินค้าที่ถูกเลือก
+  items.value = items.value.filter((i) => !i.selected)
+
+  // เซฟกลับ localStorage
+  saveToLocalStorage(STORAGE_KEY, items.value)
+}
+
+
   return {
     items,
     addItem,
@@ -198,5 +208,6 @@ export const useCartStore = defineStore('cart', () => {
     setShippingAddress,
     setOrderNote,
     getSellerGroups,
+    placeOrder
   }
 })
