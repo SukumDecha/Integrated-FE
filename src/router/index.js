@@ -45,11 +45,6 @@ const router = createRouter({
           path: 'profile/edit',
           component: () => import('../views/user/UserEditProfileView.vue'),
         },
-         {
-          path: '/cart',
-          name: 'cart',
-          component: () => import('../views/cart/CartView.vue'),
-        },
         {
           path: 'sale-items',
           children: [
@@ -108,12 +103,25 @@ const router = createRouter({
           ],
         },
         {
-          path: '/your-orders',
-          name: 'YourOrders',
-          component: () => import('../views/order/OrderHistoryView.vue'),
-          meta: {
-            requiresAuth: true,
-          }
+          path: 'your-orders',
+          children: [
+            {
+              path: '',
+              name: 'YourOrders',
+              component: () => import('../views/order/OrderHistoryView.vue'),
+              meta: {
+                requiresAuth: true,
+              },
+            },
+            {
+              path: ':id',
+              name: 'OrderDetail',
+              component: () => import('../views/order/OrderDetailView.vue'),
+              meta: {
+                requiresAuth: true,
+              },
+            }
+          ],
         },
       ],
     },

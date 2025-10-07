@@ -75,7 +75,7 @@ const fetchOrders = async () => {
   loading.orders = true
   error.orders = null
 
-  const response = await OrderService.getOrderById(userId, searchParams.value)
+  const response = await OrderService.getOrderByUserId(userId, searchParams.value)
   if (response.error) {
     error.orders = response.error.message || 'Failed to load order history.'
     toast.add({ type: 'error', message: error.orders })
@@ -111,13 +111,6 @@ watch(
   updateRouteQuery,
 )
 
-const formatDate = (d) =>
-  d
-    ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
-    : '-'
-const formatCurrency = (n) => n?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || '0'
-const calculateTotalPrice = (order) =>
-  order?.orderItems?.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 0), 0)
 </script>
 
 <template>

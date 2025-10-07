@@ -5,11 +5,15 @@ const BASE_URL_V3 = '/v2/orders'
 
 const OrderService = {
 
-  async getOrderById(id) {
+  async getOrderByUserId(id) {
     return await get(`${BASE_URL_V2}/${id}/orders`)
   },
   async placeOrder(payload) {
     return await post(`${BASE_URL_V3}`, payload)
+  },
+  async getOrderById(id) {
+        return await get(`${BASE_URL_V3}/${id}`)
+
   }
 }
 
