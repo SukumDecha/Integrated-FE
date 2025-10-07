@@ -111,13 +111,6 @@ watch(
   updateRouteQuery,
 )
 
-const formatDate = (d) =>
-  d
-    ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
-    : '-'
-const formatCurrency = (n) => n?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || '0'
-const calculateTotalPrice = (order) =>
-  order?.orderItems?.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 0), 0)
 </script>
 
 <template>
