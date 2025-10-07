@@ -53,7 +53,9 @@ const confirmDelete = () => {
       </p>
       <p class="font-medium itbms-item-total-price text-emerald-600 font-extrabold">
         Price :
-        <span class="itbms-item-total-price text-emerald-600 font-extrabold"> {{ (props.item.price * props.item.quantity).toLocaleString() }}</span>
+        <span class="itbms-item-total-price text-emerald-600 font-extrabold">
+          {{ (props.item.price * props.item.quantity).toLocaleString() }}</span
+        >
         <span class="text-emerald-600"> Baht</span>
       </p>
     </div>

@@ -3,6 +3,7 @@ import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import XPagination from '@/components/common/XPagination.vue'
+import OrderCard from '@/components/order/OrderCard.vue'
 import { useToastStore } from '@/stores/toast.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { OrderService } from '@/services'
@@ -15,7 +16,7 @@ const authStore = useAuthStore()
 
 const ORDER_STORAGE_KEYS = {
   PAGINATION: 'ORDER_HISTORY_PAGINATION',
-  SORT: 'ORDER_HISTORY_SORT'
+  SORT: 'ORDER_HISTORY_SORT',
 }
 
 const orders = ref([])
@@ -35,20 +36,20 @@ const searchOptions = reactive({
   currentPage: 1,
   pageSize: 10,
   totalItems: 0,
-  sortBy: 'createdOn',
-  sortOrder: 'desc'
+  sortBy: 'orderDate',
+  sortOrder: 'desc',
 })
 
 const searchParams = computed(() => ({
   page: searchOptions.currentPage - 1,
   size: searchOptions.pageSize,
   sortBy: searchOptions.sortBy,
-  sortDirection: searchOptions.sortOrder
+  sortDirection: searchOptions.sortOrder,
 }))
 
 const breadcrumbs = [
   { text: 'Home', path: '/' },
-  { text: 'Your Orders', path: '/your-orders', active: true }
+  { text: 'Your Orders', path: '/your-orders', active: true },
 ]
 
 const initializeState = () => {
@@ -105,14 +106,18 @@ watch(
     searchOptions.currentPage,
     searchOptions.pageSize,
     searchOptions.sortBy,
-    searchOptions.sortOrder
+    searchOptions.sortOrder,
   ],
-  updateRouteQuery
+  updateRouteQuery,
 )
 
-const formatDate = d => d ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '-'
-const formatCurrency = n => n?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || '0'
-const calculateTotalPrice = order => order?.orderItems?.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 0), 0)
+const formatDate = (d) =>
+  d
+    ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+    : '-'
+const formatCurrency = (n) => n?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || '0'
+const calculateTotalPrice = (order) =>
+  order?.orderItems?.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 0), 0)
 </script>
 
 <template>
@@ -121,43 +126,12 @@ const calculateTotalPrice = order => order?.orderItems?.reduce((sum, i) => sum +
     <h1 class="text-2xl font-semibold text-green-700 mb-6">Your Orders</h1>
 
     <div v-for="(sellerOrders, sellerName) in groupedOrders" :key="sellerName" class="space-y-6">
-      <div v-for="order in sellerOrders" :key="order.id" class="border border-green-200 p-4 rounded-xl shadow-sm">
-        <div class="flex flex-col sm:flex-row justify-between gap-4">
-          <div>
-            <div class="font-semibold text-green-800">{{ sellerName }}</div>
-            <div class="text-sm text-gray-600">
-              <span class="font-medium">Shipped To:</span> {{ order.shippingAddress }}
-            </div>
-            <div v-if="order.orderNote" class="text-sm text-gray-600">
-              <span class="font-medium">Note:</span> {{ order.orderNote }}
-            </div>
-          </div>
-
-          <div class="text-sm text-right text-gray-700 space-y-1">
-            <div><span class="font-medium">Order No:</span> {{ order.id }}</div>
-            <div><span class="font-medium">Order Date:</span> {{ formatDate(order.orderDate) }}</div>
-            <div><span class="font-medium">Payment Date:</span> {{ formatDate(order.orderDate) }}</div>
-            <div><span class="font-medium">Total:</span> {{ formatCurrency(calculateTotalPrice(order)) }}</div>
-            <div><span class="font-medium">Status:</span> {{ order.orderStatus }}</div>
-          </div>
-        </div>
-
-        <div class="mt-4 space-y-3">
-          <div
-            v-for="item in order.orderItems"
-            :key="item.no"
-            class="flex justify-between items-center border border-green-100 rounded-lg p-3 bg-green-50"
-          >
-            <div class="text-gray-800">{{ item.description }}</div>
-            <div class="text-right text-sm">
-              <div class="text-gray-600">Qty {{ item.quantity }}</div>
-              <div class="font-medium text-green-700">
-                Price: {{ formatCurrency(item.price * item.quantity) }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <OrderCard
+        v-for="order in sellerOrders"
+        :key="order.id"
+        :order="order"
+        :sellerName="sellerName"
+      />
     </div>
 
     <XPagination
@@ -166,7 +140,7 @@ const calculateTotalPrice = order => order?.orderItems?.reduce((sum, i) => sum +
       :pagination="{
         currentPage: searchOptions.currentPage,
         pageSize: searchOptions.pageSize,
-        total: searchOptions.totalItems
+        total: searchOptions.totalItems,
       }"
       :show-size-changer="true"
       @change="handlePaginationChange"
