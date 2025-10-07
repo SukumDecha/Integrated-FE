@@ -2,22 +2,20 @@
 import { NAVBAR_MENU } from '@/constants/navbar.constant'
 import { Menu, ShoppingBag, ShoppingCart, X, ChevronDown } from 'lucide-vue-next'
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { nextTick } from 'vue'
-
-defineProps({
-  cartCount: {
-    type: Number,
-    default: 0,
-  },
-})
+import { useCartStore } from '@/stores/cart.store'
+import { computed } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
 const isOpen = ref(false)
 const authStore = useAuthStore()
 const isDropdownOpen = ref(false)
+const cartStore = useCartStore()
+const { totalItems } = storeToRefs(cartStore)
 
 const isActiveRoute = (navItem) => {
   if (navItem.exact) {
@@ -46,6 +44,7 @@ const handleClearStorage = () => {
 
 const handleLogout = async () => {
   authStore.logout()
+  cartStore.clearCart()
   isDropdownOpen.value = false
 
   closeMobileMenu()
@@ -54,6 +53,8 @@ const handleLogout = async () => {
   await nextTick()
   router.push('/sale-items?logout=true')
 }
+//ตรวจสอบว่าตะกร้าว่างมั้ย
+const cartIsEmpty = computed(() => cartStore.items.length === 0)
 </script>
 
 <template>
@@ -146,19 +147,25 @@ const handleLogout = async () => {
           </template>
 
           <!-- Cart -->
-          <router-link
+          <button
             to="/cart"
-            class="relative p-1 rounded-full text-gray-500 hover:text-gray-600 transition"
+            class="itbms-cart-quantity relative p-1 rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed text-gray-500 hover:text-gray-600"
+            :disabled="cartIsEmpty"
+            @click="
+              () => {
+                if (!cartIsEmpty) router.push('/cart')
+              }
+            "
             aria-label="Shopping Cart"
           >
             <ShoppingCart class="h-6 w-6" />
             <span
-              v-if="cartCount > 0"
+              v-if="totalItems > 0"
               class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-emerald-600 rounded-full min-w-[1.25rem] h-5"
             >
-              {{ cartCount }}
+              {{ totalItems }}
             </span>
-          </router-link>
+          </button>
         </div>
 
         <!-- Mobile Menu Button -->
@@ -244,20 +251,27 @@ const handleLogout = async () => {
           </template>
 
           <!-- Mobile cart -->
-          <router-link
-            to="/cart"
-            class="relative flex items-center px-4 py-2 text-gray-500 hover:text-gray-600 hover:bg-gray-100 transition rounded-md"
-            @click="closeMobileMenu"
+          <button
+            class="relative flex items-center px-4 py-2 text-gray-500 hover:text-gray-600 hover:bg-gray-100 transition rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="cartIsEmpty"
+            @click="
+              () => {
+                if (!cartIsEmpty) {
+                  router.push('/cart')
+                  closeMobileMenu()
+                }
+              }
+            "
           >
             <ShoppingCart class="h-6 w-6 mr-2" />
             <span>Cart</span>
             <span
-              v-if="cartCount > 0"
+              v-if="totalItems > 0"
               class="ml-auto inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-emerald-600 rounded-full min-w-[1.25rem] h-5"
             >
-              {{ cartCount }}
+              {{ totalItems }}
             </span>
-          </router-link>
+          </button>
         </div>
       </div>
     </transition>
