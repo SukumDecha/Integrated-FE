@@ -1,10 +1,13 @@
 <script setup>
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   order: { type: Object, required: true },
   sellerName: { type: String, required: true }
 })
+
+const router = useRouter()
 
 const formatDate = d => d ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '-'
 const formatCurrency = n => n?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || '0'
@@ -13,7 +16,7 @@ const calculateTotalPrice = computed(() => props.order?.orderItems?.reduce((sum,
 
 <template>
   <div class="border border-green-200 p-4 rounded-xl shadow-sm mb-3">
-    <div class="flex flex-col sm:flex-row justify-between gap-4">
+    <div class="flex flex-col sm:flex-row justify-between gap-4" @click="router.push(`/your-orders/${order.id}}`)">
       <div>
         <div class="font-semibold text-green-800">{{ sellerName }}</div>
         <div class="text-sm text-gray-600">
