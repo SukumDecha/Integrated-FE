@@ -13,6 +13,7 @@ import { ArrowLeft } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth.store'
 import { useCartStore } from '@/stores/cart.store'
 import { computed } from 'vue'
+import { CART_TOAST_MESSAGES } from '@/constants/cart.constant'
 
 const imageUrl = new URL('/assets/fallback-image.jpg', import.meta.url).pathname
 
@@ -89,29 +90,44 @@ const decreaseQty = () => {
   }
 }
 
+const isOwner = computed(() => {
+  return authStore.user?.role === 'SELLER' && authStore.user?.id === props.product?.seller?.id
+})
+
 const handleAddToCart = () => {
+  const isOwner = authStore.user?.id === props.product?.seller?.id
+
+  if (isOwner) {
+    toast.add({
+      type: 'error',
+      message: CART_TOAST_MESSAGES.OWNER_ERROR,
+    })
+    return
+  }
+
   if (!authStore.isLoggedIn) {
     router.push('/signin')
     return
   }
 
-  if (authStore.user?.role === 'BUYER') {
-    cartStore.addItem({
-      userid: authStore.userId,
-      id: props.product.id,
-      brand: props.product.brand,
-      model: props.product.model,
-      price: props.product.price,
-      imageUrl: props.product.imageUrl,
-      sellerNickname: props.product.seller?.nickname || 'Unknown',
-      quantity: quantity.value,
-      stock: props.product.quantity,
-      storageGb: props.product.storageGb,
-      color: props.product.color,
-      sellerId: props.product.seller?.id,
-    })
-  }
+  cartStore.addItem({
+    userid: authStore.userId,
+    id: props.product.id,
+    brand: props.product.brand,
+    model: props.product.model,
+    price: props.product.price,
+    imageUrl: props.product.imageUrl,
+    sellerNickname: props.product.seller?.nickname || 'Unknown',
+    quantity: quantity.value,
+    stock: props.product.quantity,
+    storageGb: props.product.storageGb,
+    color: props.product.color,
+    sellerId: props.product.seller?.id,
+  })
 }
+
+
+
 const isMinusDisabled = computed(() => quantity.value <= 1)
 const isPlusDisabled = computed(() => quantity.value >= (props.product?.quantity || 0))
 </script>
@@ -252,11 +268,8 @@ const isPlusDisabled = computed(() => quantity.value >= (props.product?.quantity
                 </div>
               </div>
 
-              <!-- SELLER -->
-              <div
-                v-if="authStore.user?.role === 'SELLER'"
-                class="pt-4 border-t border-gray-100 flex gap-3 justify-end"
-              >
+              <!-- แสดง Edit/Delete เฉพาะ Seller ที่เป็นเจ้าของ -->
+              <div v-if="isOwner" class="pt-4 border-t border-gray-100 flex gap-3 justify-end">
                 <XButton
                   label="Edit"
                   variant="outline"
@@ -272,7 +285,7 @@ const isPlusDisabled = computed(() => quantity.value >= (props.product?.quantity
               </div>
 
               <!-- ไม่ login -->
-              <div v-else-if="!authStore.isLoggedIn" class="mt-4">
+              <div v-if="!isOwner" class="mt-4">
                 <p class="text-gray-600 mb-5 -mt-2">
                   Seller: <span class="font-semibold">{{ product.seller.nickname }}</span>
                 </p>
@@ -306,19 +319,20 @@ const isPlusDisabled = computed(() => quantity.value >= (props.product?.quantity
                     variant="primary"
                     size="sm"
                     @click="handleAddToCart"
+                    v-if="!isOwner"
                     class="itbms-add-to-cart-button ml-5"
                   >
                     Add to Cart
                   </XButton>
                 </div>
               </div>
-
-              <!-- Buyer -->
-              <div v-else-if="authStore.user?.role === 'BUYER'" class="mt-4">
+              <!-- Buyer หรือ Seller ที่ไม่ใช่เจ้าของ -->
+              <div v-else class="mt-4">
                 <!-- แสดงชื่อ Seller -->
                 <p class="text-gray-600 mb-5 -mt-2">
                   Seller: <span class="font-semibold">{{ product.seller.nickname }}</span>
                 </p>
+
                 <div class="flex items-center space-x-2">
                   <!-- ปุ่มลด -->
                   <XButton
@@ -327,9 +341,8 @@ const isPlusDisabled = computed(() => quantity.value >= (props.product?.quantity
                     @click="decreaseQty"
                     :disabled="isMinusDisabled"
                     class="itbms-dec-qty-button"
+                    >-</XButton
                   >
-                    -
-                  </XButton>
 
                   <span class="px-4 itbms-add-to-cart-quantity">{{ quantity }}</span>
 
@@ -340,15 +353,15 @@ const isPlusDisabled = computed(() => quantity.value >= (props.product?.quantity
                     @click="increaseQty"
                     :disabled="isPlusDisabled"
                     class="itbms-inc-qty-button"
+                    >+</XButton
                   >
-                    +
-                  </XButton>
 
                   <!-- ปุ่ม Add to Cart -->
                   <XButton
                     variant="primary"
                     size="sm"
                     @click="handleAddToCart"
+                    v-if="!isOwner"
                     class="itbms-add-to-cart-button ml-5"
                   >
                     Add to Cart
