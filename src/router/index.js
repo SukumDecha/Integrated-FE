@@ -123,6 +123,14 @@ const router = createRouter({
             }
           ],
         },
+        {
+          path: 'cart',
+          name: 'Cart',
+          component: () => import('../views/cart/CartView.vue'),
+          meta: {
+            requiresAuth: true,
+          },
+        }
       ],
     },
     {

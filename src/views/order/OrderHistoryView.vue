@@ -110,21 +110,27 @@ watch(
   ],
   updateRouteQuery,
 )
-
 </script>
 
 <template>
   <XBreadcrumb :items="breadcrumbs" />
   <div class="p-6 max-w-5xl mx-auto">
     <h1 class="text-2xl font-semibold text-green-700 mb-6">Your Orders</h1>
-
-    <div v-for="(sellerOrders, sellerName) in groupedOrders" :key="sellerName" class="space-y-6">
-      <OrderCard
-        v-for="order in sellerOrders"
-        :key="order.id"
-        :order="order"
-        :sellerName="sellerName"
-      />
+    <div
+      v-if="!loading.orders && orders.length === 0 && !error.orders"
+      class="text-center text-gray-500 text-lg py-20"
+    >
+      You don’t have any orders yet.
+    </div>
+    <div>
+      <div v-for="(sellerOrders, sellerName) in groupedOrders" :key="sellerName" class="space-y-6">
+        <OrderCard
+          v-for="order in sellerOrders"
+          :key="order.id"
+          :order="order"
+          :sellerName="sellerName"
+        />
+      </div>
     </div>
 
     <XPagination

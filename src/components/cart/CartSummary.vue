@@ -74,7 +74,7 @@ const handlePlaceOrder = async () => {
 
   try {
     await OrderService.placeOrder(ordersPayload)
-    toastStore.add({ type: 'success', message: 'Order placed successfully!' })
+    toastStore.add({ type: 'success', message: 'Your order has been successfully processed.' })
     cartStore.clearCart()
   } catch (err) {
     toastStore.add({ type: 'error', message: err?.message || 'Failed to place order' })
