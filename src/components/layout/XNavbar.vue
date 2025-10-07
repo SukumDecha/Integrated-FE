@@ -112,6 +112,13 @@ const cartIsEmpty = computed(() => cartStore.items.length === 0)
                   >
                     Profile
                   </router-link>
+                  <router-link
+                    to="/your-orders"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+                    @click="isDropdownOpen = false"
+                  >
+                    Your Order
+                  </router-link>
                   <button
                     class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
                     @click="handleLogout"
@@ -209,6 +216,13 @@ const cartIsEmpty = computed(() => cartStore.items.length === 0)
               @click="closeMobileMenu"
             >
               Profile
+            </router-link>
+            <router-link
+              to="/your-orders"
+              class="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
+              @click="closeMobileMenu"
+            >
+              Your Order
             </router-link>
             <!-- ✅ Use button instead of router-link for mobile too -->
             <button
