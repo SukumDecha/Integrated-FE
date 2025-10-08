@@ -39,10 +39,12 @@ const router = createRouter({
       children: [
         {
           path: 'profile',
+          requiresAuth: true,
           component: () => import('../views/user/UserProfileView.vue'),
         },
         {
           path: 'profile/edit',
+          requiresAuth: true,
           component: () => import('../views/user/UserEditProfileView.vue'),
         },
         {
