@@ -16,13 +16,21 @@ const calculateTotalPrice = computed(() => props.order?.orderItems?.reduce((sum,
 
 <template>
   <div class="border border-green-200 p-4 rounded-xl shadow-sm mb-3">
-    <div class="flex flex-col sm:flex-row justify-between gap-4" @click="router.push(`/your-orders/${order.id}}`)">
+    <div
+      class="flex flex-col sm:flex-row justify-between gap-4"
+      @click="router.push(`/your-orders/${props.order.id}`)"
+    >
       <div>
-        <div class="font-semibold text-green-800">{{ sellerName }}</div>
+        <div class="font-semibold text-green-800">
+          {{ sellerName }}
+        </div>
         <div class="text-sm text-gray-600">
           <span class="font-medium">Shipped To:</span> {{ order.shippingAddress }}
         </div>
-        <div v-if="order.orderNote" class="text-sm text-gray-600">
+        <div
+          v-if="order.orderNote"
+          class="text-sm text-gray-600"
+        >
           <span class="font-medium">Note:</span> {{ order.orderNote }}
         </div>
       </div>
@@ -42,9 +50,13 @@ const calculateTotalPrice = computed(() => props.order?.orderItems?.reduce((sum,
         :key="item.no"
         class="flex justify-between items-center border border-green-100 rounded-lg p-3 bg-green-50"
       >
-        <div class="text-gray-800">{{ item.description }}</div>
+        <div class="text-gray-800">
+          {{ item.description }}
+        </div>
         <div class="text-right text-sm">
-          <div class="text-gray-600">Qty {{ item.quantity }}</div>
+          <div class="text-gray-600">
+            Qty {{ item.quantity }}
+          </div>
           <div class="font-medium text-green-700">
             Price: {{ formatCurrency(item.price * item.quantity) }}
           </div>
