@@ -14,25 +14,25 @@ export const useCartStore = defineStore('cart', () => {
     const userId = authStore.user?.id
     const sellerId = item.sellerId
 
-  //ผู้ใช้ยังไม่ได้ login
-  if (!userId) {
-    toastStore.add({
-      type: 'error',
-      message: CART_TOAST_MESSAGES.LOGIN_REQUIRED,
-    })
-    return
-  }
+    //ผู้ใช้ยังไม่ได้ login
+    if (!userId) {
+      toastStore.add({
+        type: 'error',
+        message: CART_TOAST_MESSAGES.LOGIN_REQUIRED,
+      })
+      return
+    }
 
-  //สินค้าไม่มี sellerId (ข้อมูลไม่ครบ)
-  if (!sellerId) {
-    toastStore.add({
-      type: 'error',
-      message: CART_TOAST_MESSAGES.MISSING_SELLER_INFO,
-    })
-    return
-  }
+    //สินค้าไม่มี sellerId (ข้อมูลไม่ครบ)
+    if (!sellerId) {
+      toastStore.add({
+        type: 'error',
+        message: CART_TOAST_MESSAGES.MISSING_SELLER_INFO,
+      })
+      return
+    }
 
-  //พยายามซื้อสินค้าของตัวเอง
+    //พยายามซื้อสินค้าของตัวเอง
     if (sellerId && sellerId === userId) {
       toastStore.add({
         type: 'error',
@@ -46,10 +46,10 @@ export const useCartStore = defineStore('cart', () => {
       if (existing.quantity + item.quantity <= existing.stock) {
         existing.quantity += item.quantity
       } else {
-         toastStore.add({
-           type: 'warn',
-           message: CART_TOAST_MESSAGES.QUANTITY_EXCEEDS,
-         })
+        toastStore.add({
+          type: 'warn',
+          message: CART_TOAST_MESSAGES.QUANTITY_EXCEEDS,
+        })
         existing.quantity = existing.stock
       }
     } else {
@@ -57,6 +57,7 @@ export const useCartStore = defineStore('cart', () => {
         ...item,
         sellerId: sellerId,
         sellerNickname: item.sellerNickname || 'Unknown',
+        brand: item.brand,
         selected: false,
         stock: item.stock,
         storageGb: item.storageGb,
@@ -177,14 +178,13 @@ export const useCartStore = defineStore('cart', () => {
   )
 
   // ---------- Place order ----------
-const placeOrder = () => {
-  // ลบเฉพาะสินค้าที่ถูกเลือก
-  items.value = items.value.filter((i) => !i.selected)
+  const placeOrder = () => {
+    // ลบเฉพาะสินค้าที่ถูกเลือก
+    items.value = items.value.filter((i) => !i.selected)
 
-  // เซฟกลับ localStorage
-  saveToLocalStorage(STORAGE_KEY, items.value)
-}
-
+    // เซฟกลับ localStorage
+    saveToLocalStorage(STORAGE_KEY, items.value)
+  }
 
   return {
     items,
@@ -208,6 +208,6 @@ const placeOrder = () => {
     setShippingAddress,
     setOrderNote,
     getSellerGroups,
-    placeOrder
+    placeOrder,
   }
 })
