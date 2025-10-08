@@ -53,11 +53,11 @@ const handlePlaceOrder = async () => {
 
   const sellerGroups = cartStore.getSellerGroups().value
   const selectedGroups = sellerGroups
-    .map(group => ({
+    .map((group) => ({
       ...group,
-      items: group.items.filter(i => i.selected),
+      items: group.items.filter((i) => i.selected),
     }))
-    .filter(group => group.items.length > 0)
+    .filter((group) => group.items.length > 0)
 
   const ordersPayload = selectedGroups.map((group) => ({
     buyerId: authStore.user?.id,
@@ -74,23 +74,30 @@ const handlePlaceOrder = async () => {
     orderStatus: 'COMPLETED',
   }))
 
-  try {
-    await OrderService.placeOrder(ordersPayload)
-    toastStore.add({ type: 'success', message: 'Your order has been successfully processed.' })
-    cartStore.placeOrder()
-       //redirect ถ้าตะกร้าว่าง
-    if (cartStore.items.length === 0) {
-      router.push({ name: 'sale-items-gallery' })
-    }
-  } catch (err) {
-    toastStore.add({ type: 'error', message: err?.message || 'Failed to place order' })
+  const response = await OrderService.placeOrder(ordersPayload)
+
+  if (response.error) {
+    toastStore.add({ type: 'error', message: response.error || 'Failed to place order' })
+    return
+  }
+
+  toastStore.add({ type: 'success', message: 'Your order has been successfully processed.' })
+
+  cartStore.placeOrder()
+
+  if (cartStore.items.length === 0) {
+    router.push({ name: 'sale-items-gallery' })
   }
 }
 </script>
 <template>
   <div class="border rounded-lg p-4 space-y-4 shadow">
-    <h1 class="font-semibold border-b pb-2">Cart Summary</h1>
-    <h3 class="font-semibold">Ship To</h3>
+    <h1 class="font-semibold border-b pb-2">
+      Cart Summary
+    </h1>
+    <h3 class="font-semibold">
+      Ship To
+    </h3>
 
     <!-- Shipping Address -->
     <XInput
@@ -101,8 +108,8 @@ const handlePlaceOrder = async () => {
       class="itbms-shipping-address"
       required
       rows="3"
-      @blur="onBlur('address')"
       :error-message="touched.address ? errors.address : ''"
+      @blur="onBlur('address')"
     />
 
     <!-- Order Note -->
