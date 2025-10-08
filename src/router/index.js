@@ -39,13 +39,17 @@ const router = createRouter({
       children: [
         {
           path: 'profile',
-          requiresAuth: true,
           component: () => import('../views/user/UserProfileView.vue'),
+          meta: {
+            requiresAuth: true,
+          },
         },
         {
           path: 'profile/edit',
-          requiresAuth: true,
           component: () => import('../views/user/UserEditProfileView.vue'),
+          meta: {
+            requiresAuth: true,
+          },
         },
         {
           path: 'sale-items',
@@ -122,7 +126,7 @@ const router = createRouter({
               meta: {
                 requiresAuth: true,
               },
-            }
+            },
           ],
         },
         {
@@ -132,7 +136,7 @@ const router = createRouter({
           meta: {
             requiresAuth: true,
           },
-        }
+        },
       ],
     },
     {

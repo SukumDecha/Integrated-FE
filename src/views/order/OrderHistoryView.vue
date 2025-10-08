@@ -74,8 +74,8 @@ const fetchOrders = async () => {
 
   loading.orders = true
   error.orders = null
-
   const response = await OrderService.getOrderByUserId(userId, searchParams.value)
+
   if (response.error) {
     error.orders = response.error || 'Failed to load order history.'
     toast.add({ type: 'error', message: error.orders })
