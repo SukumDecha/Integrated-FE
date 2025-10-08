@@ -1,17 +1,19 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth.store'
 
 const props = defineProps({
   order: { type: Object, required: true },
   sellerName: { type: String, required: true }
 })
-
 const router = useRouter()
+const authStore = useAuthStore()
 
 const formatDate = d => d ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '-'
 const formatCurrency = n => n?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || '0'
 const calculateTotalPrice = computed(() => props.order?.orderItems?.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 0), 0))
+
 </script>
 
 <template>
@@ -25,7 +27,7 @@ const calculateTotalPrice = computed(() => props.order?.orderItems?.reduce((sum,
           {{ sellerName }}
         </div>
         <div class="text-sm text-gray-600">
-          <span class="font-medium">Shipped To:</span> {{ order.shippingAddress }}
+          <span class="font-medium">Shipped To:</span> {{ authStore?.userNickname || 'Unknown'}}, {{ order.shippingAddress }}
         </div>
         <div
           v-if="order.orderNote"

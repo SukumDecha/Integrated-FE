@@ -74,6 +74,9 @@ const handlePlaceOrder = async () => {
     orderStatus: 'COMPLETED',
   }))
 
+  console.log(ordersPayload);
+
+
   const response = await OrderService.placeOrder(ordersPayload)
 
   if (response.error) {

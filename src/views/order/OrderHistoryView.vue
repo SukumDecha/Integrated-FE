@@ -75,7 +75,6 @@ const fetchOrders = async () => {
 
   loading.orders = true
   error.orders = null
-  console.log(searchParams.value);
 
   const response = await OrderService.getOrderByUserId(userId, searchParams.value)
 
@@ -84,6 +83,8 @@ const fetchOrders = async () => {
     toast.add({ type: 'error', message: error.orders })
   } else {
     orders.value = response.data || []
+    console.log(orders.value);
+
     searchOptions.totalElements = response.data?.totalElements || 0
   }
   loading.orders = false

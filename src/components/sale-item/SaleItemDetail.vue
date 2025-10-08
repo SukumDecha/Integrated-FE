@@ -113,7 +113,7 @@ const handleAddToCart = () => {
   cartStore.addItem({
     userid: authStore.userId,
     id: props.product.id,
-    brand: props.product.brand,
+    brand: props.product.brandName,
     model: props.product.model,
     price: props.product.price,
     imageUrl: props.product.imageUrl,
