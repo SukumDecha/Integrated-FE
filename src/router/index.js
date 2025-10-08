@@ -161,6 +161,9 @@ router.beforeEach((to, from, next) => {
       return next({ name: 'home' })
     }
   }
+  if (to.meta.requiresAuth && !user) {
+    return next({ name: 'user-login' })
+  }
 
   return next()
 })
