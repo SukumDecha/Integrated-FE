@@ -35,7 +35,7 @@ const error = reactive({ orders: null })
 const searchOptions = reactive({
   currentPage: 1,
   pageSize: 10,
-  totalItems: 0,
+  totalElements: 0,
   sortBy: 'orderDate',
   sortOrder: 'desc',
 })
@@ -56,10 +56,11 @@ const initializeState = () => {
   const q = route.query
   const storedPage = loadFromSessionStorage(ORDER_STORAGE_KEYS.PAGINATION, {})
   const storedSort = loadFromSessionStorage(ORDER_STORAGE_KEYS.SORT, {})
+  router.replace({ query: {} }) // เคลียร์ค่าค้างใน URL
 
   searchOptions.currentPage = parseInt(q.page) || storedPage.currentPage || 1
   searchOptions.pageSize = parseInt(q.size) || storedPage.pageSize || 10
-  searchOptions.sortBy = q.sortBy || storedSort.field || 'createdOn'
+  searchOptions.sortBy = q.sortBy || storedSort.field || 'orderDate'
   searchOptions.sortOrder = q.sortDirection || storedSort.order || 'desc'
   updateRouteQuery()
 }
@@ -74,16 +75,20 @@ const fetchOrders = async () => {
 
   loading.orders = true
   error.orders = null
+  console.log(searchParams.value);
+
   const response = await OrderService.getOrderByUserId(userId, searchParams.value)
 
   if (response.error) {
     error.orders = response.error || 'Failed to load order history.'
     toast.add({ type: 'error', message: error.orders })
   } else {
-    orders.value = response.data.content || []
-    searchOptions.totalItems = response.data.pagination?.totalItems || 0
+    orders.value = response.data || []
+    searchOptions.totalElements = response.data?.totalElements || 0
   }
   loading.orders = false
+  console.log(orders.value);
+
 }
 
 const handlePaginationChange = async ({ currentPage, pageSize }) => {
@@ -91,7 +96,7 @@ const handlePaginationChange = async ({ currentPage, pageSize }) => {
   searchOptions.currentPage = currentPage
   searchOptions.pageSize = pageSize
 
-  if (oldPage === currentPage) await fetchOrders()
+  if (oldPage !== currentPage) await fetchOrders()
 
   saveToSessionStorage(ORDER_STORAGE_KEYS.PAGINATION, { currentPage, pageSize })
 }
@@ -145,7 +150,7 @@ watch(
       :pagination="{
         currentPage: searchOptions.currentPage,
         pageSize: searchOptions.pageSize,
-        total: searchOptions.totalItems,
+        total: searchOptions.totalElements,
       }"
       :show-size-changer="true"
       @change="handlePaginationChange"
