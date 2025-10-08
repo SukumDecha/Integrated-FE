@@ -8,7 +8,6 @@ const OrderService = {
   async getOrderByUserId(id, paginationParams = {}) {
     const queryString = buildSearchParams(paginationParams)
     const url = `${BASE_URL_V2}/${id}/orders?${queryString}`
-    console.log("papappapa "+ paginationParams);
 
     return await get(url, {
       isPaginated: true,
