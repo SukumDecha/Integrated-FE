@@ -55,6 +55,7 @@ const handleLogout = async () => {
 }
 //ตรวจสอบว่าตะกร้าว่างมั้ย
 const cartIsEmpty = computed(() => cartStore.items.length === 0)
+const newOrderCount = ref(3) // mock data — สมมติว่ามี 3 order ใหม่
 </script>
 
 <template>
@@ -117,8 +118,23 @@ const cartIsEmpty = computed(() => cartStore.items.length === 0)
                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
                     @click="isDropdownOpen = false"
                   >
-                    Your Order
+                    Your Orders
                   </router-link>
+                  <router-link
+                    v-if="authStore.user?.role === 'SELLER'"
+                    to="/sale-orders"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 flex justify-between items-center"
+                    @click="isDropdownOpen = false"
+                  >
+                    <span>Sales Orders</span>
+                    <span
+                      v-if="newOrderCount > 0"
+                      class="ml-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full"
+                    >
+                      {{ newOrderCount }}
+                    </span>
+                  </router-link>
+
                   <button
                     class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
                     @click="handleLogout"
@@ -164,6 +180,20 @@ const cartIsEmpty = computed(() => cartStore.items.length === 0)
               class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-emerald-600 rounded-full min-w-[1.25rem] h-5"
             >
               {{ totalItems }}
+            </span>
+          </button>
+          <!-- Seller only -->
+          <button
+            v-if="authStore.user?.role === 'SELLER'"
+            @click="router.push('/sale-orders')"
+            class="relative flex items-center p-2 rounded-md hover:bg-emerald-50 transition"
+          >
+            <ShoppingBag class="h-6 w-6 text-emerald-700" />
+            <span
+              v-if="newOrderCount > 0"
+              class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full"
+            >
+              {{ newOrderCount }}
             </span>
           </button>
         </div>
@@ -222,8 +252,23 @@ const cartIsEmpty = computed(() => cartStore.items.length === 0)
               class="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
               @click="closeMobileMenu"
             >
-              Your Order
+              Your Orders
             </router-link>
+            <router-link
+              v-if="authStore.user?.role === 'SELLER'"
+              to="/sale-orders"
+              class="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 flex justify-between items-center"
+              @click="isDropdownOpen = false"
+            >
+              <span>Sales Orders</span>
+              <span
+                v-if="newOrderCount > 0"
+                class="ml-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full"
+              >
+                {{ newOrderCount }}
+              </span>
+            </router-link>
+
             <!-- ✅ Use button instead of router-link for mobile too -->
             <button
               class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
@@ -270,6 +315,20 @@ const cartIsEmpty = computed(() => cartStore.items.length === 0)
               class="ml-auto inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-emerald-600 rounded-full min-w-[1.25rem] h-5"
             >
               {{ totalItems }}
+            </span>
+          </button>
+          <!-- Seller only -->
+          <button
+            v-if="authStore.user?.role === 'SELLER'"
+            @click="router.push('/sale-orders')"
+            class="relative flex items-center p-2 rounded-md hover:bg-emerald-50 transition"
+          >
+            <ShoppingBag class="h-6 w-6 text-emerald-700" />
+            <span
+              v-if="newOrderCount > 0"
+              class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full"
+            >
+              {{ newOrderCount }}
             </span>
           </button>
         </div>

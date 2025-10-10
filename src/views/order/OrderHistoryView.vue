@@ -8,6 +8,7 @@ import { useToastStore } from '@/stores/toast.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { OrderService } from '@/services'
 import { loadFromSessionStorage, saveToSessionStorage } from '@/utils/StorageUtils'
+import XTab from '@/components/common/XTab.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -20,14 +21,6 @@ const ORDER_STORAGE_KEYS = {
 }
 
 const orders = ref([])
-const groupedOrders = computed(() => {
-  return orders.value.reduce((acc, order) => {
-    const seller = order.seller?.nickname || 'Unknown'
-    if (!acc[seller]) acc[seller] = []
-    acc[seller].push(order)
-    return acc
-  }, {})
-})
 
 const loading = reactive({ orders: true })
 const error = reactive({ orders: null })
@@ -83,13 +76,12 @@ const fetchOrders = async () => {
     toast.add({ type: 'error', message: error.orders })
   } else {
     orders.value = response.data || []
-    console.log(orders.value);
+    console.log(orders.value)
 
     searchOptions.totalElements = response.data?.totalElements || 0
   }
   loading.orders = false
-  console.log(orders.value);
-
+  console.log(orders.value)
 }
 
 const handlePaginationChange = async ({ currentPage, pageSize }) => {
@@ -116,23 +108,43 @@ watch(
   ],
   updateRouteQuery,
 )
+const activeTab = ref('completed')
+
+const filteredOrders = computed(() => {
+  if (activeTab.value === 'completed') {
+    return orders.value.filter((o) => o.status === 'COMPLETED')
+  } else if (activeTab.value === 'canceled') {
+    return orders.value.filter((o) => o.status === 'CANCELED')
+  }
+  return orders.value
+})
+
+const groupedFilteredOrders = computed(() => {
+  return filteredOrders.value.reduce((acc, order) => {
+    const seller = order.seller?.nickname || 'Unknown'
+    if (!acc[seller]) acc[seller] = []
+    acc[seller].push(order)
+    return acc
+  }, {})
+})
 </script>
 
 <template>
   <XBreadcrumb :items="breadcrumbs" />
   <div class="p-6 max-w-5xl mx-auto">
-    <h1 class="text-2xl font-semibold text-green-700 mb-6">
-      Your Orders
-    </h1>
-    <div
-      v-if="!loading.orders && orders.length === 0 && !error.orders"
-      class="text-center text-gray-500 text-lg py-20"
-    >
-      You don’t have any orders yet.
-    </div>
+    <h1 class="text-2xl font-semibold text-green-700 mb-6">Your Orders</h1>
+    <XTab
+      v-model="activeTab"
+      :tabs="[
+        { label: 'Completed', value: 'completed' },
+        { label: 'Canceled', value: 'canceled' },
+        { label: 'All', value: 'all' },
+      ]"
+      class="mb-6"
+    />
     <div>
       <div
-        v-for="(sellerOrders, sellerName) in groupedOrders"
+        v-for="(sellerOrders, sellerName) in groupedFilteredOrders"
         :key="sellerName"
         class="space-y-6"
       >
@@ -143,6 +155,12 @@ watch(
           :seller-name="sellerName"
         />
       </div>
+    </div>
+    <div
+      v-if="!loading.orders && !filteredOrders.length && !error.orders"
+      class="text-center text-gray-500 text-lg py-20"
+    >
+      You don’t have any {{ activeTab }} orders.
     </div>
 
     <XPagination
@@ -157,10 +175,7 @@ watch(
       @change="handlePaginationChange"
     />
 
-    <div
-      v-if="error.orders"
-      class="text-center py-10"
-    >
+    <div v-if="error.orders" class="text-center py-10">
       <p class="text-lg text-red-500">
         {{ error.orders }}
       </p>

@@ -130,6 +130,30 @@ const router = createRouter({
           ],
         },
         {
+  path: 'sale-orders',
+  children: [
+    {
+      path: '',
+      name: 'SaleOrders',
+      component: () => import('../views/order/OrderSellerView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['SELLER'],
+      },
+    },
+    {
+      path: ':id',
+      name: 'SaleOrderDetail',
+      component: () => import('../views/order/OrderSellerDetailView.vue'),
+      meta: {
+        requiresAuth: true,
+        roles: ['SELLER'],
+      },
+    },
+  ],
+},
+
+        {
           path: 'cart',
           name: 'Cart',
           component: () => import('../views/cart/CartView.vue'),
