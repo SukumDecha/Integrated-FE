@@ -15,9 +15,14 @@ const formatDate = (d) =>
     : '-'
 const formatCurrency = (n) => n?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || '0'
 const calculateTotalPrice = computed(() => {
-  const items = props.order?.orderItems ?? []
-  return items.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 0), 0)
+  if (!props.order?.orderItems || props.order.orderItems.length === 0) return 0
+  return props.order.orderItems.reduce((sum, item) => {
+    const price = Number(item.price) || 0
+    const qty = Number(item.quantity) || 0
+    return sum + price * qty
+  }, 0)
 })
+
 
 
 // ชื่อที่จะโชว์
@@ -72,7 +77,7 @@ const orderDetailPath = computed(() =>
         <div><span class="font-medium">Order Date:</span> {{ formatDate(order.orderDate) }}</div>
         <div><span class="font-medium">Payment Date:</span> {{ formatDate(order.orderDate) }}</div>
         <div>
-          <span class="font-medium">Total:</span> {{ formatCurrency(calculateTotalPrice.value) }}
+          <span class="font-medium">Total:</span> {{ formatCurrency(calculateTotalPrice) }}
         </div>
         <div><span class="font-medium">Status:</span> {{ order.orderStatus }}</div>
       </div>
