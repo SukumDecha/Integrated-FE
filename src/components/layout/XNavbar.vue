@@ -7,7 +7,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { nextTick } from 'vue'
 import { useCartStore } from '@/stores/cart.store'
-import { computed } from 'vue'
+import { computed, onMounted,watch  } from 'vue'
+import { OrderService } from '@/services'
 
 const route = useRoute()
 const router = useRouter()
@@ -38,9 +39,22 @@ const toggleDropdown = () => {
 }
 
 const handleClearStorage = () => {
-  localStorage.clear()
+  // ดึงค่า viewedOrders เก็บไว้ก่อน
+  const viewedOrders = localStorage.getItem('viewedOrders')
+
+  // ลบเฉพาะข้อมูลที่ไม่เกี่ยว เช่น token / cart
+  localStorage.removeItem('auth')
+  localStorage.removeItem('cart')
+
+  // คืนค่า viewedOrders กลับเข้าไป
+  if (viewedOrders) {
+    localStorage.setItem('viewedOrders', viewedOrders)
+  }
+
+  // ถ้ามี session อื่นค้างอยู่ค่อยเคลียร์ได้
   sessionStorage.clear()
 }
+
 
 const handleLogout = async () => {
   authStore.logout()
@@ -55,7 +69,33 @@ const handleLogout = async () => {
 }
 //ตรวจสอบว่าตะกร้าว่างมั้ย
 const cartIsEmpty = computed(() => cartStore.items.length === 0)
-const newOrderCount = ref(3) // mock data — สมมติว่ามี 3 order ใหม่
+
+const newOrderCount = ref(0)
+const updateNewOrderCount = async () => {
+  const user = authStore.user
+  if (user?.role === 'SELLER') {
+    const response = await OrderService.getOrdersBySellerId(user.id)
+    if (response?.data) {
+      const viewedOrders = JSON.parse(localStorage.getItem('viewedOrders') || '[]')
+      newOrderCount.value = response.data.filter(
+        (order) =>
+          !viewedOrders.includes(order.id) &&
+          (order.orderStatus === 'NEW' || order.orderStatus === 'COMPLETED'),
+      ).length
+    }
+  }
+}
+onMounted(updateNewOrderCount)
+watch(
+  () => route.fullPath,
+  (newPath) => {
+    // ✅ ถ้ากลับมาหน้า sale-orders ให้ refresh ตัวเลขใหม่
+    if (newPath.includes('/sale-orders')) {
+      updateNewOrderCount()
+    }
+  }
+)
+
 </script>
 
 <template>

@@ -1,47 +1,79 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth.store'
+import { OrderStatus } from '@/constants/order.constant.js'
 
 const props = defineProps({
   order: { type: Object, required: true },
-  sellerName: { type: String, required: true }
+  isBuyerCard: { type: Boolean, default: false },
 })
 const router = useRouter()
-const authStore = useAuthStore()
 
-const formatDate = d => d ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '-'
-const formatCurrency = n => n?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || '0'
-const calculateTotalPrice = computed(() => props.order?.orderItems?.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 0), 0))
+const formatDate = (d) =>
+  d
+    ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+    : '-'
+const formatCurrency = (n) => n?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || '0'
+const calculateTotalPrice = computed(() => {
+  const items = props.order?.orderItems ?? []
+  return items.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 0), 0)
+})
 
+
+// ชื่อที่จะโชว์
+const displayName = computed(() => {
+  if (props.isBuyerCard) {
+    // buyer card → แสดงชื่อผู้ขาย
+    return props.order.seller?.nickname || 'Unknown Seller'
+  } else {
+    // seller card → แสดงชื่อผู้ซื้อ
+    return props.order.buyer?.nickname || 'Unknown Buyer'
+  }
+})
+
+// route path
+const orderDetailPath = computed(() =>
+  props.isBuyerCard ? `/your-orders/${props.order.id}` : `/sale-orders/${props.order.id}`,
+)
 </script>
 
 <template>
   <div class="border border-green-200 p-4 rounded-xl shadow-sm mb-3">
     <div
       class="flex flex-col sm:flex-row justify-between gap-4"
-      @click="router.push(`/your-orders/${props.order.id}`)"
+      @click="router.push(orderDetailPath)"
     >
-      <div>
-        <div class="font-semibold text-green-800">
-          {{ sellerName }}
-        </div>
-        <div class="text-sm text-gray-600">
-          <span class="font-medium">Shipped To:</span> {{ authStore?.userNickname || 'Unknown'}}, {{ order.shippingAddress }}
-        </div>
-        <div
-          v-if="order.orderNote"
-          class="text-sm text-gray-600"
-        >
-          <span class="font-medium">Note:</span> {{ order.orderNote }}
+      <div class="flex justify-between items-start mb-2">
+        <div>
+          <!-- ชื่อ (buyer/seller) -->
+          <div class="font-semibold text-green-800">
+            {{ displayName }}
+          </div>
+          <div class="text-sm text-gray-600">
+            <span class="font-medium">Shipped To:</span>
+            {{ order.shippingAddress }}
+          </div>
         </div>
       </div>
 
       <div class="text-sm text-right text-gray-700 space-y-1">
+        <div
+          class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold uppercase self-start"
+          :class="{
+            'bg-yellow-100 text-yellow-800': order.orderStatus === OrderStatus.NEW,
+            'bg-red-100 text-red-700': order.orderStatus === OrderStatus.CANCELED,
+            'bg-green-100 text-green-700': order.orderStatus === OrderStatus.COMPLETED,
+          }"
+        >
+          {{ order.orderStatus }}
+        </div>
+
         <div><span class="font-medium">Order No:</span> {{ order.id }}</div>
         <div><span class="font-medium">Order Date:</span> {{ formatDate(order.orderDate) }}</div>
         <div><span class="font-medium">Payment Date:</span> {{ formatDate(order.orderDate) }}</div>
-        <div><span class="font-medium">Total:</span> {{ formatCurrency(calculateTotalPrice.value) }}</div>
+        <div>
+          <span class="font-medium">Total:</span> {{ formatCurrency(calculateTotalPrice.value) }}
+        </div>
         <div><span class="font-medium">Status:</span> {{ order.orderStatus }}</div>
       </div>
     </div>
@@ -56,9 +88,7 @@ const calculateTotalPrice = computed(() => props.order?.orderItems?.reduce((sum,
           {{ item.description }}
         </div>
         <div class="text-right text-sm">
-          <div class="text-gray-600">
-            Qty {{ item.quantity }}
-          </div>
+          <div class="text-gray-600">Qty {{ item.quantity }}</div>
           <div class="font-medium text-green-700">
             Price: {{ formatCurrency(item.price * item.quantity) }}
           </div>

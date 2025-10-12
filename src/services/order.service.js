@@ -1,9 +1,9 @@
-import { get, post ,patch } from './helper/api'
+import { get, post } from './helper/api'
 import { buildSearchParams } from '@/utils'
 
 const BASE_URL_V2 = '/v2/users'
 const BASE_URL_V3 = '/v2/orders'
-const BASE_URL_V4 = '/v2/sale-orders'
+const  BASE_ORDER_URL_V2 = '/v2/sellers'
 
 const OrderService = {
   async getOrderByUserId(id, paginationParams = {}) {
@@ -26,18 +26,13 @@ const OrderService = {
   // ---------- Seller Section ----------
 
     // ดึงรายการออเดอร์ของสินค้าของ seller
-  async getOrdersBySellerId(sellerId) {
-    return await get(`${BASE_URL_V4}?sellerId=${sellerId}`)
-  },
+ async getOrdersBySellerId(sellerId) {
+  return await get(`${BASE_ORDER_URL_V2}/${sellerId}/orders`, { isPaginated: true })
+},
 
   // ดึงรายละเอียดออเดอร์ (seller ดูได้)
   async getOrderBySeller(orderId) {
-    return await get(`${BASE_URL_V4}/${orderId}`)
-  },
-
-  // mark ว่า seller เปิดดูแล้ว
-  async markOrderAsViewed(orderId) {
-    return await patch(`${BASE_URL_V4}/${orderId}/viewed`)
+    return await get(`${BASE_ORDER_URL_V2}/${orderId}`)
   },
 
 

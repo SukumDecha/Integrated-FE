@@ -9,6 +9,7 @@ import { useAuthStore } from '@/stores/auth.store'
 import { OrderService } from '@/services'
 import { loadFromSessionStorage, saveToSessionStorage } from '@/utils/StorageUtils'
 import XTab from '@/components/common/XTab.vue'
+import { OrderStatus } from '@/constants/order.constant.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -76,12 +77,10 @@ const fetchOrders = async () => {
     toast.add({ type: 'error', message: error.orders })
   } else {
     orders.value = response.data || []
-    console.log(orders.value)
 
     searchOptions.totalElements = response.data?.totalElements || 0
   }
   loading.orders = false
-  console.log(orders.value)
 }
 
 const handlePaginationChange = async ({ currentPage, pageSize }) => {
@@ -112,9 +111,9 @@ const activeTab = ref('completed')
 
 const filteredOrders = computed(() => {
   if (activeTab.value === 'completed') {
-    return orders.value.filter((o) => o.status === 'COMPLETED')
+    return orders.value.filter((o) => o.orderStatus === OrderStatus.COMPLETED)
   } else if (activeTab.value === 'canceled') {
-    return orders.value.filter((o) => o.status === 'CANCELED')
+    return orders.value.filter((o) => o.orderStatus === OrderStatus.CANCELED)
   }
   return orders.value
 })
@@ -152,7 +151,7 @@ const groupedFilteredOrders = computed(() => {
           v-for="order in sellerOrders"
           :key="order.id"
           :order="order"
-          :seller-name="sellerName"
+          :isBuyerCard="true"
         />
       </div>
     </div>
