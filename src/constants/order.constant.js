@@ -1,6 +1,6 @@
 const OrderStatus = {
   NEW: 'NEW',
-  CANCELED: 'CANCELED',
+  CANCELED: 'CANCELLED',
   COMPLETED: 'COMPLETED',
 }
 

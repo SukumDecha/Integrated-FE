@@ -5,7 +5,7 @@ import { OrderService } from '@/services'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import OrderDetail from '@/components/order/OrderDetail.vue'
 import XButton from '@/components/common/XButton.vue'
-
+import { useToastStore } from '@/stores/toast.store'
 const route = useRoute()
 const router = useRouter()
 
@@ -13,23 +13,41 @@ const orderId = route.params.id
 const order = ref(null)
 const loading = ref(true)
 const error = ref(null)
+const errorMessage = ref('')
+const toast = useToastStore()
 
-// 🔹 โหลดข้อมูลออเดอร์
+// โหลดข้อมูลออเดอร์
 const fetchOrderDetail = async () => {
-  try {
-    loading.value = true
-    const res = await OrderService.getOrderById(orderId)
-    if (res?.data) {
-      order.value = res.data
-    } else {
-      error.value = 'Order not found.'
-    }
-  } catch (err) {
-    error.value = err.message || 'Failed to load order detail.'
-  } finally {
-    loading.value = false
+  loading.value = true
+
+  const res = await OrderService.getOrderById(orderId)
+  loading.value = false
+
+  if (res?.error) {
+    error.value = true
+    errorMessage.value = res.error || 'Failed to load order.'
+    toast.add({
+      title: 'Error',
+      message: errorMessage.value,
+      type: 'error'
+    })
+    return
+  }
+
+  if (res?.data) {
+    order.value = res.data
+    error.value = null
+  } else {
+    error.value = true
+    errorMessage.value = 'Order not found.'
+    toast.add({
+      title: 'Error',
+      message: errorMessage.value,
+      type: 'error'
+    })
   }
 }
+
 
 onMounted(fetchOrderDetail)
 

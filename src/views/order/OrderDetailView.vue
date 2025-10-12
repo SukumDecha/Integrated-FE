@@ -5,21 +5,37 @@ import { OrderService } from '@/services'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import OrderDetail from '@/components/order/OrderDetail.vue'
 import XButton from '@/components/common/XButton.vue'
+import { useToastStore } from '@/stores/toast.store'
 
 const route = useRoute()
 const orderId = route.params.id
 const order = ref(null)
 const error = ref(null)
 const router = useRouter()
+const errorMessage = ref('')
+const loading = ref(false)
+const toast = useToastStore()
 
 onMounted(async () => {
-  try {
-    const response = await OrderService.getOrderById(orderId)
-    order.value = response.data
-  } catch (err) {
-    error.value = err.message || 'Failed to load order.'
+  loading.value = true
+  const response = await OrderService.getOrderById(orderId)
+
+  if (response.error) {
+    loading.value = false
+    error.value = true
+    errorMessage.value = response.error || 'Failed to load order.'
+    toast.add({
+      title: 'Error',
+      message: errorMessage.value,
+      type: 'error'
+    })
+    return
   }
+
+  order.value = response.data
+  loading.value = false
 })
+
 
 const breadcrumbs = [
   { text: 'Home', path: '/' },

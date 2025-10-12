@@ -89,7 +89,7 @@ onMounted(updateNewOrderCount)
 watch(
   () => route.fullPath,
   (newPath) => {
-    // ✅ ถ้ากลับมาหน้า sale-orders ให้ refresh ตัวเลขใหม่
+    //ถ้ากลับมาหน้า sale-orders ให้ refresh ตัวเลขใหม่
     if (newPath.includes('/sale-orders')) {
       updateNewOrderCount()
     }
