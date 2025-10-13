@@ -93,10 +93,10 @@ watch(
 </script>
 
 <template>
-  <XBreadcrumb :items="breadcrumbs" />
+
 
   <div class="p-6 max-w-5xl mx-auto">
-    <h1 class="text-2xl font-semibold text-green-700 mb-4">Sales Orders</h1>
+    <XBreadcrumb :items="breadcrumbs" class="mb-6" />
 
     <XTab v-model="activeTab" :tabs="tabs" class="mb-6" @change="fetchOrders" />
 

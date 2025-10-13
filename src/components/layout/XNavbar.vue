@@ -163,7 +163,7 @@ watch(
                   <router-link
                     v-if="authStore.user?.role === 'SELLER'"
                     to="/sale-orders"
-                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 flex justify-between items-center"
+                    class="itbms-sale-orders-button block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 flex justify-between items-center"
                     @click="isDropdownOpen = false"
                   >
                     <span>Sales Orders</span>
@@ -228,10 +228,10 @@ watch(
             @click="router.push('/sale-orders')"
             class="relative flex items-center p-2 rounded-md hover:bg-emerald-50 transition"
           >
-            <ShoppingBag class="h-6 w-6 text-emerald-700" />
+            <ShoppingBag class="itbms-bag-button h-6 w-6 text-emerald-700" />
             <span
               v-if="newOrderCount > 0"
-              class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full"
+              class="itbms-bag-quantity absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full"
             >
               {{ newOrderCount }}
             </span>
@@ -297,7 +297,7 @@ watch(
             <router-link
               v-if="authStore.user?.role === 'SELLER'"
               to="/sale-orders"
-              class="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 flex justify-between items-center"
+              class="itbms-sale-orders-button block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 flex justify-between items-center"
               @click="isDropdownOpen = false"
             >
               <span>Sales Orders</span>

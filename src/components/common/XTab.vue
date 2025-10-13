@@ -11,6 +11,18 @@ defineProps({
 })
 
 defineEmits(['update:modelValue'])
+const getTabClass = (value) => {
+  switch (value) {
+    case 'NEW':
+      return 'itbms-new-orders-button'
+    case 'ALL':
+      return 'itbms-all-orders-button'
+    case 'CANCELED':
+      return 'itbms-canceled-orders-button'
+    default:
+      return ''
+  }
+}
 </script>
 
 <template>
@@ -23,7 +35,8 @@ defineEmits(['update:modelValue'])
       :class="[
         tab.value === modelValue
           ? 'text-green-700 border-b-2 border-green-600 font-semibold'
-          : 'text-gray-500 hover:text-green-700'
+          : 'text-gray-500 hover:text-green-700',
+        getTabClass(tab.value),
       ]"
     >
       {{ tab.label }}
