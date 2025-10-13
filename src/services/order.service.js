@@ -25,10 +25,13 @@ const OrderService = {
 
   // ---------- Seller Section ----------
 
-    // ดึงรายการออเดอร์ของสินค้าของ seller
- async getOrdersBySellerId(sellerId) {
-  return await get(`${BASE_SALE_ORDERS_V2}/${sellerId}/orders`, { isPaginated: true })
-},
+  // ดึงรายการออเดอร์ของสินค้าของ seller
+  async getOrdersBySellerId(sellerId, paginationParams = {}) {
+    const queryString = buildSearchParams(paginationParams)
+    const url = `${BASE_SALE_ORDERS_V2}/${sellerId}/orders?${queryString}`
+    const res = await get(url, { isPaginated: true })
+    return res
+  },
 
   // ดึงรายละเอียดออเดอร์ (seller ดูได้)
   async getOrderBySeller(orderId) {

@@ -54,6 +54,10 @@ const initializeState = () => {
 
   searchOptions.currentPage = parseInt(q.page) || storedPage.currentPage || 1
   searchOptions.pageSize = parseInt(q.size) || storedPage.pageSize || 10
+  //เพิ่มเงื่อนไข reset ถ้าค่าไม่ถูกต้อง (เช่น undefined หรือ 0)
+  if (!searchOptions.pageSize || searchOptions.pageSize <= 0) {
+    searchOptions.pageSize = 10
+  }
   searchOptions.sortBy = q.sortBy || storedSort.field || 'orderDate'
   searchOptions.sortOrder = q.sortDirection || storedSort.order || 'desc'
   updateRouteQuery()
@@ -62,6 +66,7 @@ const initializeState = () => {
 const updateRouteQuery = () => {
   router.replace({ query: { ...searchParams.value, page: searchOptions.currentPage } })
 }
+const activeTab = ref('completed')
 
 const fetchOrders = async () => {
   const userId = authStore.user?.id
@@ -70,32 +75,49 @@ const fetchOrders = async () => {
   loading.orders = true
   error.orders = null
 
-  const response = await OrderService.getOrderByUserId(userId, searchParams.value)
+  const response = await OrderService.getOrderByUserId(userId, {
+    ...searchParams.value,
+    tab: activeTab.value.toUpperCase(),
+  })
 
   if (response.error) {
     error.orders = response.error || 'Failed to load order history.'
     toast.add({ type: 'error', message: error.orders })
   } else {
     orders.value = response.data || []
-
-    searchOptions.totalElements = response.data?.totalElements || 0
+    const p = response.pagination || {}
+    searchOptions.totalElements = p.totalItems ?? p.totalElements ?? response.totalElements ?? 0
+    searchOptions.pageSize = p.pageSize ?? response.size ?? searchOptions.pageSize
   }
   loading.orders = false
 }
-
-const handlePaginationChange = async ({ currentPage, pageSize }) => {
-  const oldPage = searchOptions.currentPage
+const handlePaginationChange = ({ currentPage, pageSize }) => {
+  // อัปเดต state ในหน้า
   searchOptions.currentPage = currentPage
   searchOptions.pageSize = pageSize
 
-  if (oldPage !== currentPage) await fetchOrders()
-
   saveToSessionStorage(ORDER_STORAGE_KEYS.PAGINATION, { currentPage, pageSize })
+
+  router.push({
+    query: {
+      ...searchParams.value,
+      page: currentPage,
+    },
+  })
 }
+
+watch(
+  () => [route.query.page, route.query.size],
+  async ([qPage, qSize]) => {
+    searchOptions.currentPage = Number(qPage) || searchOptions.currentPage || 1
+    searchOptions.pageSize = Number(qSize) || searchOptions.pageSize || 10
+    await fetchOrders()
+  },
+  { immediate: true },
+)
 
 onMounted(async () => {
   initializeState()
-  await fetchOrders()
 })
 
 watch(
@@ -107,7 +129,6 @@ watch(
   ],
   updateRouteQuery,
 )
-const activeTab = ref('completed')
 
 const filteredOrders = computed(() => {
   if (activeTab.value === 'completed') {
@@ -126,6 +147,11 @@ const groupedFilteredOrders = computed(() => {
     return acc
   }, {})
 })
+watch(activeTab, async () => {
+  searchOptions.currentPage = 1
+  await fetchOrders()
+})
+
 </script>
 
 <template>
@@ -136,7 +162,7 @@ const groupedFilteredOrders = computed(() => {
       v-model="activeTab"
       :tabs="[
         { label: 'Completed', value: 'completed' },
-        { label: 'Canceled', value: 'canceled' },
+        { label: 'Cancelled', value: 'cancelled' },
         { label: 'All', value: 'all' },
       ]"
       class="mb-6"
@@ -163,7 +189,7 @@ const groupedFilteredOrders = computed(() => {
     </div>
 
     <XPagination
-      v-if="!loading.orders && orders.length"
+      v-if="!loading.orders && filteredOrders.length > 0"
       class="mt-10"
       :pagination="{
         currentPage: searchOptions.currentPage,
