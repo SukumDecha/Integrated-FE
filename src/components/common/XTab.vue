@@ -1,4 +1,6 @@
 <script setup>
+import { defineProps, defineEmits } from 'vue'
+import { OrderStatus } from '@/constants/order.constant.js'
 defineProps({
   tabs: {
     type: Array,
@@ -13,11 +15,11 @@ defineProps({
 defineEmits(['update:modelValue'])
 const getTabClass = (value) => {
   switch (value) {
-    case 'NEW':
+    case OrderStatus.NEW:
       return 'itbms-new-orders-button'
-    case 'ALL':
+    case OrderStatus.ALL:
       return 'itbms-all-orders-button'
-    case 'CANCELED':
+    case OrderStatus.CANCELED:
       return 'itbms-canceled-orders-button'
     default:
       return ''
