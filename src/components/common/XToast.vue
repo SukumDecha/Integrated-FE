@@ -9,10 +9,10 @@
         v-for="toast in toasts"
         :key="toast.id"
         :class="[
-          'rounded-lg px-4 py-3 shadow text-white flex justify-between items-center',
-          toast.type === 'success' && 'bg-green-500',
-          toast.type === 'error' && 'bg-red-500',
-          toast.type === 'info' && 'bg-blue-500',
+          'rounded-lg px-4 py-3 shadow flex justify-between items-center',
+          toast.type === 'success' && 'bg-green-500 text-white',
+          toast.type === 'error' && 'bg-red-500 text-white',
+          toast.type === 'info' && 'bg-blue-500 text-white',
           toast.type === 'warn' && 'bg-yellow-400 text-black'
         ]"
       >

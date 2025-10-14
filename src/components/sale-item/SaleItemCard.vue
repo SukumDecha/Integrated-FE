@@ -70,7 +70,6 @@ const handleAddToCart = () => {
     return
   }
 
-
   cartStore.addItem({
     userid: authStore.userId,
     id: props.id,
@@ -86,7 +85,6 @@ const handleAddToCart = () => {
     stock: props.quantity,
   })
 }
-
 </script>
 
 <template>
@@ -126,9 +124,10 @@ const handleAddToCart = () => {
           class="w-full h-full object-cover object-center rounded-t-xl"
         />
         <span
-          class="absolute top-4 left-4 bg-emerald-100 text-emerald-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+          class="absolute top-4 left-4 text-xs font-medium px-2.5 py-0.5 rounded-full"
+          :class="quantity > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700'"
         >
-          In Stock
+          {{ quantity > 0 ? 'In Stock' : 'Out of Stock' }}
         </span>
       </div>
 
