@@ -112,7 +112,7 @@ const fetchOrders = async () => {
   const params = {
     page: pagination.currentPage - 1,
     size: pagination.pageSize,
-    sortBy: 'createdOn',
+    sortBy: 'orderDate',
     sortDirection: 'DESC',
     tab: activeTab.value,
   }
@@ -134,23 +134,20 @@ const fetchOrders = async () => {
   loading.orders = false
 }
 
-
 // --- Pagination Change Handler ---
 const handlePaginationChange = async ({ currentPage, pageSize }) => {
-  if (
-    currentPage === pagination.currentPage &&
-    pageSize === pagination.pageSize
-  ) return
+  if (currentPage === pagination.currentPage && pageSize === pagination.pageSize) return
 
   await router.push({
     query: {
       ...route.query,
       page: currentPage,
       size: pageSize,
+      sortBy: 'orderDate', // เพิ่ม
+      sortDirection: 'DESC', // เพิ่ม
     },
   })
 }
-
 
 const openOrderDetail = (order) => {
   router.push(`/sale-orders/${order.id}`)
@@ -175,7 +172,7 @@ watch(
     pagination.pageSize = parseInt(q.size) || pagination.pageSize
     await fetchOrders()
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 onMounted(() => {
