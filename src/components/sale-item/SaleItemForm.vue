@@ -295,7 +295,6 @@ const fetchBrands = async () => {
     if (props.initialData) {
       const val = props.initialData
 
-      console.log('initial val', val)
       const imagesWithPreview =
         val.saleItemImages?.map((img) => ({
           ...img,
@@ -316,7 +315,6 @@ const fetchBrands = async () => {
         images: imagesWithPreview,
       }
 
-      console.log('Form.value', form.value)
     }
   }
 }
@@ -387,10 +385,6 @@ const handleSave = async () => {
       formData.append(`${prefix}.imageFile`, img.imageFile)
     }
   })
-
-  // for (const [key, value] of formData.entries()) {
-  //   console.log(key, value)
-  // }
 
   isSaving.value = true
   await props.onSubmit(formData)

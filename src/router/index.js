@@ -150,6 +150,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   const user = authStore.user
+
   if (to.meta.requiresAuth && to.meta.roles) {
     if (!user) {
       return next({ name: 'user-login' })
@@ -161,6 +162,7 @@ router.beforeEach((to, from, next) => {
       return next({ name: 'home' })
     }
   }
+
   if (to.meta.requiresAuth && !user) {
     return next({ name: 'user-login' })
   }

@@ -456,7 +456,6 @@ function open() {
 function onInputChange(e) {
   const list = Array.from(e.target.files || [])
   addFiles(list)
-  console.log('onInputChange')
   e.target.value = ''
 }
 
@@ -471,7 +470,6 @@ function onDrop(e) {
   const dt = e.dataTransfer
   const dropped = Array.from(dt?.files || [])
   addFiles(dropped)
-  console.log('onDrop')
 }
 
 function addFiles(incoming) {
@@ -717,12 +715,10 @@ function swapSlots(fromIndex, toIndex) {
   if (files.value[fromIndex]) {
     files.value[fromIndex].slotIndex = fromIndex
     files.value[fromIndex].order = toIndex
-    console.log('Swapped from', fromIndex, 'to', toIndex)
   }
   if (files.value[toIndex]) {
     files.value[toIndex].slotIndex = toIndex
     files.value[toIndex].order = fromIndex
-    console.log('Swapped from', toIndex, 'to', fromIndex)
   }
 
   emitValidFiles()
