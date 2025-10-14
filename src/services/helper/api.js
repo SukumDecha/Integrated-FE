@@ -5,16 +5,46 @@ import { useAuthStore } from '@/stores/auth.store'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-const request = async (
-  url,
-  method,
-  payload = null,
-  options = { isPaginated: false }
-) => {
-  const { isPaginated } = options
+let isRefreshing = false
+let refreshPromise = null
 
+const ensureAccessToken = async (authStore) => {
+  if (!authStore.token) {
+    return { error: 'No token' }
+  }
+
+  if (!authStore.isTokenExpired()) {
+    return { success: true }
+  }
+
+  if (!isRefreshing) {
+    isRefreshing = true
+    refreshPromise = authStore.refreshAccessToken().finally(() => {
+      isRefreshing = false
+      refreshPromise = null
+    })
+  }
+
+  return refreshPromise
+}
+
+const request = async (url, method, payload = null, options = { isPaginated: false }) => {
+  const { isPaginated } = options
   const authStore = useAuthStore()
-  const token = authStore.token || localStorage.getItem('token')
+
+  // Check if token needs refresh
+  if (authStore.token && authStore.isTokenExpired()) {
+    const result = await ensureAccessToken(authStore)
+
+    if (result?.error) {
+      authStore.logout()
+      const ResponseBuilder = isPaginated ? PaginationResponse : BaseResponse
+      return new ResponseBuilder().error('Session expired').build()
+    }
+  }
+
+  // Get token for request
+  const token = authStore.token
 
   const headers = {
     'Content-Type': 'application/json',
@@ -37,7 +67,7 @@ const request = async (
   const ResponseBuilder = isPaginated ? PaginationResponse : BaseResponse
 
   try {
-    const res = await fetch(`${API_BASE_URL}${url}`, httpOptions)
+    let res = await fetch(`${API_BASE_URL}${url}`, httpOptions)
 
     if (!res.ok) {
       let errorMessage = `HTTP error! Status: ${res.status}`
@@ -50,15 +80,12 @@ const request = async (
         console.error('Error parsing response body:', error)
       }
 
-      return new ResponseBuilder()
-        .error(errorMessage)
-        .build()
+      console.error('❌ Request failed:', errorMessage)
+      return new ResponseBuilder().error(errorMessage).build()
     }
 
     if (res.status === 204 || method === 'DELETE') {
-      return new ResponseBuilder()
-        .message(BaseResponseMessage.Success)
-        .build()
+      return new ResponseBuilder().message(BaseResponseMessage.Success).build()
     }
 
     const item = await res.json()
@@ -83,6 +110,7 @@ const request = async (
     return response.build()
   } catch (err) {
     const errorMessage = getErrorMessage(err)
+    console.error('Request error:', errorMessage, err)
     return new ResponseBuilder().error(errorMessage).status(0).build()
   }
 }
