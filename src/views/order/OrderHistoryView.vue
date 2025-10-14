@@ -83,13 +83,10 @@ const fetchOrders = async () => {
     toast.add({ type: 'error', message: error.orders })
   } else {
     orders.value = response.data || []
-    console.log(orders.value);
 
     searchOptions.totalElements = response.data?.totalElements || 0
   }
   loading.orders = false
-  console.log(orders.value);
-
 }
 
 const handlePaginationChange = async ({ currentPage, pageSize }) => {

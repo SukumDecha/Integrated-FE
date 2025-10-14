@@ -274,7 +274,6 @@ const handleSubmit = async () => {
     formData.append('idCardImageFront', form.nationalIdFrontImage[0].imageFile)
     formData.append('idCardImageBack', form.nationalIdBackImage[0].imageFile)
   }
-  console.log(formData);
 
   const response = await AuthService.registerUser(formData)
 
