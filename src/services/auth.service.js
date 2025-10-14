@@ -25,6 +25,14 @@ const AuthService = {
 
   async resendVerification(data) {
     return await post(`${BASE_URL}/resend-verification`, data)
+  },
+
+  async refresh() {
+    return await post(`${BASE_URL}/refresh`)
+  },
+
+  async logout() {
+    return await post(`${BASE_URL}/logout`)
   }
 }
 
