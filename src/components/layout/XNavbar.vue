@@ -63,18 +63,19 @@ const cartIsEmpty = computed(() => cartStore.items.length === 0)
 const newOrderCount = ref(0)
 const updateNewOrderCount = async () => {
   const user = authStore.user
-  if (user?.role === 'SELLER') {
-    const response = await OrderService.getOrdersBySellerId(user.id)
-    if (response?.data) {
-      const viewedOrders = JSON.parse(localStorage.getItem('viewedOrders') || '[]')
-      newOrderCount.value = response.data.filter(
-        (order) =>
-          !viewedOrders.includes(order.id) &&
-          (order.orderStatus === 'NEW' || order.orderStatus === 'COMPLETED'),
-      ).length
-    }
+  if (user?.role === UserRole.SELLER) {
+    const newRes = await OrderService.getOrdersBySellerId(user.id, {
+      page: 0,
+      size: 1,
+      sortBy: 'createdOn',
+      sortDirection: 'DESC',
+      tab: 'NEW',
+    })
+
+    newOrderCount.value = newRes?.pagination?.totalItems || 0
   }
 }
+
 onMounted(updateNewOrderCount)
 watch(
   () => route.fullPath,
