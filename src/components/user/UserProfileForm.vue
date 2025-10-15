@@ -20,9 +20,14 @@
         </div>
       </div>
 
-      <XButton v-if="!isEditMode" class="itbms-profile-button" @click="toggleEditMode">
+      <XButton v-if="!isEditMode" class="itbms-profile-button ml-55" @click="toggleEditMode">
         Edit Profile
       </XButton>
+
+      <XButton  class="whitespace-nowrap" @click="goToChangePassword">
+        Change Password
+      </XButton>
+
     </div>
 
     <!-- Success Message (only in edit mode) -->
@@ -85,15 +90,6 @@
         <div v-if="isEditMode" class="absolute top-8 left-3 text-sm text-gray-500">
           Password content hidden
         </div>
-      </div>
-      <div class="flex items-center space-x-2 ml-155">
-        <XButton
-          label="Change Password"
-          variant="link"
-          type="button"
-          class="whitespace-nowrap"
-          @click="goToChangePassword"
-        />
       </div>
     </div>
 

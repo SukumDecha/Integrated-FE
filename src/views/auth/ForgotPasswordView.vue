@@ -10,6 +10,9 @@ const email = ref('')
 const goBack = () => {
   router.push('/signin')
 }
+const goReset = () => {
+  router.push('/reset-password')
+}
 </script>
 
 <template>
@@ -28,7 +31,7 @@ const goBack = () => {
           @click="goBack"
         />
 
-        <XButton label="Send Reset Link" type="button" />
+        <XButton label="Send Reset Link" type="button" @click="goReset" />
       </div>
     </form>
   </div>
