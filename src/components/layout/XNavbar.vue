@@ -7,7 +7,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { nextTick } from 'vue'
 import { useCartStore } from '@/stores/cart.store'
-import { computed } from 'vue'
+import { computed, onMounted, watch } from 'vue'
+import { OrderService } from '@/services'
+import { UserRole } from '@/constants/role.constant.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -38,7 +40,9 @@ const toggleDropdown = () => {
 }
 
 const handleClearStorage = () => {
-  localStorage.clear()
+  localStorage.removeItem('auth')
+  localStorage.removeItem('cart')
+  // ถ้ามี session อื่นค้างอยู่ค่อยเคลียร์ได้
   sessionStorage.clear()
 }
 
@@ -55,6 +59,33 @@ const handleLogout = async () => {
 }
 //ตรวจสอบว่าตะกร้าว่างมั้ย
 const cartIsEmpty = computed(() => cartStore.items.length === 0)
+
+const newOrderCount = ref(0)
+const updateNewOrderCount = async () => {
+  const user = authStore.user
+  if (user?.role === UserRole.SELLER) {
+    const newRes = await OrderService.getOrdersBySellerId(user.id, {
+      page: 0,
+      size: 1,
+      sortBy: 'createdOn',
+      sortDirection: 'DESC',
+      tab: 'NEW',
+    })
+
+    newOrderCount.value = newRes?.pagination?.totalItems || 0
+  }
+}
+
+onMounted(updateNewOrderCount)
+watch(
+  () => route.fullPath,
+  (newPath) => {
+    //ถ้ากลับมาหน้า sale-orders ให้ refresh ตัวเลขใหม่
+    if (newPath.includes('/sale-orders')) {
+      updateNewOrderCount()
+    }
+  },
+)
 </script>
 
 <template>
@@ -117,8 +148,23 @@ const cartIsEmpty = computed(() => cartStore.items.length === 0)
                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
                     @click="isDropdownOpen = false"
                   >
-                    Your Order
+                    Your Orders
                   </router-link>
+                  <router-link
+                    v-if="authStore.user?.role === UserRole.SELLER"
+                    to="/sale-orders"
+                    class="itbms-sale-orders-button block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 flex justify-between items-center"
+                    @click="isDropdownOpen = false"
+                  >
+                    <span>Sales Orders</span>
+                    <span
+                      v-if="newOrderCount > 0"
+                      class="ml-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full"
+                    >
+                      {{ newOrderCount }}
+                    </span>
+                  </router-link>
+
                   <button
                     class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
                     @click="handleLogout"
@@ -164,6 +210,20 @@ const cartIsEmpty = computed(() => cartStore.items.length === 0)
               class="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-emerald-600 rounded-full min-w-[1.25rem] h-5"
             >
               {{ totalItems }}
+            </span>
+          </button>
+          <!-- Seller only -->
+          <button
+            v-if="authStore.user?.role === UserRole.SELLER"
+            @click="router.push('/sale-orders')"
+            class="relative flex items-center p-2 rounded-md hover:bg-emerald-50 transition"
+          >
+            <ShoppingBag class="itbms-bag-button h-6 w-6 text-emerald-700" />
+            <span
+              v-if="newOrderCount > 0"
+              class="itbms-bag-quantity absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full"
+            >
+              {{ newOrderCount }}
             </span>
           </button>
         </div>
@@ -222,8 +282,23 @@ const cartIsEmpty = computed(() => cartStore.items.length === 0)
               class="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
               @click="closeMobileMenu"
             >
-              Your Order
+              Your Orders
             </router-link>
+            <router-link
+              v-if="authStore.user?.role === UserRole.SELLER"
+              to="/sale-orders"
+              class="itbms-sale-orders-button block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 flex justify-between items-center"
+              @click="isDropdownOpen = false"
+            >
+              <span>Sales Orders</span>
+              <span
+                v-if="newOrderCount > 0"
+                class="ml-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full"
+              >
+                {{ newOrderCount }}
+              </span>
+            </router-link>
+
             <!-- ✅ Use button instead of router-link for mobile too -->
             <button
               class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
@@ -270,6 +345,20 @@ const cartIsEmpty = computed(() => cartStore.items.length === 0)
               class="ml-auto inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-emerald-600 rounded-full min-w-[1.25rem] h-5"
             >
               {{ totalItems }}
+            </span>
+          </button>
+          <!-- Seller only -->
+          <button
+            v-if="authStore.user?.role === UserRole.SELLER"
+            @click="router.push('/sale-orders')"
+            class="relative flex items-center p-2 rounded-md hover:bg-emerald-50 transition"
+          >
+            <ShoppingBag class="h-6 w-6 text-emerald-700" />
+            <span
+              v-if="newOrderCount > 0"
+              class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full"
+            >
+              {{ newOrderCount }}
             </span>
           </button>
         </div>

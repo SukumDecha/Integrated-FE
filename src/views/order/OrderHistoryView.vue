@@ -8,6 +8,7 @@ import { useToastStore } from '@/stores/toast.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { OrderService } from '@/services'
 import { loadFromSessionStorage, saveToSessionStorage } from '@/utils/StorageUtils'
+import XTab from '@/components/common/XTab.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -20,14 +21,6 @@ const ORDER_STORAGE_KEYS = {
 }
 
 const orders = ref([])
-const groupedOrders = computed(() => {
-  return orders.value.reduce((acc, order) => {
-    const seller = order.seller?.nickname || 'Unknown'
-    if (!acc[seller]) acc[seller] = []
-    acc[seller].push(order)
-    return acc
-  }, {})
-})
 
 const loading = reactive({ orders: true })
 const error = reactive({ orders: null })
@@ -68,6 +61,7 @@ const initializeState = () => {
 const updateRouteQuery = () => {
   router.replace({ query: { ...searchParams.value, page: searchOptions.currentPage } })
 }
+const activeTab = ref('completed')
 
 const fetchOrders = async () => {
   const userId = authStore.user?.id
@@ -76,32 +70,49 @@ const fetchOrders = async () => {
   loading.orders = true
   error.orders = null
 
-  const response = await OrderService.getOrderByUserId(userId, searchParams.value)
+  const response = await OrderService.getOrderByUserId(userId, {
+    ...searchParams.value,
+    tab: activeTab.value.toUpperCase(),
+  })
 
   if (response.error) {
     error.orders = response.error || 'Failed to load order history.'
     toast.add({ type: 'error', message: error.orders })
   } else {
     orders.value = response.data || []
-
-    searchOptions.totalElements = response.data?.totalElements || 0
+    const p = response.pagination || {}
+    searchOptions.totalElements = p.totalElements || 0
+    searchOptions.pageSize = p.pageSize || searchOptions.pageSize
   }
   loading.orders = false
 }
-
-const handlePaginationChange = async ({ currentPage, pageSize }) => {
-  const oldPage = searchOptions.currentPage
+const handlePaginationChange = ({ currentPage, pageSize }) => {
+  // อัปเดต state ในหน้า
   searchOptions.currentPage = currentPage
   searchOptions.pageSize = pageSize
 
-  if (oldPage !== currentPage) await fetchOrders()
-
   saveToSessionStorage(ORDER_STORAGE_KEYS.PAGINATION, { currentPage, pageSize })
+
+  router.push({
+    query: {
+      ...searchParams.value,
+      page: currentPage,
+    },
+  })
 }
+
+watch(
+  () => [route.query.page, route.query.size],
+  async ([qPage, qSize]) => {
+    searchOptions.currentPage = Number(qPage) || searchOptions.currentPage || 1
+    searchOptions.pageSize = Number(qSize) || searchOptions.pageSize || 10
+    await fetchOrders()
+  },
+  { immediate: true },
+)
 
 onMounted(async () => {
   initializeState()
-  await fetchOrders()
 })
 
 watch(
@@ -113,23 +124,37 @@ watch(
   ],
   updateRouteQuery,
 )
+
+const groupedFilteredOrders = computed(() => {
+  return orders.value.reduce((acc, order) => {
+    const seller = order.seller?.nickname || 'Unknown'
+    if (!acc[seller]) acc[seller] = []
+    acc[seller].push(order)
+    return acc
+  }, {})
+})
+watch(activeTab, async () => {
+  searchOptions.currentPage = 1
+  await fetchOrders()
+})
 </script>
 
 <template>
   <XBreadcrumb :items="breadcrumbs" />
   <div class="p-6 max-w-5xl mx-auto">
-    <h1 class="text-2xl font-semibold text-green-700 mb-6">
-      Your Orders
-    </h1>
-    <div
-      v-if="!loading.orders && orders.length === 0 && !error.orders"
-      class="text-center text-gray-500 text-lg py-20"
-    >
-      You don’t have any orders yet.
-    </div>
+    <h1 class="text-2xl font-semibold text-green-700 mb-6">Your Orders</h1>
+    <XTab
+      v-model="activeTab"
+      :tabs="[
+        { label: 'Completed', value: 'completed' },
+        { label: 'Cancelled', value: 'cancelled' },
+        { label: 'All', value: 'all' },
+      ]"
+      class="mb-6"
+    />
     <div>
       <div
-        v-for="(sellerOrders, sellerName) in groupedOrders"
+        v-for="(sellerOrders, sellerName) in groupedFilteredOrders"
         :key="sellerName"
         class="space-y-6"
       >
@@ -137,13 +162,19 @@ watch(
           v-for="order in sellerOrders"
           :key="order.id"
           :order="order"
-          :seller-name="sellerName"
+          :isBuyerCard="true"
         />
       </div>
     </div>
+    <div
+      v-if="!loading.orders && !orders.value.length && !error.orders"
+      class="text-center text-gray-500 text-lg py-20"
+    >
+      You don’t have any {{ activeTab }} orders.
+    </div>
 
     <XPagination
-      v-if="!loading.orders && orders.length"
+      v-if="!loading.orders && orders.value.length > 0"
       class="mt-10"
       :pagination="{
         currentPage: searchOptions.currentPage,
@@ -154,10 +185,7 @@ watch(
       @change="handlePaginationChange"
     />
 
-    <div
-      v-if="error.orders"
-      class="text-center py-10"
-    >
+    <div v-if="error.orders" class="text-center py-10">
       <p class="text-lg text-red-500">
         {{ error.orders }}
       </p>
