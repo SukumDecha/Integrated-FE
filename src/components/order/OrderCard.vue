@@ -3,16 +3,13 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { OrderStatus } from '@/constants/order.constant.js'
 import XButton from '@/components/common/XButton.vue'
+import { formatDate } from '@/utils/DateUtils.js'
+import { displayOrDash } from '@/utils/TextUtils.js'
 const props = defineProps({
   order: { type: Object, required: true },
   isBuyerCard: { type: Boolean, default: false },
 })
 const router = useRouter()
-
-const formatDate = (d) =>
-  d
-    ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
-    : '-'
 const formatCurrency = (n) => n?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || '0'
 const calculateTotalPrice = computed(() => {
   if (!props.order?.orderItems || props.order.orderItems.length === 0) return 0
@@ -58,7 +55,7 @@ const orderDetailPath = computed(() =>
           </div>
           <div class="text-sm text-gray-600">
             <span class="itbms-order-note font-medium">Note:</span>
-            {{ order.orderNote || '' }}
+            {{ displayOrDash(order.orderNote) }}
           </div>
         </div>
       </div>

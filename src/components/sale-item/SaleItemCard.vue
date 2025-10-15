@@ -165,7 +165,7 @@ const handleAddToCart = () => {
     </router-link>
 
     <div class="p-5 flex justify-center -mt-5">
-      <XButton class="itbms-add-to-cart-button" @click="handleAddToCart">
+      <XButton class="itbms-add-to-cart-button" @click="handleAddToCart" :disabled="quantity <= 0">
         <span class="flex items-center">
           <ShoppingCart class="mr-2 h-5 w-5" />
           ADD TO CART

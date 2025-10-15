@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import AuthLayout from '@/components/layout/AuthLayout.vue'
 import { useAuthStore } from '@/stores/auth.store'
+import { UserRole } from '@/constants/role.constant.js'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -82,7 +83,7 @@ const router = createRouter({
               component: () => import('../views/sale-item/SaleItemListView.vue'),
               meta: {
                 requiresAuth: true,
-                roles: ['SELLER'],
+                roles: [UserRole.SELLER],
               },
             },
           ],
@@ -138,7 +139,7 @@ const router = createRouter({
       component: () => import('../views/order/OrderSellerView.vue'),
       meta: {
         requiresAuth: true,
-        roles: ['SELLER'],
+        roles: [UserRole.SELLER],
       },
     },
     {
@@ -147,7 +148,7 @@ const router = createRouter({
       component: () => import('../views/order/OrderSellerDetailView.vue'),
       meta: {
         requiresAuth: true,
-        roles: ['SELLER'],
+       roles: [UserRole.SELLER],
       },
     },
   ],

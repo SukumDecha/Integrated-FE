@@ -117,7 +117,6 @@ const fetchOrders = async () => {
     tab: activeTab.value,
   }
 
-  console.log('📡 Fetching Orders =>', params)
   const res = await OrderService.getOrdersBySellerId(sellerId, params)
 
   if (res?.data) {

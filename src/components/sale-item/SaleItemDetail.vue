@@ -130,6 +130,7 @@ const handleAddToCart = () => {
 
 const isMinusDisabled = computed(() => quantity.value <= 1)
 const isPlusDisabled = computed(() => quantity.value >= (props.product?.quantity || 0))
+const isOutOfStock = computed(() => props.product?.quantity <= 0)
 </script>
 
 <template>
@@ -319,6 +320,7 @@ const isPlusDisabled = computed(() => quantity.value >= (props.product?.quantity
                     variant="primary"
                     size="sm"
                     @click="handleAddToCart"
+                    :disabled="isOutOfStock"
                     v-if="!isOwner"
                     class="itbms-add-to-cart-button ml-5"
                   >

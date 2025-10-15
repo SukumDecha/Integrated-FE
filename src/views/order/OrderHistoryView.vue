@@ -9,7 +9,6 @@ import { useAuthStore } from '@/stores/auth.store'
 import { OrderService } from '@/services'
 import { loadFromSessionStorage, saveToSessionStorage } from '@/utils/StorageUtils'
 import XTab from '@/components/common/XTab.vue'
-import { OrderStatus } from '@/constants/order.constant.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -54,10 +53,6 @@ const initializeState = () => {
 
   searchOptions.currentPage = parseInt(q.page) || storedPage.currentPage || 1
   searchOptions.pageSize = parseInt(q.size) || storedPage.pageSize || 10
-  //เพิ่มเงื่อนไข reset ถ้าค่าไม่ถูกต้อง (เช่น undefined หรือ 0)
-  if (!searchOptions.pageSize || searchOptions.pageSize <= 0) {
-    searchOptions.pageSize = 10
-  }
   searchOptions.sortBy = q.sortBy || storedSort.field || 'orderDate'
   searchOptions.sortOrder = q.sortDirection || storedSort.order || 'desc'
   updateRouteQuery()
@@ -86,8 +81,8 @@ const fetchOrders = async () => {
   } else {
     orders.value = response.data || []
     const p = response.pagination || {}
-    searchOptions.totalElements = p.totalItems ?? p.totalElements ?? response.totalElements ?? 0
-    searchOptions.pageSize = p.pageSize ?? response.size ?? searchOptions.pageSize
+    searchOptions.totalElements = p.totalElements || 0
+    searchOptions.pageSize = p.pageSize || searchOptions.pageSize
   }
   loading.orders = false
 }
@@ -130,17 +125,8 @@ watch(
   updateRouteQuery,
 )
 
-const filteredOrders = computed(() => {
-  if (activeTab.value === 'completed') {
-    return orders.value.filter((o) => o.orderStatus === OrderStatus.COMPLETED)
-  } else if (activeTab.value === 'canceled') {
-    return orders.value.filter((o) => o.orderStatus === OrderStatus.CANCELED)
-  }
-  return orders.value
-})
-
 const groupedFilteredOrders = computed(() => {
-  return filteredOrders.value.reduce((acc, order) => {
+  return orders.value.reduce((acc, order) => {
     const seller = order.seller?.nickname || 'Unknown'
     if (!acc[seller]) acc[seller] = []
     acc[seller].push(order)
@@ -151,7 +137,6 @@ watch(activeTab, async () => {
   searchOptions.currentPage = 1
   await fetchOrders()
 })
-
 </script>
 
 <template>
@@ -182,14 +167,14 @@ watch(activeTab, async () => {
       </div>
     </div>
     <div
-      v-if="!loading.orders && !filteredOrders.length && !error.orders"
+      v-if="!loading.orders && !orders.value.length && !error.orders"
       class="text-center text-gray-500 text-lg py-20"
     >
       You don’t have any {{ activeTab }} orders.
     </div>
 
     <XPagination
-      v-if="!loading.orders && filteredOrders.length > 0"
+      v-if="!loading.orders && orders.value.length > 0"
       class="mt-10"
       :pagination="{
         currentPage: searchOptions.currentPage,

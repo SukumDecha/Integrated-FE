@@ -7,8 +7,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
 import { nextTick } from 'vue'
 import { useCartStore } from '@/stores/cart.store'
-import { computed, onMounted,watch  } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { OrderService } from '@/services'
+import { UserRole } from '@/constants/role.constant.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -39,22 +40,11 @@ const toggleDropdown = () => {
 }
 
 const handleClearStorage = () => {
-  // ดึงค่า viewedOrders เก็บไว้ก่อน
-  const viewedOrders = localStorage.getItem('viewedOrders')
-
-  // ลบเฉพาะข้อมูลที่ไม่เกี่ยว เช่น token / cart
   localStorage.removeItem('auth')
   localStorage.removeItem('cart')
-
-  // คืนค่า viewedOrders กลับเข้าไป
-  if (viewedOrders) {
-    localStorage.setItem('viewedOrders', viewedOrders)
-  }
-
   // ถ้ามี session อื่นค้างอยู่ค่อยเคลียร์ได้
   sessionStorage.clear()
 }
-
 
 const handleLogout = async () => {
   authStore.logout()
@@ -93,9 +83,8 @@ watch(
     if (newPath.includes('/sale-orders')) {
       updateNewOrderCount()
     }
-  }
+  },
 )
-
 </script>
 
 <template>
@@ -161,7 +150,7 @@ watch(
                     Your Orders
                   </router-link>
                   <router-link
-                    v-if="authStore.user?.role === 'SELLER'"
+                    v-if="authStore.user?.role === UserRole.SELLER"
                     to="/sale-orders"
                     class="itbms-sale-orders-button block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 flex justify-between items-center"
                     @click="isDropdownOpen = false"
@@ -224,7 +213,7 @@ watch(
           </button>
           <!-- Seller only -->
           <button
-            v-if="authStore.user?.role === 'SELLER'"
+            v-if="authStore.user?.role === UserRole.SELLER"
             @click="router.push('/sale-orders')"
             class="relative flex items-center p-2 rounded-md hover:bg-emerald-50 transition"
           >
@@ -295,7 +284,7 @@ watch(
               Your Orders
             </router-link>
             <router-link
-              v-if="authStore.user?.role === 'SELLER'"
+              v-if="authStore.user?.role === UserRole.SELLER"
               to="/sale-orders"
               class="itbms-sale-orders-button block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 flex justify-between items-center"
               @click="isDropdownOpen = false"
@@ -359,7 +348,7 @@ watch(
           </button>
           <!-- Seller only -->
           <button
-            v-if="authStore.user?.role === 'SELLER'"
+            v-if="authStore.user?.role === UserRole.SELLER"
             @click="router.push('/sale-orders')"
             class="relative flex items-center p-2 rounded-md hover:bg-emerald-50 transition"
           >
