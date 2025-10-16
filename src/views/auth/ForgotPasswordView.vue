@@ -3,15 +3,30 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import XInput from '@/components/common/form/XInput.vue'
 import XButton from '@/components/common/XButton.vue'
+import AuthService from '@/services/auth.service'
+import { useToastStore } from '@/stores/toast.store'
+import { useLoaderStore } from '@/stores/loader.store'
 
 const router = useRouter()
+const toastStore = useToastStore()
+const loaderStore = useLoaderStore()
 const email = ref('')
 
 const goBack = () => {
   router.push('/signin')
 }
-const goReset = () => {
-  router.push('/reset-password')
+
+const handleSubmit = async () => {
+  try {
+    loaderStore.startLoading()
+    await AuthService.forgotPassword({ email: email.value })
+    toastStore.success('Reset password link has been sent to your email')
+    router.push('/signin')
+  } catch (error) {
+    toastStore.error(error.message || 'Failed to send reset password link')
+  } finally {
+     loaderStore.stopLoading()
+  }
 }
 </script>
 
@@ -19,7 +34,7 @@ const goReset = () => {
   <div class="max-w-md mx-auto mt-12 p-6">
     <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Forgot Password</h2>
 
-    <form class="space-y-4">
+    <form class="space-y-4" @submit.prevent="handleSubmit">
       <XInput v-model="email" label="Email" type="email" required placeholder="Enter your email" />
 
       <div class="flex justify-between items-center pt-4">
@@ -31,7 +46,7 @@ const goReset = () => {
           @click="goBack"
         />
 
-        <XButton label="Send Reset Link" type="button" @click="goReset" />
+        <XButton label="Send Reset Link" type="submit" />
       </div>
     </form>
   </div>

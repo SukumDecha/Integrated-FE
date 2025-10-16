@@ -33,6 +33,30 @@ const AuthService = {
 
   async logout() {
     return await post(`${BASE_URL}/logout`)
+  },
+
+  async forgotPassword(data) {
+    return await post(`${BASE_URL}/forgot-password`, data)
+  },
+
+  async validateResetPasswordToken(token) {
+    return await get(`${BASE_URL}/reset-password/validate`, {
+      headers: {
+        token: token
+      }
+    })
+  },
+
+  async resetPassword(token, data) {
+    return await post(`${BASE_URL}/reset-password`, data, {
+      headers: {
+        token: token
+      }
+    })
+  },
+
+  async changePassword(data) {
+    return await post(`${BASE_URL}/change-password`, data)
   }
 }
 

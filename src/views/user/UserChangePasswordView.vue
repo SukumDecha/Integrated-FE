@@ -4,6 +4,9 @@ import { useRouter } from 'vue-router'
 import XInput from '@/components/common/form/XInput.vue'
 import XButton from '@/components/common/XButton.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
+import AuthService from '@/services/auth.service'
+import { useToastStore } from '@/stores/toast.store'
+import { useLoaderStore } from '@/stores/loader.store'
 
 
 const breadcrumbs = [
@@ -13,6 +16,8 @@ const breadcrumbs = [
 ]
 
 const router = useRouter()
+const toastStore = useToastStore()
+const loaderStore = useLoaderStore()
 
 const form = ref({
   currentPassword: '',
@@ -20,6 +25,28 @@ const form = ref({
   confirmPassword: ''
 })
 
+const handleSubmit = async () => {
+  // Check if passwords match
+  if (form.value.newPassword !== form.value.confirmPassword) {
+    toastStore.error('New passwords do not match!')
+    return
+  }
+
+  try {
+    loaderStore.show()
+    await AuthService.changePassword({
+      oldPassword: form.value.currentPassword,
+      newPassword: form.value.newPassword,
+      confirmPassword: form.value.confirmPassword
+    })
+    toastStore.success('Password changed successfully')
+    router.push('/profile')
+  } catch (error) {
+    toastStore.error(error.message || 'Failed to change password')
+  } finally {
+    loaderStore.hide()
+  }
+}
 
 const goBack = () => {
   router.push('/profile')
@@ -36,7 +63,7 @@ const goBack = () => {
     </div>
 
     <!-- Password Form -->
-    <form class="space-y-4">
+    <form class="space-y-4" @submit.prevent="handleSubmit">
       <XInput
         v-model="form.currentPassword"
         label="Current Password"
