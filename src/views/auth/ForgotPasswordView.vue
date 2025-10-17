@@ -17,17 +17,18 @@ const goBack = () => {
 }
 
 const handleSubmit = async () => {
-  try {
     loaderStore.startLoading()
-    await AuthService.forgotPassword({ email: email.value })
-    toastStore.success('Reset password link has been sent to your email')
-    router.push('/signin')
-  } catch (error) {
-    toastStore.error(error.message || 'Failed to send reset password link')
-  } finally {
+    const response = await AuthService.forgotPassword({ email: email.value })
+
+    if (response?.message === 'If email exists, a reset link has been sent to your email.') {
+      toastStore.add({ type: 'success', message: 'Reset password link has been sent to your email' })
+      router.push('/signin')
+    } else {
+      toastStore.add({ type: 'error', message: response.message || 'Failed to send reset password link' })
+      router.push('/signin')
+    }
      loaderStore.stopLoading()
   }
-}
 </script>
 
 <template>

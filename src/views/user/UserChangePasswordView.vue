@@ -8,7 +8,6 @@ import AuthService from '@/services/auth.service'
 import { useToastStore } from '@/stores/toast.store'
 import { useLoaderStore } from '@/stores/loader.store'
 
-
 const breadcrumbs = [
   { text: 'Home', path: '/' },
   { text: 'Profile', path: '/profile' },
@@ -22,30 +21,33 @@ const loaderStore = useLoaderStore()
 const form = ref({
   currentPassword: '',
   newPassword: '',
-  confirmPassword: ''
+  confirmPassword: '',
 })
 
 const handleSubmit = async () => {
   // Check if passwords match
   if (form.value.newPassword !== form.value.confirmPassword) {
-    toastStore.error('New passwords do not match!')
+    toastStore.add({ type: 'error', message: 'New passwords do not match!' })
+
     return
   }
 
-  try {
-    loaderStore.show()
-    await AuthService.changePassword({
-      oldPassword: form.value.currentPassword,
-      newPassword: form.value.newPassword,
-      confirmPassword: form.value.confirmPassword
-    })
-    toastStore.success('Password changed successfully')
+  loaderStore.startLoading()
+
+  const response = await AuthService.changePassword({
+    oldPassword: form.value.currentPassword,
+    newPassword: form.value.newPassword,
+    confirmPassword: form.value.confirmPassword,
+  })
+
+  if (response?.message === 'Password changed successfully') {
+    toastStore.add({ type: 'success', message: 'Your password has been updated.' })
     router.push('/profile')
-  } catch (error) {
-    toastStore.error(error.message || 'Failed to change password')
-  } finally {
-    loaderStore.hide()
+  } else {
+    toastStore.add({ type: 'error', message: response?.message || 'Failed to change password' })
   }
+
+  loaderStore.stopLoading()
 }
 
 const goBack = () => {
@@ -100,8 +102,9 @@ const goBack = () => {
 
         <XButton
           label="Change Password"
-          type="submit"
+          type="button"
           class="itbms-save-button"
+          @click="handleSubmit"
         />
       </div>
     </form>
