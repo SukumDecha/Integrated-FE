@@ -430,27 +430,59 @@ watch(
     <div class="max-w-7xl mx-auto py-8 px-4 space-y-6">
       <XBreadcrumb :items="breadcrumbs" />
 
-      <div class="flex justify-between items-center mb-6 mx-4">
-        <div class="flex items-center gap-x-2 w-full max-w-3xl">
-          <!-- 🔍 Search section -->
+      <!-- Search Bar with Sort Controls -->
+      <div class="flex items-center gap-3 mb-4">
+        <div class="flex-1 max-w-md relative">
           <XInput
             v-model="searchOptions.filterSearch"
             placeholder="Search..."
-            class="w-full rounded-md"
+            class="w-full"
             @keydown.enter="onSearch"
           />
+        </div>
+        <XButton color="primary" @click="onSearch">
+          <template #default>Search</template>
+        </XButton>
+        <XButton variant="outline" class="itbms-search-clear-button" @click="clearSearch">
+          Clear
+        </XButton>
 
-          <XButton color="primary" @click="onSearch">
-            <template #default> 🔍 </template>
+        <!-- Spacer -->
+        <div class="flex-1"></div>
+
+        <!-- Sort Controls -->
+        <div class="flex items-center gap-2">
+          <XButton
+            class-name="itbms-brand-none"
+            variant="info"
+            :disabled="!searchOptions.sortBy && !searchOptions.sortOrder"
+            @click="clearSort"
+          >
+            <AlignJustify class="w-4 h-4" />
           </XButton>
-
-          <XButton class="itbms-search-clear-button" @click="clearSearch"> Clear </XButton>
+          <XButton
+            class-name="itbms-brand-asc"
+            variant="info"
+            :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'asc'"
+            @click="sortAscByName"
+          >
+            <ArrowUpWideNarrow class="w-4 h-4" />
+          </XButton>
+          <XButton
+            class-name="itbms-brand-desc"
+            variant="info"
+            :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'desc'"
+            @click="sortDescByName"
+          >
+            <ArrowDownWideNarrow class="w-4 h-4" />
+          </XButton>
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-md">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-1">
-          <!-- brand filter -->
+      <!-- Filters Section -->
+      <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Brand Filter -->
           <div class="min-w-[200px]">
             <XSelector
               v-model="searchOptions.filteredBrands"
@@ -464,7 +496,8 @@ watch(
               @remove="handleBrandRemove"
             />
           </div>
-          <!-- Price filter -->
+
+          <!-- Price Range Filter -->
           <div class="min-w-[200px]">
             <XSelector
               v-model="searchOptions.filteredPrices"
@@ -476,7 +509,8 @@ watch(
               @update:model-value="() => resetPagination(false)"
             />
           </div>
-          <!-- Storage filter -->
+
+          <!-- Storage Filter -->
           <div class="min-w-[200px]">
             <XSelector
               v-model="searchOptions.filteredStorages"
@@ -489,63 +523,34 @@ watch(
               @update:model-value="() => resetPagination(false)"
             />
           </div>
-          <XButton class-name="itbms-brand-filter-clear" @click="clearAllFilter"> Clear </XButton>
-        </div>
 
-        <div class="flex flex-wrap items-center gap-2 p-4 pt-0 rounded-md" />
-
-        <div class="flex items-center gap-2">
-          <XButton
-            class-name="itbms-brand-none"
-            variant="info"
-            :disabled="!searchOptions.sortBy && !searchOptions.sortOrder"
-            @click="clearSort"
-          >
-            <AlignJustify />
-          </XButton>
-          <XButton
-            class-name="itbms-brand-asc"
-            variant="info"
-            :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'asc'"
-            @click="sortAscByName"
-          >
-            <ArrowUpWideNarrow />
-          </XButton>
-          <XButton
-            class-name="itbms-brand-desc"
-            variant="info"
-            :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'desc'"
-            @click="sortDescByName"
-          >
-            <ArrowDownWideNarrow />
-          </XButton>
-        </div>
-      </div>
-
-      <!-- แถวล่าง: Min / Max -->
-      <div class="flex flex-wrap items-center gap-2 px-4 pt-2 pb-0 rounded-md">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-1">
-          <div class="min-w-[200px]">
+          <!-- Custom Price Inputs -->
+          <div class="flex items-center gap-2">
             <XInput
               v-model="customPrice.min"
               type="number"
               placeholder="Min"
               step="1"
               variant="filter"
+              class="w-24"
               @keydown.enter.prevent="resetPagination(false)"
             />
-          </div>
-
-          <div class="min-w-[200px]">
+            <span class="text-gray-400">-</span>
             <XInput
               v-model="customPrice.max"
               type="number"
               placeholder="Max"
               step="1"
               variant="filter"
+              class="w-24"
               @keydown.enter.prevent="resetPagination(false)"
             />
           </div>
+
+          <!-- Clear Filter Button -->
+          <XButton variant="outline" class="itbms-brand-filter-clear" @click="clearAllFilter">
+            Clear
+          </XButton>
         </div>
       </div>
 
