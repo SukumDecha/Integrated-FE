@@ -81,7 +81,7 @@ const fetchOrders = async () => {
   } else {
     orders.value = response.data || []
     const p = response.pagination || {}
-    searchOptions.totalElements = p.totalElements || 0
+    searchOptions.totalItems = p.totalItems || 0
     searchOptions.pageSize = p.pageSize || searchOptions.pageSize
   }
   loading.orders = false
@@ -179,7 +179,7 @@ watch(activeTab, async () => {
       :pagination="{
         currentPage: searchOptions.currentPage,
         pageSize: searchOptions.pageSize,
-        total: searchOptions.totalElements,
+        total: searchOptions.totalItems,
       }"
       :show-size-changer="true"
       @change="handlePaginationChange"

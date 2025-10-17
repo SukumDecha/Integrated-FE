@@ -121,7 +121,7 @@ const fetchOrders = async () => {
 
   if (res?.data) {
     orders.value = res.data
-    pagination.totalItems = res.pagination?.totalItems ?? res.totalElements ?? 0
+    pagination.totalItems = res.pagination?.totalItems ?? 0
   } else {
     toast.add({
       title: 'Error',
@@ -183,22 +183,37 @@ onMounted(() => {
 
 <template>
   <div class="p-6 max-w-5xl mx-auto">
-    <XBreadcrumb :items="breadcrumbs" class="mb-6" />
+    <XBreadcrumb
+      :items="breadcrumbs"
+      class="mb-6"
+    />
 
-    <XTab v-model="activeTab" :tabs="tabs" class="mb-6" />
+    <XTab
+      v-model="activeTab"
+      :tabs="tabs"
+      class="mb-6"
+    />
 
-    <div v-if="loading.orders" class="text-center py-20 text-gray-500">Loading orders...</div>
+    <div
+      v-if="loading.orders"
+      class="text-center py-20 text-gray-500"
+    >
+      Loading orders...
+    </div>
 
     <div v-else>
       <OrderCard
         v-for="order in orders"
         :key="order.id"
         :order="order"
-        :isBuyerCard="false"
+        :is-buyer-card="false"
         @click="openOrderDetail(order)"
       />
 
-      <div v-if="!orders.length" class="text-center text-gray-500 py-20">
+      <div
+        v-if="!orders.length"
+        class="text-center text-gray-500 py-20"
+      >
         You don’t have any {{ activeTab }} orders.
       </div>
     </div>

@@ -6,9 +6,48 @@ import { useToastStore } from './toast.store'
 import { CART_STORAGE_KEY as STORAGE_KEY, CART_TOAST_MESSAGES } from '@/constants/cart.constant'
 
 export const useCartStore = defineStore('cart', () => {
-  const items = ref(loadFromLocalStorage(STORAGE_KEY, []))
+  const items = ref([])
+
   const authStore = useAuthStore()
   const toastStore = useToastStore()
+
+  // Helper: derive a per-user storage key so multiple accounts persist separately
+  const storageKey = computed(() => {
+    const uid = authStore.user?.id || 'guest'
+    return `${STORAGE_KEY}:${uid}`
+  })
+
+  // Migrate legacy non-namespaced cart (CART_STORAGE_KEY) into per-user key once
+  // const migrateLegacyCartIfNeeded = () => {
+  //   try {
+  //     const legacyRaw = localStorage.getItem(STORAGE_KEY)
+  //     if (!legacyRaw) return
+  //     const legacyItems = JSON.parse(legacyRaw)
+  //     const currentItems = loadFromLocalStorage(storageKey.value, [])
+  //     if (
+  //       Array.isArray(legacyItems) &&
+  //       (Array.isArray(currentItems) ? currentItems.length === 0 : true)
+  //     ) {
+  //       saveToLocalStorage(storageKey.value, legacyItems)
+  //       localStorage.removeItem(STORAGE_KEY)
+  //       items.value = legacyItems
+  //     }
+  //   } catch {
+  //     // ignore migration errors
+  //   }
+  // }
+  // migrateLegacyCartIfNeeded()
+
+  // Re-hydrate cart when logged-in user changes (login/logout/switch account)
+  watch(
+    () => authStore.user?.id,
+    () => {
+      items.value = loadFromLocalStorage(storageKey.value, [])
+    },
+    {
+      immediate: true,
+    },
+  )
 
   const addItem = (item) => {
     const userId = authStore.user?.id
@@ -67,10 +106,9 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   const getSellerGroups = () => {
-    const cartStore = useCartStore()
     return computed(() => {
       const groupsMap = new Map()
-      for (const item of cartStore.items) {
+      for (const item of items.value) {
         const nickname = item?.sellerNickname || 'Unknown'
         if (!groupsMap.has(nickname)) {
           groupsMap.set(nickname, [])
@@ -105,12 +143,15 @@ export const useCartStore = defineStore('cart', () => {
 
   const clearCart = () => {
     items.value = []
+    // Persist clear for current user
+    saveToLocalStorage(storageKey.value, items.value)
   }
 
   watch(
     items,
     (newVal) => {
-      saveToLocalStorage(STORAGE_KEY, newVal)
+      // Persist to the current user's cart bucket
+      saveToLocalStorage(storageKey.value, newVal)
     },
     { deep: true },
   )
@@ -183,7 +224,7 @@ export const useCartStore = defineStore('cart', () => {
     items.value = items.value.filter((i) => !i.selected)
 
     // เซฟกลับ localStorage
-    saveToLocalStorage(STORAGE_KEY, items.value)
+    saveToLocalStorage(storageKey.value, items.value)
   }
 
   return {
