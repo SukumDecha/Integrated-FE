@@ -1,6 +1,7 @@
 <script setup>
 import { RouterView, useRoute } from 'vue-router'
 import { computed } from 'vue'
+import { MailCheck } from 'lucide-vue-next'
 
 const route = useRoute()
 
@@ -75,9 +76,7 @@ const pageContent = computed(() => {
         <div class="max-w-md space-y-6">
           <div class="flex items-center space-x-3 mb-8">
             <div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-              <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M3 3h18a1 1 0 011 1v16a1 1 0 01-1 1H3a1 1 0 01-1-1V4a1 1 0 011-1zm9 12.5l-5-5 1.5-1.5L12 12.5l7.5-7.5L21 6.5l-9 9z"/>
-              </svg>
+            <MailCheck class="w-6 h-6 text-white" />
             </div>
             <h1 class="text-2xl font-bold">Green Cart</h1>
           </div>

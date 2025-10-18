@@ -44,21 +44,15 @@
           <!-- Feature Pills -->
           <div class="flex flex-wrap gap-2">
             <span class="inline-flex items-center px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-xs text-gray-700">
-              <svg class="w-3.5 h-3.5 mr-1.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
+              <Check class="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
               Free Shipping
             </span>
             <span class="inline-flex items-center px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-xs text-gray-700">
-              <svg class="w-3.5 h-3.5 mr-1.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
+              <shield-check class="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
               Warranty Included
             </span>
             <span class="inline-flex items-center px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-xs text-gray-700">
-              <svg class="w-3.5 h-3.5 mr-1.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-              </svg>
+              <badge-dollar-sign class="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
               Best Price
             </span>
           </div>
@@ -75,9 +69,7 @@
               <template #default>
                 <span class="flex items-center">
                   {{ primaryButtonText }}
-                  <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                  </svg>
+                  <ArrowRight class="w-4 h-4 ml-2" />
                 </span>
               </template>
             </XButton>
@@ -120,6 +112,7 @@
 import { defineProps } from 'vue'
 import { useRouter } from 'vue-router'
 import XButton from '@/components/common/XButton.vue'
+import { Check , ShieldCheck , BadgeDollarSign , ArrowRight } from 'lucide-vue-next'
 
 const router = useRouter()
 

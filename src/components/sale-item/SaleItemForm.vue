@@ -1,3 +1,4 @@
+
 <template>
   <form
     class="sale-item-form-container"
@@ -8,9 +9,7 @@
       <div class="section-header">
         <div class="flex items-center gap-2 mb-3">
           <div class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center shadow-sm">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-            </svg>
+            <Tag class="w-5 h-5 text-white" />
           </div>
           <h3 class="section-title">Brand Information</h3>
         </div>
@@ -38,9 +37,7 @@
       <div class="section-header">
         <div class="flex items-center gap-2 mb-3">
           <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-            </svg>
+         <TabletSmartphone class="w-5 h-5 text-white" />
           </div>
           <h3 class="section-title">Product Details</h3>
         </div>
@@ -84,9 +81,7 @@
       <div class="section-header">
         <div class="flex items-center gap-2 mb-3">
           <div class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center shadow-sm">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+            <BadgeDollarSign class="w-5 h-5 text-white" />
           </div>
           <h3 class="section-title">Pricing & Inventory</h3>
         </div>
@@ -122,9 +117,7 @@
       <div class="section-header">
         <div class="flex items-center gap-2 mb-3">
           <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
-            </svg>
+            <CircuitBoard class="w-5 h-5 text-white" />
           </div>
           <h3 class="section-title">Technical Specifications</h3>
         </div>
@@ -170,9 +163,7 @@
       <div class="section-header">
         <div class="flex items-center gap-2 mb-3">
           <div class="w-8 h-8 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg flex items-center justify-center shadow-sm">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
+         <Image class="w-5 h-5 text-white" />
           </div>
           <h3 class="section-title">Product Images</h3>
         </div>
@@ -194,23 +185,17 @@
     <!-- Form Status Messages -->
     <div class="form-section">
       <div v-if="!isFormValid" class="flex items-center gap-3 text-sm text-amber-700 bg-amber-50 px-4 py-3 rounded-xl border border-amber-200">
-        <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-        </svg>
+        <TriangleAlert class="w-5 h-5 flex-shrink-0" />
         <span class="font-medium">Please fill in all required fields and fix any errors before saving</span>
       </div>
 
       <div v-else-if="!isImageChanged && !isDetailChanged && isEditMode" class="flex items-center gap-3 text-sm text-slate-600 bg-slate-50 px-4 py-3 rounded-xl border border-slate-200">
-        <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-        </svg>
+        <Info class="w-5 h-5 flex-shrink-0" />
         <span class="font-medium">No changes detected</span>
       </div>
 
       <div v-else-if="isFormValid && (isImageChanged || isDetailChanged)" class="flex items-center gap-3 text-sm text-emerald-700 bg-emerald-50 px-4 py-3 rounded-xl border border-emerald-200">
-        <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-        </svg>
+        <Check class="w-5 h-5 flex-shrink-0" />
         <span class="font-medium">Form is ready to submit</span>
       </div>
     </div>
@@ -249,6 +234,7 @@ import XButton from '@/components/common/XButton.vue'
 import XUpload from '@/components/common/XUpload.vue'
 import { parseNumber } from '@/utils/NumberUtils'
 import { getImageUrl } from '@/utils'
+import { Tag , TabletSmartphone , BadgeDollarSign, CircuitBoard, Image ,TriangleAlert , Info , Check } from 'lucide-vue-next'
 
 const props = defineProps({
   initialData: {

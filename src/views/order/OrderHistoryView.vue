@@ -69,14 +69,17 @@ const fetchOrders = async () => {
   if (!userId) return
 
   const requestId = ++latestFetchId.value
+  const currentTab = activeTab.value.toLowerCase() // Capture current tab value
+
   loading.orders = true
   error.orders = null
+  orders.value = [] // Clear orders immediately to prevent showing stale data
 
   let response
   try {
     response = await OrderService.getOrderByUserId(userId, {
       ...searchParams.value,
-      tab: activeTab.value.toUpperCase(),
+      tab: currentTab,
     })
   } catch (err) {
     if (requestId !== latestFetchId.value) return
@@ -182,14 +185,14 @@ watch(activeTab, async () => {
       </div>
     </div>
     <div
-      v-if="!loading.orders && !orders.value.length && !error.orders"
+      v-if="!loading.orders && orders.length === 0 && !error.orders"
       class="text-center text-gray-500 text-lg py-20"
     >
-      You don’t have any {{ activeTab }} orders.
+      You don't have any {{ activeTab }} orders.
     </div>
 
     <XPagination
-      v-if="!loading.orders && orders.value.length > 0"
+      v-if="!loading.orders && orders.length > 0"
       class="mt-10"
       :pagination="{
         currentPage: searchOptions.currentPage,

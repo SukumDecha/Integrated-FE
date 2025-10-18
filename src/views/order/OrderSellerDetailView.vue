@@ -79,7 +79,6 @@ const goBackToOrders = () => {
       {{ error }}
     </div>
 
-    <!-- ✅ ใช้ component OrderDetail -->
     <div v-else-if="order">
       <OrderDetail :order="order" />
     </div>

@@ -5,6 +5,7 @@ import { OrderStatus } from '@/constants/order.constant.js'
 import XButton from '@/components/common/XButton.vue'
 import { formatDate } from '@/utils/DateUtils.js'
 import { displayOrDash } from '@/utils/TextUtils.js'
+import { Calendar, MapPinHouse, NotebookPen, Box } from 'lucide-vue-next'
 
 const props = defineProps({
   order: { type: Object, required: true },
@@ -69,9 +70,7 @@ const statusConfig = computed(() => {
               {{ displayName }}
             </div>
             <div class="text-xs text-gray-500 flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+           <Calendar class="w-3.5 h-3.5 text-gray-700" />
               <span class="itbms-order-date">{{ formatDate(order.orderDate) }}</span>
             </div>
           </div>
@@ -97,10 +96,7 @@ const statusConfig = computed(() => {
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <!-- Shipping Address -->
         <div class="flex items-start gap-2">
-          <svg class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+          <MapPinHouse class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
           <div>
             <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide itbms-shipping-address">Shipped To</div>
             <div class="text-sm text-gray-800 font-medium mt-0.5">{{ order.shippingAddress }}</div>
@@ -109,9 +105,7 @@ const statusConfig = computed(() => {
 
         <!-- Order Note -->
         <div class="flex items-start gap-2">
-          <svg class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-          </svg>
+          <NotebookPen class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
           <div>
             <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide itbms-order-note">Note</div>
             <div class="text-sm text-gray-800 font-medium mt-0.5">{{ displayOrDash(order.orderNote) }}</div>
@@ -149,9 +143,7 @@ const statusConfig = computed(() => {
         >
           <div class="flex items-center gap-3 flex-1">
             <div class="w-10 h-10 bg-gray-300 rounded-lg flex items-center justify-center text-white font-bold shadow-md">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
+              <Box class="w-5 h-5 text-emerald-600" />
             </div>
             <div class="flex-1">
               <div class="itbms-item-description text-sm font-semibold text-gray-800">

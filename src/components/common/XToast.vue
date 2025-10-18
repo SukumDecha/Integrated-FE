@@ -1,10 +1,6 @@
 <template>
   <div class="fixed top-6 right-6 z-50 space-y-3 w-96">
-    <transition-group
-      name="toast"
-      tag="div"
-      class="space-y-3"
-    >
+    <transition-group name="toast" tag="div" class="space-y-3">
       <div
         v-for="toast in toasts"
         :key="toast.id"
@@ -13,7 +9,7 @@
           toast.type === 'success' && 'border-emerald-500',
           toast.type === 'error' && 'border-red-500',
           toast.type === 'info' && 'border-blue-500',
-          toast.type === 'warn' && 'border-amber-500'
+          toast.type === 'warn' && 'border-amber-500',
         ]"
       >
         <!-- Icon with colored background -->
@@ -23,45 +19,21 @@
             toast.type === 'success' && 'bg-emerald-500',
             toast.type === 'error' && 'bg-red-500',
             toast.type === 'info' && 'bg-blue-500',
-            toast.type === 'warn' && 'bg-amber-500'
+            toast.type === 'warn' && 'bg-amber-500',
           ]"
         >
-          <svg
-            v-if="toast.type === 'success'"
-            class="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-          </svg>
-          <svg
-            v-else-if="toast.type === 'error'"
-            class="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-          <svg
-            v-else-if="toast.type === 'info'"
-            class="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <svg
-            v-else-if="toast.type === 'warn'"
-            class="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-          </svg>
+          <template v-if="toast.type === 'success'">
+            <Check class="w-6 h-6 text-white" />
+          </template>
+          <template v-else-if="toast.type === 'info'">
+            <Info class="w-6 h-6 text-white" />
+          </template>
+          <template v-else-if="toast.type === 'error'">
+            <XCircle class="w-6 h-6 text-white" />
+          </template>
+          <template v-else-if="toast.type === 'warn'">
+            <CircleAlert class="w-6 h-6 text-white" />
+          </template>
         </div>
 
         <!-- Content -->
@@ -73,10 +45,18 @@
               toast.type === 'success' && 'text-emerald-700',
               toast.type === 'error' && 'text-red-700',
               toast.type === 'info' && 'text-blue-700',
-              toast.type === 'warn' && 'text-amber-700'
+              toast.type === 'warn' && 'text-amber-700',
             ]"
           >
-            {{ toast.type === 'success' ? 'Success' : toast.type === 'error' ? 'Error' : toast.type === 'info' ? 'Info' : 'Warning' }}
+            {{
+              toast.type === 'success'
+                ? 'Success'
+                : toast.type === 'error'
+                  ? 'Error'
+                  : toast.type === 'info'
+                    ? 'Info'
+                    : 'Warning'
+            }}
           </div>
 
           <!-- Message -->
@@ -91,14 +71,7 @@
           @click="remove(toast.id)"
           aria-label="Close notification"
         >
-          <svg
-            class="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X class="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
         </button>
       </div>
     </transition-group>
@@ -108,6 +81,7 @@
 <script setup>
 import { storeToRefs } from 'pinia'
 import { useToastStore } from '@/stores/toast.store'
+import { Check, Info, XCircle, CircleAlert} from 'lucide-vue-next'
 
 const toastStore = useToastStore()
 const { toasts } = storeToRefs(toastStore)
