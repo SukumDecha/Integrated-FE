@@ -1,31 +1,40 @@
 <template>
-  <form
-    class="space-y-4"
-    @submit.prevent="handleSubmit"
-  >
-    <XInput
-      v-model="form.email"
-      label="Email"
-      type="email"
-      required
-      :error-message="touched.email ? errors.email : ''"
-      maxlength="50"
-      placeholder="Enter your email"
-      class="itbms-email"
-      @blur="onBlur('email')"
-    />
+  <form class="space-y-4" @submit.prevent="handleSubmit">
+    <div class="flex flex-col space-y-4">
+      <XInput
+        v-model="form.email"
+        label="Email"
+        type="email"
+        required
+        :error-message="touched.email ? errors.email : ''"
+        maxlength="50"
+        placeholder="Enter your email"
+        class="itbms-email"
+        @blur="onBlur('email')"
+      />
 
-    <XInput
-      v-model="form.password"
-      label="Password"
-      type="password"
-      required
-      :error-message="touched.password ? errors.password : ''"
-      maxlength="14"
-      placeholder="Enter your password"
-      class="itbms-password"
-      @blur="onBlur('password')"
-    />
+      <XInput
+        v-model="form.password"
+        label="Password"
+        type="password"
+        required
+        :error-message="touched.password ? errors.password : ''"
+        maxlength="14"
+        placeholder="Enter your password"
+        class="itbms-password"
+        @blur="onBlur('password')"
+      />
+
+      <div class="flex justify-start mt-1 ml-1">
+        <XButton
+          label="Forgot Password?"
+          variant="link"
+          type="button"
+          class="text-gray-500 hover:text-gray-700 px-0 py-0 text-sm"
+          @click="goToForgotPassword"
+        />
+      </div>
+    </div>
 
     <div class="flex justify-end gap-4 pt-4">
       <XButton
@@ -137,7 +146,6 @@ const handleSubmit = async () => {
       } else {
         router.push('/sale-items') // Other roles go to home
       }
-
     } else {
       toast.add({ type: 'error', message: 'Login failed. Invalid token response.' })
     }
@@ -160,5 +168,9 @@ const handleCancel = () => {
   errors.email = ''
   errors.password = ''
   router.push('/')
+}
+
+const goToForgotPassword = () => {
+  router.push('/forgot-password')
 }
 </script>

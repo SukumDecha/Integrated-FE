@@ -80,6 +80,14 @@ export const useCartStore = defineStore('cart', () => {
       return
     }
 
+    if (item.stock === 0) {
+      toastStore.add({
+        type: 'error',
+        message: CART_TOAST_MESSAGES.OUT_OF_STOCK,
+      })
+      return
+    }
+
     const existing = items.value.find((i) => i.id === item.id)
     if (existing) {
       if (existing.quantity + item.quantity <= existing.stock) {

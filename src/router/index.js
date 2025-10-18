@@ -32,6 +32,16 @@ const router = createRouter({
           name: 'verify-email',
           component: () => import('../views/auth/VerifyEmailView.vue'),
         },
+        {
+          path: '/forgot-password',
+          name: 'forgot-password',
+          component: () => import('../views/auth/ForgotPasswordView.vue'),
+        },
+          {
+          path: '/reset-password',
+          name: 'reset-password',
+          component: () => import('../views/auth/ResetPasswordView.vue'),
+        },
       ],
     },
     {
@@ -52,6 +62,15 @@ const router = createRouter({
             requiresAuth: true,
           },
         },
+        {
+          path: 'profile/change-password',
+          name: 'change-password',
+          component: () => import('../views/user/UserChangePasswordView.vue'),
+          meta: {
+            requiresAuth: true,
+          },
+        },
+
         {
           path: 'sale-items',
           children: [
@@ -196,5 +215,3 @@ router.beforeEach((to, from, next) => {
 })
 
 export default router
-
-

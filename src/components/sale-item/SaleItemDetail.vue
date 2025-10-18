@@ -126,8 +126,6 @@ const handleAddToCart = () => {
   })
 }
 
-
-
 const isMinusDisabled = computed(() => quantity.value <= 1)
 const isPlusDisabled = computed(() => quantity.value >= (props.product?.quantity || 0))
 const isOutOfStock = computed(() => props.product?.quantity <= 0)
@@ -219,10 +217,15 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
                   }}</span>
                   <span class="ml-2 text-gray-600 itbms-price-unit">Baht</span>
                 </div>
+
+                <!-- Stock display -->
                 <div class="mt-2 flex items-center">
-                  <span class="text-sm text-gray-500">
+                  <span class="text-sm text-gray-500" v-if="product.quantity > 0">
                     <span class="font-medium itbms-quantity">{{ product.quantity }}</span>
                     <span class="itbms-quantity-unit"> units available</span>
+                  </span>
+                  <span v-else class="text-sm text-red-500 font-semibold itbms-outofstock">
+                    Out of Stock
                   </span>
                 </div>
               </div>
@@ -363,6 +366,7 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
                     variant="primary"
                     size="sm"
                     @click="handleAddToCart"
+                    :disabled="isOutOfStock"
                     v-if="!isOwner"
                     class="itbms-add-to-cart-button ml-5"
                   >

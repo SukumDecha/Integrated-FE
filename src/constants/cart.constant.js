@@ -4,4 +4,5 @@ export const CART_TOAST_MESSAGES = {
   LOGIN_REQUIRED: 'Please log in to add items to your cart',
   MISSING_SELLER_INFO: 'Cannot add this item because seller information is missing',
   QUANTITY_EXCEEDS: 'Cannot add more. Quantity exceeds available stock.',
+  OUT_OF_STOCK: 'This product is out of stock.',
 }
