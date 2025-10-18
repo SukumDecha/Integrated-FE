@@ -53,6 +53,10 @@ const handleSubmit = async () => {
 const goBack = () => {
   router.push('/profile')
 }
+
+const goToForgotPassword = () => {
+  router.push('/forgot-password')
+}
 </script>
 
 <template>
@@ -72,6 +76,13 @@ const goBack = () => {
         type="password"
         placeholder="Enter your current password"
         required
+      />
+      <XButton
+        label="Forgot Password?"
+        variant="link"
+        type="button"
+        class="text-gray-500 hover:text-gray-700 px-0 py-0 text-sm ml-64"
+        @click="goToForgotPassword"
       />
 
       <XInput
