@@ -430,60 +430,80 @@ watch(
     <div class="max-w-7xl mx-auto py-8 px-4 space-y-6">
       <XBreadcrumb :items="breadcrumbs" />
 
-      <!-- Search Bar with Sort Controls -->
-      <div class="flex items-center gap-3 mb-4">
-        <div class="flex-1 max-w-md relative">
-          <XInput
-            v-model="searchOptions.filterSearch"
-            placeholder="Search..."
-            class="w-full"
-            @keydown.enter="onSearch"
-          />
-        </div>
-        <XButton color="primary" @click="onSearch">
-          <template #default>Search</template>
-        </XButton>
-        <XButton variant="outline" class="itbms-search-clear-button" @click="clearSearch">
-          Clear
-        </XButton>
+       <!-- Search Bar with Sort Controls -->
+      <div class="bg-white rounded-lg border border-gray-200 p-5 mb-4">
+        <div class="flex items-center gap-4">
+            <h3 class="text-lg font-semibold text-gray-700 uppercase tracking-wide">Search</h3>
+          <div class="flex-1 max-w-2xl relative">
+            <XInput
+              v-model="searchOptions.filterSearch"
+              placeholder="Search by brand, model, or color..."
+              class="w-full text-base"
+              @keydown.enter="onSearch"
+            />
+          </div>
+          <XButton color="primary" size="sm" @click="onSearch">
+            <template #default>Search</template>
+          </XButton>
+          <XButton variant="outline" size="sm" class="itbms-search-clear-button" @click="clearSearch">
+            Clear
+          </XButton>
 
-        <!-- Spacer -->
-        <div class="flex-1"></div>
+          <!-- Spacer -->
+          <div class="flex-1"></div>
 
-        <!-- Sort Controls -->
-        <div class="flex items-center gap-2">
-          <XButton
-            class-name="itbms-brand-none"
-            variant="info"
-            :disabled="!searchOptions.sortBy && !searchOptions.sortOrder"
-            @click="clearSort"
-          >
-            <AlignJustify class="w-4 h-4" />
-          </XButton>
-          <XButton
-            class-name="itbms-brand-asc"
-            variant="info"
-            :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'asc'"
-            @click="sortAscByName"
-          >
-            <ArrowUpWideNarrow class="w-4 h-4" />
-          </XButton>
-          <XButton
-            class-name="itbms-brand-desc"
-            variant="info"
-            :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'desc'"
-            @click="sortDescByName"
-          >
-            <ArrowDownWideNarrow class="w-4 h-4" />
-          </XButton>
+          <!-- Sort Controls -->
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-gray-600 mr-2">Sort:</span>
+            <XButton
+              class-name="itbms-brand-none"
+              variant="info"
+              size="sm"
+              :disabled="!searchOptions.sortBy && !searchOptions.sortOrder"
+              @click="clearSort"
+            >
+              <AlignJustify class="w-5 h-5" />
+            </XButton>
+            <XButton
+              class-name="itbms-brand-asc"
+              variant="info"
+              size="sm"
+              :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'asc'"
+              @click="sortAscByName"
+            >
+              <ArrowUpWideNarrow class="w-5 h-5" />
+            </XButton>
+            <XButton
+              class-name="itbms-brand-desc"
+              variant="info"
+              size="sm"
+              :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'desc'"
+              @click="sortDescByName"
+            >
+              <ArrowDownWideNarrow class="w-5 h-5" />
+            </XButton>
+          </div>
         </div>
       </div>
 
       <!-- Filters Section -->
-      <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
-        <div class="flex flex-wrap items-center gap-3">
+      <div class="bg-white rounded-lg border border-gray-200 p-5 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-700 uppercase tracking-wide">Filters</h3>
+          <XButton
+            variant="outline"
+            size="sm"
+            class="itbms-brand-filter-clear"
+            @click="clearAllFilter"
+          >
+            Clear All
+          </XButton>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <!-- Brand Filter -->
-          <div class="min-w-[200px]">
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-2">Brand</label>
             <XSelector
               v-model="searchOptions.filteredBrands"
               :options="brandOptions"
@@ -498,11 +518,12 @@ watch(
           </div>
 
           <!-- Price Range Filter -->
-          <div class="min-w-[200px]">
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-2">Price Range</label>
             <XSelector
               v-model="searchOptions.filteredPrices"
               :options="priceOptions"
-              placeholder="Price Range"
+              placeholder="Select Range"
               class="itbms-price-filter"
               :searchable="false"
               :clearable="true"
@@ -511,11 +532,12 @@ watch(
           </div>
 
           <!-- Storage Filter -->
-          <div class="min-w-[200px]">
+          <div>
+            <label class="block text-sm  font-medium text-gray-600 mb-2">Storage Size</label>
             <XSelector
               v-model="searchOptions.filteredStorages"
               :options="storageOptions"
-              placeholder="Storage Range"
+              placeholder="Select Storage"
               mode="multiple"
               class="itbms-storage-size-filter"
               :searchable="false"
@@ -524,33 +546,31 @@ watch(
             />
           </div>
 
-          <!-- Custom Price Inputs -->
-          <div class="flex items-center gap-2">
-            <XInput
-              v-model="customPrice.min"
-              type="number"
-              placeholder="Min"
-              step="1"
-              variant="filter"
-              class="w-24"
-              @keydown.enter.prevent="resetPagination(false)"
-            />
-            <span class="text-gray-400">-</span>
-            <XInput
-              v-model="customPrice.max"
-              type="number"
-              placeholder="Max"
-              step="1"
-              variant="filter"
-              class="w-24"
-              @keydown.enter.prevent="resetPagination(false)"
-            />
+          <!-- Custom Price Range -->
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-2">Custom Price (Baht)</label>
+            <div class="flex items-center gap-2">
+              <XInput
+                v-model="customPrice.min"
+                type="number"
+                placeholder="Min"
+                step="1"
+                variant="filter"
+                class="w-full"
+                @keydown.enter.prevent="resetPagination(false)"
+              />
+              <span class="text-gray-400 flex-shrink-0">-</span>
+              <XInput
+                v-model="customPrice.max"
+                type="number"
+                placeholder="Max"
+                step="1"
+                variant="filter"
+                class="w-full"
+                @keydown.enter.prevent="resetPagination(false)"
+              />
+            </div>
           </div>
-
-          <!-- Clear Filter Button -->
-          <XButton variant="outline" class="itbms-brand-filter-clear" @click="clearAllFilter">
-            Clear
-          </XButton>
         </div>
       </div>
 

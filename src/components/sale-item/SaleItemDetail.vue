@@ -8,7 +8,7 @@ import { formatPrice, getImageUrl } from '@/utils'
 import SaleItemForm from './SaleItemForm.vue'
 import XButton from '@/components/common/XButton.vue'
 import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
-import { ArrowLeft } from 'lucide-vue-next'
+import { ArrowLeft, ShoppingCart, Package, User } from 'lucide-vue-next'
 
 import { useAuthStore } from '@/stores/auth.store'
 import { useCartStore } from '@/stores/cart.store'
@@ -132,17 +132,20 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 py-8 px-4">
-    <div class="max-w-5xl mx-auto">
+  <div class="min-h-screen bg-gradient-to-br py-8 px-4">
+    <div class="max-w-6xl mx-auto">
       <!-- Header with back button -->
       <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">
-          {{ modeTitle }}
-        </h1>
+        <div>
+          <h1 class="text-3xl font-bold text-slate-900 mb-1">
+            {{ modeTitle }}
+          </h1>
+          <p class="text-slate-600 text-sm">View detailed product information</p>
+        </div>
         <XButton
           label="Back"
           variant="info"
-          class-name="itbms-back-button flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700"
+          class-name="itbms-back-button flex items-center gap-2 px-4 py-2.5 text-sm font-medium bg-white hover:bg-slate-50 border border-slate-200 rounded-lg shadow-sm transition-all duration-200"
           @click="$router.back()"
         >
           <ArrowLeft class="h-4 w-4" />
@@ -151,28 +154,27 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
       </div>
 
       <!-- Main content card -->
-      <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-0">
+      <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
           <!-- Left: Image Gallery -->
-          <div class="p-6 border-b md:border-b-0 md:border-r border-gray-100">
-            <div
-              class="aspect-square bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center"
-            >
+          <div class="p-8 bg-gradient-to-br from-slate-50 to-white border-b lg:border-b-0 lg:border-r border-slate-200">
+            <div class="aspect-square bg-white rounded-2xl overflow-hidden flex items-center justify-center shadow-lg border border-slate-200 group">
               <img
                 :src="
                   currentImage || getImageUrl(product.saleItemImages?.[0]?.imageUrl) || imageUrl
                 "
                 alt="Product image"
-                class="w-full h-full object-contain"
+                class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
               />
             </div>
 
             <!-- Thumbnails -->
-            <div class="grid grid-cols-4 gap-3 mt-4">
+            <div class="grid grid-cols-4 gap-3 mt-6">
               <div
                 v-for="i in 4"
                 :key="i"
-                class="aspect-square bg-white border border-gray-200 rounded-md overflow-hidden cursor-pointer hover:border-gray-400 transition-colors"
+                class="aspect-square bg-white border-2 border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-emerald-500 hover:shadow-md transition-all duration-200"
+                :class="currentImage === getImageUrl(product.saleItemImages?.[i - 1]?.imageUrl) ? 'border-emerald-500 ring-2 ring-emerald-200' : ''"
               >
                 <img
                   :src="getImageUrl(product.saleItemImages?.[i - 1]?.imageUrl) || imageUrl"
@@ -188,8 +190,8 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
             </div>
           </div>
 
-          <!-- ✅ Right: Product Details (ใส่ itbms-row ตรงนี้) -->
-          <div class="p-6 itbms-row">
+          <!-- Right: Product Details -->
+          <div class="p-8 itbms-row">
             <SaleItemForm
               v-if="mode !== 'detail'"
               :initial-data="product"
@@ -200,178 +202,170 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
 
             <div v-else class="space-y-6">
               <!-- Product title section -->
-              <div class="space-y-1">
-                <h2 class="text-2xl font-bold text-gray-800 itbms-model">
+              <div class="space-y-2 pb-6 border-b border-slate-200">
+                <!-- Brand Badge -->
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="text-emerald-600 text-sm font-bold uppercase tracking-wide itbms-brand">
+                    {{ product.brandName }}
+                  </span>
+                </div>
+
+                <h2 class="text-3xl font-bold text-slate-900 itbms-model leading-tight">
                   {{ product.model }}
                 </h2>
-                <p class="text-lg text-gray-600 itbms-brand">
-                  {{ product.brandName }}
-                </p>
               </div>
 
               <!-- Price section -->
-              <div class="bg-gray-50 rounded-lg p-4">
-                <div class="flex items-baseline">
-                  <span class="text-3xl font-bold text-gray-900 itbms-price">{{
+              <div class="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-6 border border-emerald-200 shadow-sm">
+                <div class="flex items-baseline gap-2">
+                  <span class="text-sm text-emerald-700 font-medium itbms-price-unit">฿</span>
+                  <span class="text-4xl font-bold text-emerald-600 itbms-price">{{
                     formatPrice(product.price)
                   }}</span>
-                  <span class="ml-2 text-gray-600 itbms-price-unit">Baht</span>
+                  <span class="text-emerald-700 font-medium ml-1">Baht</span>
                 </div>
 
                 <!-- Stock display -->
-                <div class="mt-2 flex items-center">
-                  <span class="text-sm text-gray-500" v-if="product.quantity > 0">
-                    <span class="font-medium itbms-quantity">{{ product.quantity }}</span>
-                    <span class="itbms-quantity-unit"> units available</span>
+                <div class="mt-4 flex items-center gap-2">
+                  <Package class="h-5 w-5 text-emerald-600" />
+                  <span v-if="product.quantity > 0" class="text-sm text-slate-700 font-medium">
+                    <span class="font-bold text-emerald-600 itbms-quantity">{{ product.quantity }}</span>
+                    <span class="itbms-quantity-unit"> units in stock</span>
                   </span>
-                  <span v-else class="text-sm text-red-500 font-semibold itbms-outofstock">
+                  <span v-else class="text-sm text-red-600 font-bold itbms-outofstock">
                     Out of Stock
                   </span>
                 </div>
               </div>
 
               <!-- Description -->
-              <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-2">Description</h3>
-                <p class="text-gray-700 itbms-description">
+              <div class="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  Description
+                </h3>
+                <p class="text-slate-700 leading-relaxed itbms-description">
                   {{ product.description }}
                 </p>
               </div>
 
               <!-- Specifications -->
               <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-3">Specifications</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6">
-                  <div class="flex justify-between">
-                    <span class="text-gray-500">RAM</span>
-                    <span class="font-medium text-gray-800">
+                <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                  <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                  </svg>
+                  Technical Specifications
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="flex justify-between items-center bg-white p-4 rounded-lg border border-slate-200">
+                    <span class="text-slate-600 font-medium">RAM</span>
+                    <span class="font-bold text-slate-900">
                       <span class="itbms-ramGb">{{ product.ramGb ?? '-' }}</span>
-                      <span class="itbms-ramGb-unit"> GB</span>
+                      <span class="itbms-ramGb-unit text-slate-600"> GB</span>
                     </span>
                   </div>
-                  <div class="flex justify-between">
-                    <span class="text-gray-500">Screen Size</span>
-                    <span class="font-medium text-gray-800">
+                  <div class="flex justify-between items-center bg-white p-4 rounded-lg border border-slate-200">
+                    <span class="text-slate-600 font-medium">Screen Size</span>
+                    <span class="font-bold text-slate-900">
                       <span class="itbms-screenSizeInch">{{ product.screenSizeInch ?? '-' }}</span>
-                      <span class="itbms-screenSizeInch-unit"> Inches</span>
+                      <span class="itbms-screenSizeInch-unit text-slate-600"> inch</span>
                     </span>
                   </div>
-                  <div class="flex justify-between">
-                    <span class="text-gray-500">Storage</span>
-                    <span class="font-medium text-gray-800">
+                  <div class="flex justify-between items-center bg-white p-4 rounded-lg border border-slate-200">
+                    <span class="text-slate-600 font-medium">Storage</span>
+                    <span class="font-bold text-slate-900">
                       <span class="itbms-storageGb">{{ product.storageGb ?? '-' }}</span>
-                      <span class="itbms-storageGb-unit"> GB</span>
+                      <span class="itbms-storageGb-unit text-slate-600"> GB</span>
                     </span>
                   </div>
-                  <div class="flex justify-between">
-                    <span class="text-gray-500">Color</span>
-                    <span class="font-medium text-gray-800 itbms-color">{{
+                  <div class="flex justify-between items-center bg-white p-4 rounded-lg border border-slate-200">
+                    <span class="text-slate-600 font-medium">Color</span>
+                    <span class="font-bold text-slate-900 itbms-color capitalize">{{
                       product.color ?? '-'
                     }}</span>
                   </div>
                 </div>
               </div>
 
-              <!-- แสดง Edit/Delete เฉพาะ Seller ที่เป็นเจ้าของ -->
-              <div v-if="isOwner" class="pt-4 border-t border-gray-100 flex gap-3 justify-end">
-                <XButton
-                  label="Edit"
-                  variant="outline"
-                  class-name="itbms-edit-button"
-                  @click="router.push(`/sale-items/${product.id}/edit`)"
-                />
-                <XButton
-                  label="Delete"
-                  variant="danger"
-                  class-name="itbms-delete-button"
-                  @click="showConfirm = true"
-                />
-              </div>
-
-              <!-- ไม่ login -->
-              <div v-if="!isOwner" class="mt-4">
-                <p class="text-gray-600 mb-5 -mt-2">
-                  Seller: <span class="font-semibold">{{ product.seller.nickname }}</span>
-                </p>
-                <div class="flex items-center space-x-2">
-                  <!-- ปุ่มลด -->
-                  <XButton
-                    variant="outline"
-                    size="sm"
-                    @click="decreaseQty"
-                    :disabled="isMinusDisabled"
-                    class="itbms-dec-qty-button"
-                  >
-                    -
-                  </XButton>
-
-                  <span class="px-4 itbms-add-to-cart-quantity">{{ quantity }}</span>
-
-                  <!-- ปุ่มเพิ่ม -->
-                  <XButton
-                    variant="outline"
-                    size="sm"
-                    @click="increaseQty"
-                    :disabled="isPlusDisabled"
-                    class="itbms-inc-qty-button"
-                  >
-                    +
-                  </XButton>
-
-                  <!-- ปุ่ม Add to Cart -->
-                  <XButton
-                    variant="primary"
-                    size="sm"
-                    @click="handleAddToCart"
-                    :disabled="isOutOfStock"
-                    v-if="!isOwner"
-                    class="itbms-add-to-cart-button ml-5"
-                  >
-                    Add to Cart
-                  </XButton>
+              <!-- Seller Info -->
+              <div class="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-5 border border-slate-200">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-md">
+                    <User class="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-600 font-medium uppercase tracking-wide">Sold by</p>
+                    <p class="text-lg font-bold text-slate-900">{{ product.seller?.nickname || 'Unknown' }}</p>
+                  </div>
                 </div>
               </div>
-              <!-- Buyer หรือ Seller ที่ไม่ใช่เจ้าของ -->
-              <div v-else class="mt-4">
-                <!-- แสดงชื่อ Seller -->
-                <p class="text-gray-600 mb-5 -mt-2">
-                  Seller: <span class="font-semibold">{{ product.seller.nickname }}</span>
-                </p>
 
-                <div class="flex items-center space-x-2">
-                  <!-- ปุ่มลด -->
+              <!-- Owner Actions (Edit/Delete) -->
+              <div v-if="isOwner" class="pt-6 border-t border-slate-200">
+                <div class="flex gap-3">
                   <XButton
+                    label="Edit Product"
                     variant="outline"
-                    size="sm"
-                    @click="decreaseQty"
-                    :disabled="isMinusDisabled"
-                    class="itbms-dec-qty-button"
-                    >-</XButton
-                  >
-
-                  <span class="px-4 itbms-add-to-cart-quantity">{{ quantity }}</span>
-
-                  <!-- ปุ่มเพิ่ม -->
+                    class-name="itbms-edit-button flex-1 bg-white hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-600 transition-all duration-200"
+                    @click="router.push(`/sale-items/${product.id}/edit`)"
+                  />
                   <XButton
-                    variant="outline"
-                    size="sm"
-                    @click="increaseQty"
-                    :disabled="isPlusDisabled"
-                    class="itbms-inc-qty-button"
-                    >+</XButton
-                  >
+                    label="Delete Product"
+                    variant="danger"
+                    class-name="itbms-delete-button flex-1 hover:shadow-lg transition-all duration-200"
+                    @click="showConfirm = true"
+                  />
+                </div>
+              </div>
 
-                  <!-- ปุ่ม Add to Cart -->
-                  <XButton
-                    variant="primary"
-                    size="sm"
-                    @click="handleAddToCart"
-                    :disabled="isOutOfStock"
-                    v-if="!isOwner"
-                    class="itbms-add-to-cart-button ml-5"
-                  >
-                    Add to Cart
-                  </XButton>
+              <!-- Buyer Actions (Quantity + Add to Cart) -->
+              <div v-else class="pt-6 border-t border-slate-200">
+                <div class="bg-white rounded-xl border-2 border-emerald-200 p-6 shadow-sm">
+                  <h4 class="text-sm font-bold text-slate-800 mb-4">Select Quantity</h4>
+
+                  <div class="flex items-center gap-4 mb-6">
+                    <!-- Quantity Controls -->
+                    <div class="flex items-center gap-3 bg-slate-50 rounded-lg p-2 border border-slate-200">
+                      <XButton
+                        variant="outline"
+                        size="sm"
+                        @click="decreaseQty"
+                        :disabled="isMinusDisabled"
+                        class="itbms-dec-qty-button w-10 h-10 flex items-center justify-center font-bold text-lg hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-600 transition-all duration-200"
+                      >
+                        −
+                      </XButton>
+
+                      <span class="itbms-add-to-cart-quantity text-2xl font-bold text-slate-900 min-w-[3rem] text-center">{{ quantity }}</span>
+
+                      <XButton
+                        variant="outline"
+                        size="sm"
+                        @click="increaseQty"
+                        :disabled="isPlusDisabled"
+                        class="itbms-inc-qty-button w-10 h-10 flex items-center justify-center font-bold text-lg hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-600 transition-all duration-200"
+                      >
+                        +
+                      </XButton>
+                    </div>
+
+                    <!-- Add to Cart Button -->
+                    <XButton
+                      variant="primary"
+                      size="md"
+                      @click="handleAddToCart"
+                      :disabled="isOutOfStock"
+                      class="itbms-add-to-cart-button flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:from-slate-300 disabled:to-slate-400"
+                    >
+                      <span class="flex items-center justify-center gap-2">
+                        <ShoppingCart class="h-5 w-5" />
+                        {{ isOutOfStock ? 'OUT OF STOCK' : 'ADD TO CART' }}
+                      </span>
+                    </XButton>
+                  </div>
                 </div>
               </div>
             </div>

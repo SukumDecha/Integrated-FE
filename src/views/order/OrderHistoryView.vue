@@ -21,6 +21,7 @@ const ORDER_STORAGE_KEYS = {
 }
 
 const orders = ref([])
+const latestFetchId = ref(0)
 
 const loading = reactive({ orders: true })
 const error = reactive({ orders: null })
@@ -28,7 +29,7 @@ const error = reactive({ orders: null })
 const searchOptions = reactive({
   currentPage: 1,
   pageSize: 10,
-  totalElements: 0,
+  totalItems: 0,
   sortBy: 'orderDate',
   sortOrder: 'desc',
 })
@@ -67,13 +68,28 @@ const fetchOrders = async () => {
   const userId = authStore.user?.id
   if (!userId) return
 
+  const requestId = ++latestFetchId.value
   loading.orders = true
   error.orders = null
 
-  const response = await OrderService.getOrderByUserId(userId, {
-    ...searchParams.value,
-    tab: activeTab.value.toUpperCase(),
-  })
+  let response
+  try {
+    response = await OrderService.getOrderByUserId(userId, {
+      ...searchParams.value,
+      tab: activeTab.value.toUpperCase(),
+    })
+  } catch (err) {
+    if (requestId !== latestFetchId.value) return
+    error.orders = err?.message || 'Failed to load order history.'
+    toast.add({ type: 'error', message: error.orders })
+    return
+  } finally {
+    if (requestId === latestFetchId.value) {
+      loading.orders = false
+    }
+  }
+
+  if (requestId !== latestFetchId.value) return
 
   if (response.error) {
     error.orders = response.error || 'Failed to load order history.'
@@ -81,10 +97,9 @@ const fetchOrders = async () => {
   } else {
     orders.value = response.data || []
     const p = response.pagination || {}
-    searchOptions.totalItems = p.totalItems || 0
-    searchOptions.pageSize = p.pageSize || searchOptions.pageSize
+    searchOptions.totalItems = p.totalItems ?? 0
+    searchOptions.pageSize = p.pageSize ?? searchOptions.pageSize
   }
-  loading.orders = false
 }
 const handlePaginationChange = ({ currentPage, pageSize }) => {
   // อัปเดต state ในหน้า

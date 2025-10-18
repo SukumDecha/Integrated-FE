@@ -75,11 +75,10 @@ const confirmDelete = () => {
         :disabled="props.item.quantity >= props.item.stock"
         >+</XButton
       >
-      <!-- ✅ ปุ่มลบ -->
       <XButton
         size="sm"
         variant="destructive"
-        class="bg-gray-300 hover:bg-red-500 itbms-remove-item ml-2 py-2.5 px-2"
+        class="bg-gray-300 hover:bg-red-500 itbms-remove-item ml-2 px-2 flex items-center justify-center"
         @click="showConfirm = true"
       >
         <Trash2 class="w-4 h-4" />

@@ -1,89 +1,17 @@
 <template>
-  <div class="min-h-screen flex flex-col">
-    <!-- Navbar -->
-    <XNavbar :brand-name="storeName" />
+  <div class="min-h-screen flex flex-col bg-white">
 
     <!-- Hero Section -->
     <HeroSection
-      title="Spring Collection"
-      subtitle="Discover our new eco-friendly collection. Sustainable fashion that doesn't compromise on style or comfort."
+      title="Discover Your Perfect"
+      subtitle="Explore our premium collection of the latest smartphones with cutting-edge technology, stunning designs, and unbeatable prices. Find your perfect device today."
       primary-button-text="Shop Now"
-      secondary-button-text="Learn More"
+      primary-button-link="/sale-items"
+      secondary-button-text=""
     />
-
-    <!-- Featured Products -->
-    <div class="bg-white">
-      <div class="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
-        <h2 class="text-3xl font-extrabold tracking-tight text-gray-900">
-          Featured Products
-        </h2>
-        <p class="mt-4 text-gray-500">
-          Check out our most popular items this season.
-        </p>
-
-        <div
-          class="mt-10 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-5 xl:gap-x-8"
-        >
-          <SaleItemCard
-            v-for="product in products"
-            :id="product.id"
-            :key="product.id"
-            :brand="product.brandName"
-            :model="product.model"
-            :ram-gb="product.ramGb"
-            :storage-gb="product.storageGb"
-            :color="product.color"
-            :price="product.price"
-            :is-loading="loading"
-            :quantity="product.quantity"
-            :seller-nickname="product.seller?.nickname"
-            :seller-id="product.seller?.id"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <XFooter :company-name="storeName" />
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import XNavbar from '@/components/layout/XNavbar.vue'
 import HeroSection from '@/components/home/HeroSection.vue'
-import SaleItemCard from '@/components/sale-item/SaleItemCard.vue'
-import { SaleItemService } from '@/services'
-import XFooter from '@/components/layout/XFooter.vue'
-import { useLoaderStore } from '@/stores/loader.store'
-
-// Store data
-const storeName = ref('GreenCart')
-
-const products = ref([])
-const loading = ref(true)
-// const error = ref(null)
-
-const loaderStore = useLoaderStore();
-
-const fetchProducts = async () => {
-  loading.value = true
-
-  loaderStore.startLoading()
-  try {
-    const response = await SaleItemService.getAllSaleItems()
-    products.value = response.data
-  } catch (error) {
-    console.error('Error fetching products:', error)
-    error.value = 'Failed to load products. Please try again.'
-  } finally {
-    loading.value = false
-  }
-
-  loaderStore.resetLoading()
-}
-
-onMounted(() => {
-  fetchProducts()
-})
 </script>

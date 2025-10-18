@@ -86,6 +86,17 @@ watch(
     }
   },
 )
+
+const filteredMenu = computed(() => {
+  const userRole = authStore.user?.role
+  if (userRole === UserRole.SELLER) {
+    // Seller เห็นทุกเมนู
+    return NAVBAR_MENU
+  } else {
+    // Buyer หรือ Guest เห็นเฉพาะ Home กับ Shop
+    return NAVBAR_MENU.filter((item) => ['Home', 'Shop'].includes(item.name))
+  }
+})
 </script>
 
 <template>
@@ -101,7 +112,7 @@ watch(
 
           <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
             <router-link
-              v-for="item in NAVBAR_MENU"
+              v-for="item in filteredMenu"
               :key="item.name"
               :to="item.to"
               class="inline-flex items-center px-1 pt-1 border-b-2 text-base md:text-lg font-medium transition-colors duration-200"
@@ -249,7 +260,7 @@ watch(
       <div v-show="isOpen" class="sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
           <router-link
-            v-for="item in NAVBAR_MENU"
+            v-for="item in filteredMenu"
             :key="item.name"
             :to="item.to"
             class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition"
