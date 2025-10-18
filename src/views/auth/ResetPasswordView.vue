@@ -63,7 +63,7 @@ onMounted(async () => {
   // Validate token
   loaderStore.startLoading()
   const res = await AuthService.validateResetPasswordToken(token.value)
-  const response = res.data || res
+  const response = res.data 
 
   if (response.valid) {
     tokenValid.value = true
