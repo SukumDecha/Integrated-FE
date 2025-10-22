@@ -65,11 +65,14 @@
       </table>
     </div>
 
-    <!-- ✅ Pagination (ถ้ามี) -->
+    <!-- ✅ Pagination (ถ้ามี) - คืนค่า props ที่หายไป -->
     <XPagination
       v-if="pagination"
       :pagination="pagination"
+      :data="data"
+      :page-size-options="pageSizeOptions"
       :show-size-changer="showSizeChanger"
+      :max-visible-pages="maxVisiblePages"
       @change="handlePaginationChange"
     />
   </div>
@@ -78,7 +81,7 @@
 <script setup>
 import XPagination from './XPagination.vue';
 
-defineProps({
+const props = defineProps({
   columns: { type: Array, required: true },
   data: { type: Array, required: true },
   pagination: {
@@ -89,16 +92,29 @@ defineProps({
     type: String,
     default: 'No data'
   },
+  pageSizeOptions: {
+    type: Array,
+    default: () => [10, 20, 50, 100]
+  },
   showSizeChanger: {
     type: Boolean,
     default: true
+  },
+  maxVisiblePages: {
+    type: Number,
+    default: 10
   }
 });
 
 const emit = defineEmits(['change']);
 
 function handlePaginationChange({ currentPage, pageSize }) {
-  emit('change', { currentPage, pageSize });
+  const newPagination = {
+    ...props.pagination,
+    currentPage,
+    pageSize
+  };
+  emit('change', newPagination);
 }
 
 function getAlignmentClass(align) {

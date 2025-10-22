@@ -36,18 +36,13 @@ const breadcrumbs = [
 const handleSubmit = async (data) => {
   const res = await BrandService.createBrand(data)
 
-  // ถ้ามี error จาก backend
-  if (res?.error) {
-    toast.add({ message: 'Failed to save item', type: 'error' })
-    return
-  }
+if (res.error) {
+  toast.add({ message: 'Failed to save item', type: 'error' })
+  return
+}
 
-  // ถ้าสำเร็จ
-  if (res) {
-    router.push({ path: '/brands', query: { toast: 'created' } })
-  } else {
-    toast.add({ message: 'Failed to save item', type: 'error' })
-  }
+router.push({ path: '/brands', query: { toast: 'created' } })
+
 }
 
 const handleCancel = () => {

@@ -4,6 +4,7 @@ import { BrandService } from '@/services'
 import { useToastStore } from '@/stores/toast.store'
 import BrandForm from '@/components/brand/BrandForm.vue'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
+import XCard from '@/components/common/XCard.vue'
 import { onMounted, ref } from 'vue'
 import { NotebookPen } from 'lucide-vue-next'
 
@@ -71,11 +72,12 @@ onMounted(fetchBrand)
       </div>
 
       <!-- Loading State -->
-      <div
+      <XCard
         v-if="loading"
-        class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden"
+        title="Edit Brand"
+        subtitle="Loading brand information..."
       >
-        <div class="bg-gradient-to-r from-emerald-600 to-green-600 px-8 py-6">
+        <template #header>
           <div class="flex items-center gap-4">
             <div
               class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg"
@@ -89,8 +91,9 @@ onMounted(fetchBrand)
               </p>
             </div>
           </div>
-        </div>
-        <div class="p-16 text-center">
+        </template>
+
+        <div class="text-center py-8">
           <div class="inline-block">
             <div
               class="w-16 h-16 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"
@@ -100,7 +103,7 @@ onMounted(fetchBrand)
             </p>
           </div>
         </div>
-      </div>
+      </XCard>
 
       <!-- Content -->
       <div v-else>

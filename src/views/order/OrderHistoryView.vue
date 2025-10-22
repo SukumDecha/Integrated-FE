@@ -69,28 +69,31 @@ const fetchOrders = async () => {
   if (!userId) return
 
   const requestId = ++latestFetchId.value
-  const currentTab = activeTab.value.toLowerCase() // Capture current tab value
+  const currentTab = activeTab.value.toUpperCase()
 
   loading.orders = true
   error.orders = null
   orders.value = [] // Clear orders immediately to prevent showing stale data
 
-  let response
-  try {
-    response = await OrderService.getOrderByUserId(userId, {
-      ...searchParams.value,
-      tab: currentTab,
-    })
-  } catch (err) {
-    if (requestId !== latestFetchId.value) return
-    error.orders = err?.message || 'Failed to load order history.'
+  loading.orders = true
+  latestFetchId.value = requestId
+
+  const response = await OrderService.getOrderByUserId(userId, {
+    ...searchParams.value,
+    tab: currentTab,
+  })
+
+  if (requestId !== latestFetchId.value) return
+
+  if (response?.error) {
+    error.orders = response.error.message || 'Failed to load order history.'
     toast.add({ type: 'error', message: error.orders })
-    return
-  } finally {
-    if (requestId === latestFetchId.value) {
-      loading.orders = false
-    }
+  } else {
+    // ถ้า success — ใช้ response ตามต้องการ
+    orders.value = response.data || []
   }
+
+  loading.orders = false
 
   if (requestId !== latestFetchId.value) return
 
