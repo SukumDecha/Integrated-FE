@@ -1,4 +1,4 @@
-const baseURL = import.meta.env.VITE_API_BASE_URL
+// const baseURL = import.meta.env.VITE_API_BASE_URL
 
 /**
  * Get the URL for an image file.
@@ -6,11 +6,9 @@ const baseURL = import.meta.env.VITE_API_BASE_URL
  * @returns The full URL of the image.
  */
 const getImageUrl = (imageUrl) => {
-  if (!imageUrl) return null;
+  if (!imageUrl) return null
 
-  return `${baseURL}${imageUrl}`
+  return `${imageUrl}`
 }
 
-export {
-  getImageUrl
-}
+export { getImageUrl }
