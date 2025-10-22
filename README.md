@@ -1,96 +1,215 @@
-# 📁 Cooperative File Naming & Folder Structure Guide
+# Integrated-FE
 
-## 🧭 Purpose
+Vue 3 + Vite + Pinia storefront with authentication, brand and sale-item management, cart and orders, Cypress E2E, and Docker+Nginx deployment.
 
-This document outlines the standardized file naming conventions and folder structures adopted by our cooperative. Adhering to these guidelines ensures:
+## Features
 
-- Efficient file organization and retrieval
-- Enhanced collaboration among team members
-- Reduced risk of misplaced or duplicate files
-- Improved clarity for both current and future members
+- Vue 3 (Composition API) with Vite and Tailwind CSS
+- State management with Pinia (auth, cart, loader, toast)
+- Authentication flows: login, register, verify email, forgot/reset password
+- Brand and sale-item management (list, detail, add/edit)
+- Cart with seller grouping, selection, quantity control, and checkout
+- Per-user cart persistence in localStorage that survives re-login across accounts
+- Orders pages (list/detail) and reusable UI components (XButton, XTable, XUpload, etc.)
+- Cypress E2E tests
+- Production deployment via Docker and Nginx with SPA routing under `/ssa1/`
 
----
+## Tech stack
 
-## 📂 Folder Structure Overview
+- Vue 3, Vite, Vue Router
+- Pinia
+- Tailwind CSS
+- Cypress
+- ESLint + Prettier
+- Docker, Nginx
 
-The following structure reflects our Vue.js project layout:
+## Getting started
 
-```
-INTEGRATED-FE/
-├── .vscode/
-├── node_modules/
-├── public/
-├── src/
-│   ├── assets/
-│   ├── components/
-│   │   ├── common/
-│   │   │   └── XButton.vue
-│   │   ├── layout/
-│   │   │   └── Navbar.vue
-│   │   └── sale-item/
-│   │       └── SaleItemGallery.vue
-│   ├── router/
-│   ├── services/
-│   │   └── sale-item.service.ts
-│   ├── stores/
-│   │   └── toast.store.js
-│   ├── utils/
-│   │   └── DateUtils.js
-│   └── views/
-│       ├── sale-item/
-│       │   ├── SaleItemDetails.vue
-│       │   └── SaleItemGallery.vue
-│       └── HomeView.vue
-├── App.vue
-└── main.js
+### Prerequisites
+
+- Node.js 20+ and npm
+
+### Install dependencies
+
+```bash
+npm install
 ```
 
-**Guidelines:**
+### Environment variables
 
-- Group reusable UI components under `components/`
-- Organize pages or views under `views/`
-- Keep services for API calls in the `services/` folder
-- Use `stores/` for state management (e.g., Pinia or Vuex)
-- Utility functions belong in `utils/`
-- Route definitions live in `router/`
+Create a `.env.local` at the project root:
 
----
+```bash
+# API base used by fetch helper
+VITE_API_BASE_URL=https://your-api.example.com
 
-## 📝 File Naming Convention
-
-Standardize file names using the following format:
-
-```
-[YYYYMMDD]_[ModuleName]_[Description]_v[VersionNumber].[Extension]
+# Public base for building image/file URLs
+VITE_BASE_URL=https://your-cdn-or-origin.example.com
 ```
 
-### Components
+Notes:
 
-- `YYYYMMDD`: Date in YearMonthDay format (e.g., 20250430)
-- `ModuleName`: Area/module (e.g., SaleItem, Navbar)
-- `Description`: Short explanation of file purpose
-- `v[VersionNumber]`: Version (e.g., v01, v02)
-- `Extension`: Vue, JS, TS, etc.
+- The router uses `import.meta.env.BASE_URL` which comes from Vite `base`. In dev it's `/`, in UAT/Prod builds it is `/ssa1/` (see `vite.config.js`).
 
-**Example:**
+### Run in development
 
-```
-20250430_SaleItem_Service_v01.ts
+```bash
+npm run dev
 ```
 
----
+App runs with base `/` locally.
 
-## 🔄 Version Control
+### Build
 
-- Maintain history by incrementing `v` numbers
-- Append `_DRAFT` or `_FINAL` if applicable
+```bash
+# Default vite build
+npm run build
 
----
+# With explicit modes and base=/ssa1/
+npm run build:dev
+npm run build:uat
+npm run build:prod
+```
 
-## 🛠 Additional Tips
+Artifacts are emitted to `dist/`.
 
-- **Use PascalCase** for Vue components (e.g., `SaleItemGallery.vue`)
-- **Use camelCase** for JS variables and functions
-- Maintain folder-specific focus (no mixing logic across modules)
+### Available scripts
 
-Store this file as `README.md` in the root of the repository.
+```bash
+npm run dev          # Start dev server
+npm run build        # Build (base from Vite defaults)
+npm run build:dev    # Build with base /ssa1/
+npm run build:uat    # Build with base /ssa1/
+npm run build:prod   # Build with base /ssa1/
+npm run preview      # Preview production build
+npm run lint         # ESLint with autofix
+npm run format       # Prettier format src/
+npm run cypress:open # Open Cypress runner
+```
+
+## Project structure
+
+```text
+├─ cypress/
+│  ├─ e2e/
+│  │  ├─ R2-Sprint-3/
+│  │  └─ R2-Sprint-4/
+│  └─ support/
+├─ nginx/
+│  └─ default.conf
+├─ public/
+│  └─ assets/
+├─ src/
+│  ├─ assets/
+│  ├─ components/
+│  │  ├─ auth/ (LoginForm, RegisterForm)
+│  │  ├─ brand/
+│  │  ├─ cart/ (CartItemRow, CartSellerGroup, CartSummary)
+│  │  ├─ common/ (XButton, XTable, XUpload, XToast, XPagination, XSpin, XTab)
+│  │  ├─ layout/ (XNavbar, XFooter, AuthLayout, DefaultLayout, XBreadcrumb)
+│  │  ├─ order/
+│  │  └─ sale-item/
+│  ├─ constants/
+│  ├─ router/
+│  ├─ services/
+│  │  ├─ helper/api.js
+│  │  └─ models/ (BaseResponse, PaginationResponse)
+│  ├─ stores/ (auth.store, cart.store, loader.store, toast.store)
+│  ├─ utils/ (DateUtils, ErrorUtils, ImageUtils, NumberUtils, StorageUtils, TextUtils)
+│  └─ views/
+│     ├─ auth/ (LoginView, RegisterView, VerifyEmailView, Forgot/Reset Password)
+│     ├─ brand/
+│     ├─ cart/
+│     ├─ order/
+│     ├─ sale-item/
+│     └─ HomeView.vue, NotFoundView.vue
+├─ Dockerfile
+├─ docker-compose.yml
+├─ vite.config.js
+├─ package.json
+└─ README.md
+```
+
+Alias `@` resolves to `src/` (see `vite.config.js`).
+
+## Key implementation notes
+
+### Per-user cart persistence (localStorage)
+
+The cart store (`src/stores/cart.store.js`) now persists items per account using a namespaced key:
+
+- Key format: `cart_items:<userId>` (falls back to `cart_items:guest` when not logged in)
+- Cart hydrates automatically when authentication state changes (login/logout/switch user)
+- All cart changes are saved to the active user’s key
+- Legacy global key `cart_items` is migrated once to the current user’s key (then removed)
+
+This enables multiple users on the same device to maintain distinct carts that survive re-login.
+
+### API configuration
+
+- All requests are made through `src/services/helper/api.js`
+- `VITE_API_BASE_URL` is required (e.g., `https://api.example.com`)
+- Access token is attached via `Authorization: Bearer` when available
+- Automatic access-token refresh is supported; on failure, user is logged out
+
+### Router base
+
+- `base` is `/` in dev and `/ssa1/` for UAT/Prod builds
+- Router history uses `import.meta.env.BASE_URL`
+
+## Testing (Cypress)
+
+```bash
+npm run cypress:open
+```
+
+E2E specs live under `cypress/e2e/` grouped by sprints and test cases.
+
+## Docker & deployment
+
+### Build image
+
+```bash
+# BUILD_ENV can be: dev | uat | prod (maps to npm scripts)
+docker build --build-arg BUILD_ENV=uat -t integrated-nginx:latest .
+```
+
+### Run with docker-compose
+
+```bash
+docker-compose up -d
+```
+
+Notes:
+
+- `docker-compose.yml` expects an external volume `backend_uploads` and external network `integrated-network`.
+- Create them if needed:
+
+```bash
+docker volume create backend_uploads
+docker network create integrated-network
+```
+
+### Nginx
+
+- Config is in `nginx/default.conf`
+- SPA is served under `/ssa1/` with proper caching and index fallbacks
+- API is proxied at `/itb-mshop/` to `integrated-backend:8080` on the same Docker network
+- TLS certs are expected under `/ssl` inside the container (mounted from host)
+
+## Conventions
+
+- Use Composition API and `script setup` in Vue SFCs
+- Centralize API calls in `src/services`
+- Keep global state in Pinia stores under `src/stores`
+- Reusable UI under `src/components/common`
+
+## Troubleshooting
+
+- Blank routes in UAT/Prod: ensure builds are run with base `/ssa1/` and Nginx config is deployed
+- API 401/expired: verify refresh endpoint works and `VITE_API_BASE_URL` is correct
+- Static images not loading: set `VITE_BASE_URL` to the correct origin
+
+## License
+
+This project is for educational purposes within the Integrated Project context.
