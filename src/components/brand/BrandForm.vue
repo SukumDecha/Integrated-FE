@@ -4,6 +4,7 @@ import { useToastStore } from '@/stores/toast.store'
 import XInput from '@/components/common/form/XInput.vue'
 import XButton from '@/components/common/XButton.vue'
 import XToggle from '@/components/common/form/XToggle.vue'
+import XCard from '@/components/common/XCard.vue'
 import { Tag, Globe, Earth, Info, ShieldCheck, BadgeAlert, Plus, NotebookPen, CircleAlert } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -159,10 +160,10 @@ const handleSave = async () => {
 
 <template>
   <div class="itbms-manage-brand">
-    <!-- Header Card -->
-    <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-6">
-      <!-- Header with Gradient -->
-      <div class="bg-gradient-to-r from-emerald-600 to-green-600 px-8 py-6">
+    <!-- Header Card with Form -->
+    <XCard>
+      <!-- Custom Header -->
+      <template #header>
         <div class="flex items-center gap-4">
           <div
             class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg"
@@ -187,18 +188,11 @@ const handleSave = async () => {
             </p>
           </div>
         </div>
-      </div>
+      </template>
 
-      <!-- Info Banner -->
-      <div
-        :class="[
-          'px-8 py-4 border-b',
-          isEditMode
-            ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-100'
-            : 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-100'
-        ]"
-      >
-        <div class="flex items-start gap-3">
+      <!-- Info Banner (Using stats slot) -->
+      <template #stats>
+        <div class="flex items-start gap-3 w-full">
           <div class="flex-shrink-0 mt-0.5">
             <Info :class="isEditMode ? 'w-5 h-5 text-amber-600' : 'w-5 h-5 text-emerald-600'" />
           </div>
@@ -213,132 +207,130 @@ const handleSave = async () => {
             </p>
           </div>
         </div>
-      </div>
+      </template>
 
-      <!-- Form Container -->
-      <div class="p-8">
-        <div class="space-y-6">
-          <!-- Brand Name Field -->
-          <div class="form-field-wrapper">
-            <div class="flex items-center gap-2 mb-2">
-              <Tag class="w-5 h-5 text-emerald-600" name="brand" />
-              <span class="form-label-enhanced">Brand Name <span class="text-red-500">*</span></span>
-            </div>
-            <XInput
-              v-model="form.name"
-              class="itbms-name"
-              placeholder="Enter brand name (e.g., Apple, Samsung)"
-              :error-message="touchedFields.name ? fieldErrors.name : ''"
-              @blur="onBlur('name')"
-            />
-            <p class="form-hint">Must be between 1-30 characters</p>
+      <!-- Form Content -->
+      <div class="space-y-6">
+        <!-- Brand Name Field -->
+        <div class="form-field-wrapper">
+          <div class="flex items-center gap-2 mb-2">
+            <Tag class="w-5 h-5 text-emerald-600" name="brand" />
+            <span class="form-label-enhanced">Brand Name <span class="text-red-500">*</span></span>
           </div>
+          <XInput
+            v-model="form.name"
+            class="itbms-name"
+            placeholder="Enter brand name (e.g., Apple, Samsung)"
+            :error-message="touchedFields.name ? fieldErrors.name : ''"
+            @blur="onBlur('name')"
+          />
+          <p class="form-hint">Must be between 1-30 characters</p>
+        </div>
 
-          <!-- Website URL Field -->
-          <div class="form-field-wrapper">
-            <div class="flex items-center gap-2 mb-2">
-              <Globe class="w-5 h-5 text-emerald-600" />
-              <span class="form-label-enhanced">Website URL</span>
-            </div>
-            <XInput
-              v-model="form.websiteUrl"
-              class="itbms-websiteUrl"
-              placeholder="https://www.example.com"
-              :error-message="touchedFields.websiteUrl ? fieldErrors.websiteUrl : ''"
-              @blur="onBlur('websiteUrl')"
-            />
-            <p class="form-hint">Optional - Enter the brand's official website</p>
+        <!-- Website URL Field -->
+        <div class="form-field-wrapper">
+          <div class="flex items-center gap-2 mb-2">
+            <Globe class="w-5 h-5 text-emerald-600" />
+            <span class="form-label-enhanced">Website URL</span>
           </div>
+          <XInput
+            v-model="form.websiteUrl"
+            class="itbms-websiteUrl"
+            placeholder="https://www.example.com"
+            :error-message="touchedFields.websiteUrl ? fieldErrors.websiteUrl : ''"
+            @blur="onBlur('websiteUrl')"
+          />
+          <p class="form-hint">Optional - Enter the brand's official website</p>
+        </div>
 
-          <!-- Active Status Toggle -->
-          <div class="form-field-wrapper">
-            <div class="bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg p-4 border border-emerald-200">
-              <div class="flex items-center justify-between">
-                <div class="flex items-start gap-3">
-                  <div class="flex-shrink-0 mt-1">
-                    <Earth class="w-5 h-5 text-emerald-600" />
-                  </div>
-                  <div>
-                    <label
-                      for="active"
-                      class="form-label-enhanced cursor-pointer"
-                    >
-                      Active Status
-                    </label>
-                    <p class="text-xs text-slate-600 mt-1">
-                      Toggle to enable or disable this brand in your system
-                    </p>
-                  </div>
+        <!-- Active Status Toggle -->
+        <div class="form-field-wrapper">
+          <div class="bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg p-4 border border-emerald-200">
+            <div class="flex items-center justify-between">
+              <div class="flex items-start gap-3">
+                <div class="flex-shrink-0 mt-1">
+                  <Earth class="w-5 h-5 text-emerald-600" />
                 </div>
-                <XToggle
-                  id="active"
-                  v-model="form.isActive"
-                  class="itbms-isActive"
-                />
+                <div>
+                  <label
+                    for="active"
+                    class="form-label-enhanced cursor-pointer"
+                  >
+                    Active Status
+                  </label>
+                  <p class="text-xs text-slate-600 mt-1">
+                    Toggle to enable or disable this brand in your system
+                  </p>
+                </div>
               </div>
+              <XToggle
+                id="active"
+                v-model="form.isActive"
+                class="itbms-isActive"
+              />
             </div>
           </div>
+        </div>
 
-          <!-- Country of Origin Field -->
-          <div class="form-field-wrapper">
-            <div class="flex items-center gap-2 mb-2">
-              <Earth class="w-5 h-5 text-emerald-600" />
-              <span class="form-label-enhanced">Country of Origin</span>
-            </div>
-            <XInput
-              v-model="form.countryOfOrigin"
-              class="itbms-countryOfOrigin"
-              placeholder="e.g., Japan, United States, South Korea"
-              :error-message="touchedFields.countryOfOrigin ? fieldErrors.countryOfOrigin : ''"
-              @blur="onBlur('countryOfOrigin')"
+        <!-- Country of Origin Field -->
+        <div class="form-field-wrapper">
+          <div class="flex items-center gap-2 mb-2">
+            <Earth class="w-5 h-5 text-emerald-600" />
+            <span class="form-label-enhanced">Country of Origin</span>
+          </div>
+          <XInput
+            v-model="form.countryOfOrigin"
+            class="itbms-countryOfOrigin"
+            placeholder="e.g., Japan, United States, South Korea"
+            :error-message="touchedFields.countryOfOrigin ? fieldErrors.countryOfOrigin : ''"
+            @blur="onBlur('countryOfOrigin')"
+          />
+          <p class="form-hint">Optional - Maximum 80 characters</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-6 border-t border-slate-200">
+          <div class="flex gap-3">
+            <XButton
+              label="Save Brand"
+              class="itbms-save-button"
+              variant="primary"
+              :disabled="!isFormValid || !isChanged"
+              :loading="isSaving"
+              @click="handleSave"
             />
-            <p class="form-hint">Optional - Maximum 80 characters</p>
+            <XButton
+              label="Cancel"
+              class="itbms-cancel-button"
+              variant="secondary"
+              :disabled="isSaving"
+              @click="props.onCancel"
+            />
           </div>
 
-          <!-- Action Buttons -->
-          <div class="pt-6 border-t border-slate-200">
-            <div class="flex gap-3">
-              <XButton
-                label="Save Brand"
-                class="itbms-save-button"
-                variant="primary"
-                :disabled="!isFormValid || !isChanged"
-                :loading="isSaving"
-                @click="handleSave"
-              />
-              <XButton
-                label="Cancel"
-                class="itbms-cancel-button"
-                variant="secondary"
-                :disabled="isSaving"
-                @click="props.onCancel"
-              />
+          <!-- Form Status Messages -->
+          <div class="mt-4 space-y-2">
+            <div v-if="!isFormValid" class="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
+              <BadgeAlert class="w-4 h-4 flex-shrink-0" />
+              <span>Please fix the errors before saving</span>
             </div>
 
-            <!-- Form Status Messages -->
-            <div class="mt-4 space-y-2">
-              <div v-if="!isFormValid" class="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
-                <BadgeAlert class="w-4 h-4 flex-shrink-0" />
-                <span>Please fix the errors before saving</span>
-              </div>
+            <div v-else-if="!isChanged && isEditMode" class="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
+              <Info class="w-4 h-4 flex-shrink-0" />
+              <span>No changes detected</span>
+            </div>
 
-              <div v-else-if="!isChanged && isEditMode" class="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
-                <Info class="w-4 h-4 flex-shrink-0" />
-                <span>No changes detected</span>
-              </div>
-
-              <div v-else-if="isFormValid && isChanged" class="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200">
-                <ShieldCheck class="w-4 h-4 flex-shrink-0" />
-                <span>Form is ready to submit</span>
-              </div>
+            <div v-else-if="isFormValid && isChanged" class="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200">
+              <ShieldCheck class="w-4 h-4 flex-shrink-0" />
+              <span>Form is ready to submit</span>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </XCard>
 
     <!-- Help Card -->
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+    <XCard :show-header="false" :show-stats="false">
       <div class="flex items-start gap-4">
         <div class="flex-shrink-0">
           <div
@@ -383,7 +375,7 @@ const handleSave = async () => {
           </ul>
         </div>
       </div>
-    </div>
+    </XCard>
   </div>
 </template>
 

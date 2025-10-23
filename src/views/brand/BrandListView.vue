@@ -40,7 +40,8 @@ const headerButtons = computed(() => [
     label: 'Add Brand',
     variant: 'outline',
     size: 'md',
-    className: 'itbms-add-button bg-white text-emerald-600 hover:bg-emerald-50 shadow-md transition-all duration-200 hover:shadow-lg font-semibold',
+    className:
+      'itbms-add-button bg-white text-emerald-600 hover:bg-emerald-50 shadow-md transition-all duration-200 hover:shadow-lg font-semibold',
     onClick: goToAdd,
   },
 ])
@@ -96,6 +97,13 @@ async function askDeleteBrand(brand) {
   brandToDelete.value = brand
 
   const res = await BrandService.getBrandById(brand.id)
+  if (res.error) {
+    toast.add({
+      message: 'Brand not found.',
+      type: 'error',
+    })
+    return
+  }
 
   const brandDetails = res.data
 
