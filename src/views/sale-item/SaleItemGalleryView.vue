@@ -430,28 +430,80 @@ watch(
     <div class="max-w-7xl mx-auto py-8 px-4 space-y-6">
       <XBreadcrumb :items="breadcrumbs" />
 
-      <div class="flex justify-between items-center mb-6 mx-4">
-        <div class="flex items-center gap-x-2 w-full max-w-3xl">
-          <!-- 🔍 Search section -->
-          <XInput
-            v-model="searchOptions.filterSearch"
-            placeholder="Search..."
-            class="w-full rounded-md"
-            @keydown.enter="onSearch"
-          />
-
-          <XButton color="primary" @click="onSearch">
-            <template #default> 🔍 </template>
+       <!-- Search Bar with Sort Controls -->
+      <div class="bg-white rounded-lg border border-gray-200 p-5 mb-4">
+        <div class="flex items-center gap-4">
+            <h3 class="text-lg font-semibold text-gray-700 uppercase tracking-wide">Search</h3>
+          <div class="flex-1 max-w-2xl relative">
+            <XInput
+              v-model="searchOptions.filterSearch"
+              placeholder="Search by brand, model, or color..."
+              class="w-full text-base"
+              @keydown.enter="onSearch"
+            />
+          </div>
+          <XButton color="primary" size="sm" @click="onSearch">
+            <template #default>Search</template>
+          </XButton>
+          <XButton variant="outline" size="sm" class="itbms-search-clear-button" @click="clearSearch">
+            Clear
           </XButton>
 
-          <XButton class="itbms-search-clear-button" @click="clearSearch"> Clear </XButton>
+          <!-- Spacer -->
+          <div class="flex-1"></div>
+
+          <!-- Sort Controls -->
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-gray-600 mr-2">Sort:</span>
+            <XButton
+              class-name="itbms-brand-none"
+              variant="info"
+              size="sm"
+              :disabled="!searchOptions.sortBy && !searchOptions.sortOrder"
+              @click="clearSort"
+            >
+              <AlignJustify class="w-5 h-5" />
+            </XButton>
+            <XButton
+              class-name="itbms-brand-asc"
+              variant="info"
+              size="sm"
+              :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'asc'"
+              @click="sortAscByName"
+            >
+              <ArrowUpWideNarrow class="w-5 h-5" />
+            </XButton>
+            <XButton
+              class-name="itbms-brand-desc"
+              variant="info"
+              size="sm"
+              :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'desc'"
+              @click="sortDescByName"
+            >
+              <ArrowDownWideNarrow class="w-5 h-5" />
+            </XButton>
+          </div>
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center justify-between gap-4 p-4 rounded-md">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-1">
-          <!-- brand filter -->
-          <div class="min-w-[200px]">
+      <!-- Filters Section -->
+      <div class="bg-white rounded-lg border border-gray-200 p-5 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-gray-700 uppercase tracking-wide">Filters</h3>
+          <XButton
+            variant="outline"
+            size="sm"
+            class="itbms-brand-filter-clear"
+            @click="clearAllFilter"
+          >
+            Clear All
+          </XButton>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Brand Filter -->
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-2">Brand</label>
             <XSelector
               v-model="searchOptions.filteredBrands"
               :options="brandOptions"
@@ -464,24 +516,28 @@ watch(
               @remove="handleBrandRemove"
             />
           </div>
-          <!-- Price filter -->
-          <div class="min-w-[200px]">
+
+          <!-- Price Range Filter -->
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-2">Price Range</label>
             <XSelector
               v-model="searchOptions.filteredPrices"
               :options="priceOptions"
-              placeholder="Price Range"
+              placeholder="Select Range"
               class="itbms-price-filter"
               :searchable="false"
               :clearable="true"
               @update:model-value="() => resetPagination(false)"
             />
           </div>
-          <!-- Storage filter -->
-          <div class="min-w-[200px]">
+
+          <!-- Storage Filter -->
+          <div>
+            <label class="block text-sm  font-medium text-gray-600 mb-2">Storage Size</label>
             <XSelector
               v-model="searchOptions.filteredStorages"
               :options="storageOptions"
-              placeholder="Storage Range"
+              placeholder="Select Storage"
               mode="multiple"
               class="itbms-storage-size-filter"
               :searchable="false"
@@ -489,62 +545,31 @@ watch(
               @update:model-value="() => resetPagination(false)"
             />
           </div>
-          <XButton class-name="itbms-brand-filter-clear" @click="clearAllFilter"> Clear </XButton>
-        </div>
 
-        <div class="flex flex-wrap items-center gap-2 p-4 pt-0 rounded-md" />
-
-        <div class="flex items-center gap-2">
-          <XButton
-            class-name="itbms-brand-none"
-            variant="info"
-            :disabled="!searchOptions.sortBy && !searchOptions.sortOrder"
-            @click="clearSort"
-          >
-            <AlignJustify />
-          </XButton>
-          <XButton
-            class-name="itbms-brand-asc"
-            variant="info"
-            :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'asc'"
-            @click="sortAscByName"
-          >
-            <ArrowUpWideNarrow />
-          </XButton>
-          <XButton
-            class-name="itbms-brand-desc"
-            variant="info"
-            :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'desc'"
-            @click="sortDescByName"
-          >
-            <ArrowDownWideNarrow />
-          </XButton>
-        </div>
-      </div>
-
-      <!-- แถวล่าง: Min / Max -->
-      <div class="flex flex-wrap items-center gap-2 px-4 pt-2 pb-0 rounded-md">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-1">
-          <div class="min-w-[200px]">
-            <XInput
-              v-model="customPrice.min"
-              type="number"
-              placeholder="Min"
-              step="1"
-              variant="filter"
-              @keydown.enter.prevent="resetPagination(false)"
-            />
-          </div>
-
-          <div class="min-w-[200px]">
-            <XInput
-              v-model="customPrice.max"
-              type="number"
-              placeholder="Max"
-              step="1"
-              variant="filter"
-              @keydown.enter.prevent="resetPagination(false)"
-            />
+          <!-- Custom Price Range -->
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-2">Custom Price (Baht)</label>
+            <div class="flex items-center gap-2">
+              <XInput
+                v-model="customPrice.min"
+                type="number"
+                placeholder="Min"
+                step="1"
+                variant="filter"
+                class="w-full"
+                @keydown.enter.prevent="resetPagination(false)"
+              />
+              <span class="text-gray-400 flex-shrink-0">-</span>
+              <XInput
+                v-model="customPrice.max"
+                type="number"
+                placeholder="Max"
+                step="1"
+                variant="filter"
+                class="w-full"
+                @keydown.enter.prevent="resetPagination(false)"
+              />
+            </div>
           </div>
         </div>
       </div>

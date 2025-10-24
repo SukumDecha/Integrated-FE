@@ -5,12 +5,16 @@ import { OrderStatus } from '@/constants/order.constant.js'
 import XButton from '@/components/common/XButton.vue'
 import { formatDate } from '@/utils/DateUtils.js'
 import { displayOrDash } from '@/utils/TextUtils.js'
+import { Calendar, MapPinHouse, NotebookPen, Box } from 'lucide-vue-next'
+
 const props = defineProps({
   order: { type: Object, required: true },
   isBuyerCard: { type: Boolean, default: false },
 })
+
 const router = useRouter()
 const formatCurrency = (n) => n?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || '0'
+
 const calculateTotalPrice = computed(() => {
   if (!props.order?.orderItems || props.order.orderItems.length === 0) return 0
   return props.order.orderItems.reduce((sum, item) => {
@@ -20,87 +24,150 @@ const calculateTotalPrice = computed(() => {
   }, 0)
 })
 
-// ชื่อที่จะโชว์
 const displayName = computed(() => {
   if (props.isBuyerCard) {
-    // buyer card → แสดงชื่อผู้ขาย
     return props.order.seller?.nickname || 'Unknown Seller'
   } else {
-    // seller card → แสดงชื่อผู้ซื้อ
     return props.order.buyer?.nickname || 'Unknown Buyer'
   }
 })
 
-// route path
 const orderDetailPath = computed(() =>
   props.isBuyerCard ? `/your-orders/${props.order.id}` : `/sale-orders/${props.order.id}`,
 )
+
+const statusConfig = computed(() => {
+  const status = props.order.orderStatus
+  if (status === OrderStatus.NEW) {
+    return { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', badge: 'bg-amber-100 text-amber-800' }
+  } else if (status === OrderStatus.CANCELED) {
+    return { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-700', badge: 'bg-red-100 text-red-700' }
+  } else if (status === OrderStatus.COMPLETED) {
+    return { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700', badge: 'bg-emerald-100 text-emerald-700' }
+  }
+  return { bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-700', badge: 'bg-gray-100 text-gray-700' }
+})
 </script>
 
 <template>
-  <div class="border border-green-200 p-4 rounded-xl shadow-sm mb-3">
-    <div
-      class="flex flex-col sm:flex-row justify-between gap-4"
-      @click="router.push(orderDetailPath)"
-    >
-      <div class="flex justify-between items-start mb-2">
+  <div
+    :class="[
+      'border-2 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden mb-4 cursor-pointer group',
+      statusConfig.border
+    ]"
+    @click="router.push(orderDetailPath)"
+  >
+    <!-- Header Section -->
+    <div :class="['px-6 py-4 border-b-2', statusConfig.bg, statusConfig.border]">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <!-- Left: User Info -->
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-gradient-to-br from-gray-300 to-gray-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+            {{ displayName.charAt(0).toUpperCase() }}
+          </div>
+          <div>
+            <div class="font-bold text-lg text-gray-800 itbms-nickname group-hover:text-emerald-600 transition-colors">
+              {{ displayName }}
+            </div>
+            <div class="text-xs text-gray-500 flex items-center gap-1">
+           <Calendar class="w-3.5 h-3.5 text-gray-700" />
+              <span class="itbms-order-date">{{ formatDate(order.orderDate) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Status Badge -->
         <div>
-          <!-- ชื่อ (buyer/seller) -->
-          <div class="font-semibold text-green-800 itbms-nickname">
-            {{ displayName }}
+          <div
+            :class="[
+              'itbms-order-status inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide shadow-sm',
+              statusConfig.badge
+            ]"
+          >
+            <span class="w-2 h-2 rounded-full bg-current mr-2 animate-pulse"></span>
+            {{ order.orderStatus }}
           </div>
-          <div class="text-sm text-gray-600">
-            <span class="itbms-shipping-address font-medium">Shipped To:</span>
-            {{ order.shippingAddress }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Details Section -->
+    <div class="px-6 py-4 bg-white">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <!-- Shipping Address -->
+        <div class="flex items-start gap-2">
+          <MapPinHouse class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+          <div>
+            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide itbms-shipping-address">Shipped To</div>
+            <div class="text-sm text-gray-800 font-medium mt-0.5">{{ order.shippingAddress }}</div>
           </div>
-          <div class="text-sm text-gray-600">
-            <span class="itbms-order-note font-medium">Note:</span>
-            {{ displayOrDash(order.orderNote) }}
+        </div>
+
+        <!-- Order Note -->
+        <div class="flex items-start gap-2">
+          <NotebookPen class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+          <div>
+            <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide itbms-order-note">Note</div>
+            <div class="text-sm text-gray-800 font-medium mt-0.5">{{ displayOrDash(order.orderNote) }}</div>
           </div>
         </div>
       </div>
 
-      <div class="text-sm text-right text-gray-700 space-y-1">
+      <!-- Order Info Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 py-4 border-t border-b border-gray-100">
+        <div>
+          <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide itbms-order-id">Order No</div>
+          <div class="text-sm font-bold text-gray-800 mt-1">#{{ order.id }}</div>
+        </div>
+        <div>
+          <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide itbms-payment-date">Payment</div>
+          <div class="text-sm font-bold text-gray-800 mt-1">{{ formatDate(order.orderDate) }}</div>
+        </div>
+        <div>
+          <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide itbms-order-status">Status</div>
+          <div class="text-sm font-bold text-gray-800 mt-1">{{ order.orderStatus }}</div>
+        </div>
+        <div>
+          <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide itbms-total-order-price">Total</div>
+          <div class="text-base font-bold text-emerald-600 mt-1">฿{{ formatCurrency(calculateTotalPrice) }}</div>
+        </div>
+      </div>
+
+      <!-- Order Items -->
+      <div class="mt-4 space-y-2">
+        <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Order Items</div>
         <div
-          class="itbms-order-status inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold uppercase self-start"
-          :class="{
-            'bg-yellow-100 text-yellow-800': order.orderStatus === OrderStatus.NEW,
-            'bg-red-100 text-red-700': order.orderStatus === OrderStatus.CANCELED,
-            'bg-green-100 text-green-700': order.orderStatus === OrderStatus.COMPLETED,
-          }"
+          v-for="item in order.orderItems"
+          :key="item.no"
+          class="flex justify-between items-center border-2 border-gray-100 rounded-xl p-3 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 transition-all duration-200"
         >
-          {{ order.orderStatus }}
-        </div>
-
-        <div><span class="itbms-order-id font-medium">Order No:</span> {{ order.id }}</div>
-        <div><span class="itbms-order-date font-medium">Order Date:</span> {{ formatDate(order.orderDate) }}</div>
-        <div><span class="itbms-payment-date font-medium">Payment Date:</span> {{ formatDate(order.orderDate) }}</div>
-        <div><span class="itbms-total-order-price font-medium">Total:</span> {{ formatCurrency(calculateTotalPrice) }}</div>
-        <div><span class="itbms-order-status font-medium">Status:</span> {{ order.orderStatus }}</div>
-      </div>
-    </div>
-
-    <div class="mt-4 space-y-3">
-      <div
-        v-for="item in order.orderItems"
-        :key="item.no"
-        class="flex justify-between items-center border border-green-100 rounded-lg p-3 bg-green-50"
-      >
-        <div class="itbms-item-description text-gray-800">
-          {{ item.description }}
-        </div>
-        <div class="text-right text-sm">
-          <div class="itbms-item-quantity text-gray-600">Qty {{ item.quantity }}</div>
-          <div class="itbms-item-total-price font-medium text-green-700">
-            Price: {{ formatCurrency(item.price * item.quantity) }}
+          <div class="flex items-center gap-3 flex-1">
+            <div class="w-10 h-10 bg-gray-300 rounded-lg flex items-center justify-center text-white font-bold shadow-md">
+              <Box class="w-5 h-5 text-emerald-600" />
+            </div>
+            <div class="flex-1">
+              <div class="itbms-item-description text-sm font-semibold text-gray-800">
+                {{ item.description }}
+              </div>
+              <div class="flex items-center gap-3 mt-1">
+                <span class="itbms-item-quantity text-xs text-gray-600 bg-white px-2 py-0.5 rounded-full border border-gray-200">
+                  Qty: <span class="font-bold">{{ item.quantity }}</span>
+                </span>
+                <span class="itbms-item-total-price text-sm font-bold text-emerald-700">
+                  ฿{{ formatCurrency(item.price * item.quantity) }}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="mt-4 flex justify-end">
+
+    <!-- Footer Action -->
+    <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
       <XButton
-        class="itbms-view-button mt-4"
-        label="View"
+        class="itbms-view-button"
+        label="View Details"
         variant="primary"
         size="sm"
         @click="router.push(orderDetailPath)"

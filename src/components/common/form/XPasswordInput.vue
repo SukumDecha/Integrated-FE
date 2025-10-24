@@ -1,5 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { Check, X } from 'lucide-vue-next'
+
 
 const props = defineProps({
   modelValue: String,
@@ -85,36 +87,8 @@ const isPasswordValid = computed(() => Object.values(passwordRules.value).every(
         ]"
       >
         <span class="mr-2">
-          <svg
-            v-if="valid"
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-          <svg
-            v-else
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+          <Check v-if="valid" class="h-4 w-4 text-emerald-600" />
+        <X v-else class="h-4 w-4 text-red-500" />
         </span>
         <span>
           {{

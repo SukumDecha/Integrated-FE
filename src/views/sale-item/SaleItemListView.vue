@@ -3,8 +3,7 @@ import { ref, onMounted, watchEffect, computed, reactive } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import XBreadcrumb from '@/components/layout/XBreadcrumb.vue'
 import XButton from '@/components/common/XButton.vue'
-import XTable from '@/components/common/XTable.vue'
-import XPagination from '@/components/common/XPagination.vue'
+import XList from '@/components/common/XList.vue'
 import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { SaleItemService } from '@/services'
 import { formatPrice, displayOrDash } from '@/utils/TextUtils'
@@ -64,17 +63,56 @@ const searchParams = computed(() => {
   }
 })
 
+const headerButtons = computed(() => [
+  {
+    label: 'Add Sale Item',
+    variant: 'outline',
+    size: 'md',
+    className: 'itbms-sale-item-add bg-emerald-500 text-white border-white hover:bg-emerald-700 transition-all duration-200',
+    onClick: onAdd,
+  },
+  {
+    label: 'Manage Brand',
+    variant: 'outline',
+    size: 'md',
+    className: 'itbms-manage-brand bg-emerald-500 text-white border-white hover:bg-emerald-700 transition-all duration-200',
+    onClick: onManage,
+  },
+])
+
+const statsData = computed(() => [
+  {
+    showPulse: true,
+    label: `Total Items: <span class="font-semibold text-slate-900">${searchOptions.totalItems}</span>`,
+  },
+  {
+    showPulse: false,
+    label: `Page: <span class="font-semibold text-slate-900">${searchOptions.currentPage}</span>`,
+  },
+])
+
+const paginationData = computed(() => ({
+  currentPage: searchOptions.currentPage,
+  pageSize: searchOptions.pageSize,
+  total: searchOptions.totalItems,
+}))
+
 const initializeStateFromRouteOrStorage = () => {
   const q = route.query
 
   // Pagination
   searchOptions.currentPage =
-    parseInt(q.page, 10) || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {}).currentPage || 1
+    parseInt(q.page, 10) ||
+    loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {}).currentPage ||
+    1
   searchOptions.pageSize =
-    parseInt(q.size, 10) || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {}).pageSize || 10
+    parseInt(q.size, 10) ||
+    loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {}).pageSize ||
+    10
 
   // Sort
-  searchOptions.sortBy = q.sortBy || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).field || 'createdOn'
+  searchOptions.sortBy =
+    q.sortBy || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).field || 'createdOn'
   searchOptions.sortOrder =
     q.sortDirection || loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.SORT, {}).order || 'asc'
 
@@ -99,10 +137,7 @@ const fetchSaleItems = async () => {
   loading.items = true
   error.items = null
 
-  const response = await SaleItemService.getSaleItemListBySellerId(
-    sellerId,
-    searchParams.value
-  )
+  const response = await SaleItemService.getSaleItemListBySellerId(sellerId, searchParams.value)
 
   if (response.error) {
     error.items = response.error.message || 'Failed to load sale items. Please try again later.'
@@ -174,7 +209,7 @@ async function confirmDeleteItem() {
     return
   }
 
-  const index = saleItems.findIndex(item => item.id === id)
+  const index = saleItems.findIndex((item) => item.id === id)
   if (index !== -1) {
     saleItems.splice(index, 1)
     searchOptions.totalItems -= 1
@@ -205,97 +240,74 @@ function onManage() {
 </script>
 
 <template>
-  <XBreadcrumb :items="breadcrumbs" />
+  <div class="min-h-screen bg-gradient-to-br">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Breadcrumb -->
+      <div class="mb-6">
+        <XBreadcrumb :items="breadcrumbs" />
+      </div>
 
-  <div class="flex justify-between items-center mb-4">
-    <XButton
-      label="Add Sale Item"
-      variant="primary"
-      size="md"
-      class-name="itbms-sale-item-add"
-      @click="onAdd"
-    />
-    <XButton
-      label="Manage Brand"
-      variant="outline"
-      size="md"
-      class-name="itbms-manage-brand"
-      @click="onManage"
-    />
-  </div>
+      <!-- List View Wrapper -->
+      <XList
+        title="Sale Items Management"
+        subtitle="Manage your inventory and product listings"
+        :buttons="headerButtons"
+        :stats="statsData"
+        :loading="loading.items"
+        loading-text="Loading sale items..."
+        empty-text="No sale items found. Start by adding your first item!"
+        :columns="columns"
+        :data="saleItems"
+        :pagination="paginationData"
+        :show-size-changer="true"
+        @pagination-change="handlePaginationChange"
+      >
+        <!-- Format ราคาด้วย comma -->
+        <template #itbms-price="{ record }">
+          <span class="font-semibold text-emerald-600">
+            {{ formatPrice(record.price) }}
+          </span>
+        </template>
 
-  <div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">
-      Sale Item Table
-    </h1>
+        <!-- Show RAM หรือ '-' -->
+        <template #itbms-ramGb="{ record }">
+          <span class="text-slate-700">
+            {{ displayOrDash(record.ramGb) }}
+          </span>
+        </template>
 
-    <XTable
-      :columns="columns"
-      :data="saleItems"
-      empty-text="No sale item"
-    >
-      <!-- Format ราคาด้วย comma -->
-      <template #itbms-price="{ record }">
-        {{ formatPrice(record.price) }}
-      </template>
+        <!-- Show Storage หรือ '-' -->
+        <template #itbms-storageGb="{ record }">
+          <span class="text-slate-700">
+            {{ displayOrDash(record.storageGb) }}
+          </span>
+        </template>
 
-      <!-- Show RAM หรือ '-' -->
-      <template #itbms-ramGb="{ record }">
-        {{ displayOrDash(record.ramGb) }}
-      </template>
+        <!-- Show สี หรือ '-' -->
+        <template #itbms-color="{ record }">
+          <span class="text-slate-700">{{ record.color }}</span>
+        </template>
 
-      <!-- Show Storage หรือ '-' -->
-      <template #itbms-storageGb="{ record }">
-        {{ displayOrDash(record.storageGb) }}
-      </template>
-
-      <!-- Show สี หรือ '-' -->
-      <template #itbms-color="{ record }">
-        {{ displayOrDash(record.color) }}
-      </template>
-
-      <!-- ปุ่ม Edit/Delete -->
-      <template #actions="{ record }">
-        <div class="flex space-x-2">
-          <XButton
-            size="sm"
-            variant="outline"
-            class-name="itbms-edit-button"
-            label="Edit"
-            @click="editSaleItem(record.id)"
-          />
-          <XButton
-            size="sm"
-            variant="danger"
-            class-name="itbms-delete-button"
-            label="Delete"
-            @click="askDeleteItem(record)"
-          />
-        </div>
-      </template>
-    </XTable>
-
-    <!-- Pagination Component -->
-    <XPagination
-      v-if="!loading.items && saleItems.length > 0"
-      class="mt-8"
-      :pagination="{
-        currentPage: searchOptions.currentPage,
-        pageSize: searchOptions.pageSize,
-        total: searchOptions.totalItems,
-      }"
-      :show-size-changer="true"
-      @change="handlePaginationChange"
-    />
-
-    <!-- Error message -->
-    <div
-      v-if="error.items"
-      class="text-center py-10"
-    >
-      <p class="text-lg text-red-500">
-        {{ error.items }}
-      </p>
+        <!-- ปุ่ม Edit/Delete -->
+        <template #actions="{ record }">
+          <div class="flex gap-2">
+            <XButton
+              size="sm"
+              variant="outline"
+              class-name="itbms-edit-button hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-600 transition-all duration-200"
+              label="Edit"
+              @click="editSaleItem(record.id)"
+            />
+            <XButton
+              size="sm"
+              variant="danger"
+              class-name="itbms-delete-button hover:bg-red-600 hover:shadow-md transition-all duration-200"
+              label="Delete"
+              @click="askDeleteItem(record)"
+            />
+          </div>
+        </template>
+      </XList>
     </div>
   </div>
 

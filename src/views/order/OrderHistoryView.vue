@@ -21,6 +21,7 @@ const ORDER_STORAGE_KEYS = {
 }
 
 const orders = ref([])
+const latestFetchId = ref(0)
 
 const loading = reactive({ orders: true })
 const error = reactive({ orders: null })
@@ -28,7 +29,7 @@ const error = reactive({ orders: null })
 const searchOptions = reactive({
   currentPage: 1,
   pageSize: 10,
-  totalElements: 0,
+  totalItems: 0,
   sortBy: 'orderDate',
   sortOrder: 'desc',
 })
@@ -67,13 +68,34 @@ const fetchOrders = async () => {
   const userId = authStore.user?.id
   if (!userId) return
 
+  const requestId = ++latestFetchId.value
+  const currentTab = activeTab.value.toUpperCase()
+
   loading.orders = true
   error.orders = null
+  orders.value = [] // Clear orders immediately to prevent showing stale data
+
+  loading.orders = true
+  latestFetchId.value = requestId
 
   const response = await OrderService.getOrderByUserId(userId, {
     ...searchParams.value,
-    tab: activeTab.value.toUpperCase(),
+    tab: currentTab,
   })
+
+  if (requestId !== latestFetchId.value) return
+
+  if (response?.error) {
+    error.orders = response.error.message || 'Failed to load order history.'
+    toast.add({ type: 'error', message: error.orders })
+  } else {
+    // ถ้า success — ใช้ response ตามต้องการ
+    orders.value = response.data || []
+  }
+
+  loading.orders = false
+
+  if (requestId !== latestFetchId.value) return
 
   if (response.error) {
     error.orders = response.error || 'Failed to load order history.'
@@ -81,10 +103,9 @@ const fetchOrders = async () => {
   } else {
     orders.value = response.data || []
     const p = response.pagination || {}
-    searchOptions.totalItems = p.totalItems || 0
-    searchOptions.pageSize = p.pageSize || searchOptions.pageSize
+    searchOptions.totalItems = p.totalItems ?? 0
+    searchOptions.pageSize = p.pageSize ?? searchOptions.pageSize
   }
-  loading.orders = false
 }
 const handlePaginationChange = ({ currentPage, pageSize }) => {
   // อัปเดต state ในหน้า
@@ -167,14 +188,14 @@ watch(activeTab, async () => {
       </div>
     </div>
     <div
-      v-if="!loading.orders && !orders.value.length && !error.orders"
+      v-if="!loading.orders && orders.length === 0 && !error.orders"
       class="text-center text-gray-500 text-lg py-20"
     >
-      You don’t have any {{ activeTab }} orders.
+      You don't have any {{ activeTab }} orders.
     </div>
 
     <XPagination
-      v-if="!loading.orders && orders.value.length > 0"
+      v-if="!loading.orders && orders.length > 0"
       class="mt-10"
       :pagination="{
         currentPage: searchOptions.currentPage,

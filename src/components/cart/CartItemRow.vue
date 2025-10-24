@@ -5,6 +5,7 @@ import { defineProps } from 'vue'
 import { useCartStore } from '@/stores/cart.store'
 import XConfirmModal from '@/components/common/modal/XConfirmModal.vue'
 import { ref } from 'vue'
+import { Trash2 } from 'lucide-vue-next'
 
 const props = defineProps({
   item: {
@@ -74,14 +75,13 @@ const confirmDelete = () => {
         :disabled="props.item.quantity >= props.item.stock"
         >+</XButton
       >
-      <!-- ✅ ปุ่มลบ -->
       <XButton
         size="sm"
         variant="destructive"
-        class="bg-gray-200 text-gray-700 hover:bg-gray-300 itbms-remove-item ml-2"
+        class="bg-gray-300 hover:bg-red-500 itbms-remove-item ml-2 px-2 flex items-center justify-center"
         @click="showConfirm = true"
       >
-        🗑
+        <Trash2 class="w-4 h-4" />
       </XButton>
       <XConfirmModal
         v-model="showConfirm"

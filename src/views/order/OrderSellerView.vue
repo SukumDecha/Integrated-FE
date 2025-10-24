@@ -88,7 +88,6 @@ const fetchAllTabsCounts = async () => {
       canceled: canceledRes?.pagination.totalItems || 0,
     }
 
-    console.log('Order counts updated:', orderCounts.value)
   } catch (err) {
     console.error('Error fetching order counts:', err)
     toast.add({
@@ -142,8 +141,8 @@ const handlePaginationChange = async ({ currentPage, pageSize }) => {
       ...route.query,
       page: currentPage,
       size: pageSize,
-      sortBy: 'orderDate', // เพิ่ม
-      sortDirection: 'DESC', // เพิ่ม
+      sortBy: 'orderDate', 
+      sortDirection: 'DESC',
     },
   })
 }
