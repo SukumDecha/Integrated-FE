@@ -56,7 +56,7 @@ const fetchOrderDetail = async () => {
 
 onMounted(fetchOrderDetail)
 const goBackToOrders = () => {
-  router.push('/your-orders')
+  router.push('sale-orders')
 }
 </script>
 
