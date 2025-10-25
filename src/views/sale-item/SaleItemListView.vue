@@ -315,6 +315,7 @@ function onManage() {
     v-model="showConfirm"
     title="Delete Sale Item"
     message="Do you want to delete this sale item?"
+    type="error"
     @confirm="confirmDeleteItem"
   />
 </template>

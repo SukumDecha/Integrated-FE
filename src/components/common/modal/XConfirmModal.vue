@@ -24,19 +24,21 @@
       leave-from-class="scale-100 opacity-100"
       leave-to-class="scale-95 opacity-0"
     >
-      <div
-        v-if="modelValue"
-        class="fixed inset-0 flex items-center justify-center z-50"
-      >
-        <div
-          class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center"
-        >
+      <div v-if="modelValue" class="fixed inset-0 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center">
           <!-- Icon -->
           <div class="flex justify-center mb-4">
             <div
-              class="bg-red-100 text-red-500 w-12 h-12 flex items-center justify-center rounded-full"
+              :class="[
+                'w-12 h-12 flex items-center justify-center rounded-full',
+                type === 'success'
+                  ? 'bg-emerald-100 text-emerald-600'
+                  : type === 'error'
+                    ? 'bg-red-100 text-red-500'
+                    : 'bg-gray-100 text-gray-500',
+              ]"
             >
-            <AlertCircle class="w-8 h-8" />
+              <component :is="iconComponent" class="w-8 h-8" />
             </div>
           </div>
 
@@ -72,9 +74,10 @@
 
 <script setup>
 import XButton from '../XButton.vue'
-import { AlertCircle } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { CheckCircle2, AlertCircle, HelpCircle } from 'lucide-vue-next'
 
-defineProps({
+const props = defineProps({
   modelValue: Boolean,
   title: {
     type: String,
@@ -96,6 +99,16 @@ defineProps({
     type: Boolean,
     default: true,
   },
+   type: {
+    type: String,
+    default: 'confirm', // 'success' | 'error' | 'confirm'
+  },
+})
+
+const iconComponent = computed(() => {
+  if (props.type === 'success') return CheckCircle2
+  if (props.type === 'error') return AlertCircle
+  return HelpCircle
 })
 
 const emit = defineEmits(['update:modelValue', 'confirm'])

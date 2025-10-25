@@ -376,6 +376,7 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
       v-model="showConfirm"
       title="Delete Confirmation"
       message="Do you want to delete this sale item?"
+      type="error"
       @confirm="deleteProduct"
     />
   </div>
