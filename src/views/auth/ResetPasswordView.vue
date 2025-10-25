@@ -63,7 +63,7 @@ onMounted(async () => {
   // Validate token
   loaderStore.startLoading()
   const res = await AuthService.validateResetPasswordToken(token.value)
-  const response = res.data 
+  const response = res.data
 
   if (response.valid) {
     tokenValid.value = true
@@ -166,6 +166,7 @@ const goToLogin = () => {
     v-model="showSuccessModal"
     title="Password Reset Successful"
     message="Your password has been successfully updated."
+    type="success"
     :showConfirm="false"
     cancelLabel="OK"
     @update:modelValue="goToLogin"

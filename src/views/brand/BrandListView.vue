@@ -246,6 +246,7 @@ onMounted(() => {
     v-model="showConfirm"
     title="Delete Brand"
     :message="modalMessage || `Do you want to delete ${brandToDelete?.name || ''} brand?`"
+    type="error"
     :show-confirm="showConfirmButton"
     @confirm="confirmDeleteBrand"
   />

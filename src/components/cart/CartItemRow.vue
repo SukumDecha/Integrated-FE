@@ -87,6 +87,7 @@ const confirmDelete = () => {
         v-model="showConfirm"
         title="Remove item"
         :message="`Do you want to remove ${props.item.model} from cart?`"
+        type="error"
         confirm-label="Delete"
         cancel-label="Cancel"
         @confirm="confirmDelete"
