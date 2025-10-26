@@ -1,4 +1,5 @@
 <script setup>
+import { OrderStatus } from '@/constants'
 import { computed } from 'vue'
 
 const props = defineProps({
@@ -20,7 +21,7 @@ const statusConfig = computed(() => {
     return { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-300' }
   } else if (status === 'CANCELED' || status === 'CANCELLED') {
     return { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-300' }
-  } else if (status === 'COMPLETED') {
+  } else if (status === OrderStatus.COMPLETED) {
     return { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-300' }
   }
   return { bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-gray-300' }
