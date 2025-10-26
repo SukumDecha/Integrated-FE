@@ -9,6 +9,7 @@ import { BrandService } from '@/services'
 import { useToastStore } from '@/stores/toast.store'
 import { useAuthStore } from '@/stores/auth.store'
 import { Tag, Info } from 'lucide-vue-next'
+import { UserRole } from '@/constants'
 
 const router = useRouter()
 const route = useRoute()
@@ -143,7 +144,7 @@ async function confirmDeleteBrand() {
 }
 
 onMounted(() => {
-  if (authStore.userInfo.role !== 'SELLER') {
+  if (authStore.userInfo.role !== UserRole.SELLER) {
     toast.add({ type: 'error', message: 'Unauthorized access.' })
     router.push('/sale-items')
   }

@@ -66,6 +66,7 @@ import { useToastStore } from '@/stores/toast.store'
 import { AuthService } from '@/services'
 import XInput from '@/components/common/form/XInput.vue'
 import XButton from '@/components/common/XButton.vue'
+import { UserRole } from '@/constants'
 
 // ────────────────────────────────
 // State
@@ -159,7 +160,7 @@ const handleSubmit = async () => {
     const userRole = authStore.userInfo.role
 
     // redirect ตาม role
-    if (userRole?.toLowerCase() === 'seller') {
+    if (userRole === UserRole.SELLER) {
       router.push('/sale-items/list')
     } else {
       router.push('/sale-items')

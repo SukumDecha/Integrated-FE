@@ -112,7 +112,7 @@
     </div>
 
     <!-- Seller Information (only for sellers) -->
-    <div v-if="profile.userType === 'SELLER'">
+    <div v-if="profile.userType === UserRole.SELLER">
       <div
         v-if="!isEditMode"
         class="border-b border-slate-400 my-4"
@@ -195,7 +195,7 @@
     <!-- User Role Display -->
     <div class="text-center text-sm text-gray-500 pt-2 border-t">
       Account Type:
-      <strong class="itbms-type">{{ toPascalCase(profile.userType) || 'Buyer' }}</strong>
+      <strong class="itbms-type">{{ toPascalCase(profile.userType) || UserRole.BUYER }}</strong>
       <div class="text-xs text-gray-400 mt-1">
         User role cannot be changed
       </div>
@@ -212,6 +212,7 @@ import { maskNumber, toPascalCase } from '@/utils'
 import { onMounted, ref, computed, reactive, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
+import { UserRole } from '@/constants'
 
 const router = useRouter()
 const route = useRoute()

@@ -15,6 +15,7 @@ import { useCartStore } from '@/stores/cart.store'
 import { computed } from 'vue'
 import { CART_TOAST_MESSAGES } from '@/constants/cart.constant'
 import { NotebookPen, Box } from 'lucide-vue-next'
+import { UserRole } from '@/constants'
 
 const imageUrl = new URL('/assets/fallback-image.jpg', import.meta.url).pathname
 
@@ -92,7 +93,7 @@ const decreaseQty = () => {
 }
 
 const isOwner = computed(() => {
-  return authStore.userInfo.role === 'SELLER' && authStore.userInfo.id === props.product?.seller?.id
+  return authStore.userInfo.role === UserRole.SELLER && authStore.userInfo.id === props.product?.seller?.id
 })
 
 const handleAddToCart = () => {

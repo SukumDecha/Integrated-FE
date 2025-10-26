@@ -11,15 +11,15 @@
     <div class="flex justify-center gap-4 mb-6">
       <XButton
         label="I'm a Buyer"
-        :variant="userType === 'BUYER' ? 'primary' : 'outline'"
+        :variant="userType === UserRole.BUYER ? 'primary' : 'outline'"
         class="itbms-register-buyer"
-        @click="userType = 'BUYER'"
+        @click="userType = UserRole.BUYER"
       />
       <XButton
         label="I'm a Seller"
-        :variant="userType === 'SELLER' ? 'primary' : 'outline'"
+        :variant="userType === UserRole.SELLER ? 'primary' : 'outline'"
         class="itbms-register-seller"
-        @click="userType = 'SELLER'"
+        @click="userType = UserRole.SELLER"
       />
     </div>
 
@@ -36,8 +36,9 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import RegisterForm from '@/components/auth/RegisterForm.vue'
 import XButton from '@/components/common/XButton.vue'
+import { UserRole } from '@/constants'
 
-const userType = ref('BUYER')
+const userType = ref(UserRole.BUYER)
 const router = useRouter()
 
 const handleSuccess = () => {

@@ -50,7 +50,7 @@
     />
 
     <!-- Seller fields -->
-    <template v-if="mode === 'SELLER'">
+    <template v-if="mode === UserRole.SELLER">
       <XInput
         v-model="form.mobileNumber"
         label="Mobile Number"
@@ -151,6 +151,7 @@ import XPasswordInput from '../common/form/XPasswordInput.vue'
 import { useToastStore } from '@/stores/toast.store'
 import { AuthService } from '@/services'
 import { useRouter } from 'vue-router'
+import { UserRole } from '@/constants'
 
 const toast = useToastStore()
 const emit = defineEmits(['submitted'])
@@ -158,8 +159,8 @@ const router = useRouter()
 const props = defineProps({
   mode: {
     type: String,
-    default: 'BUYER',
-    validator: (val) => ['BUYER', 'SELLER'].includes(val),
+    default: UserRole.BUYER,
+    validator: (val) => [ UserRole.BUYER, UserRole.SELLER].includes(val),
   },
 })
 
@@ -216,7 +217,7 @@ function validateForm() {
     errors.fullname = 'Fullname must be between 4 and 40 characters.'
   }
 
-  if (props.mode === 'SELLER') {
+  if (props.mode === UserRole.SELLER) {
     if (!form.mobileNumber) errors.mobileNumber = 'Mobile number is required.'
     if (!form.bankAccountNumber) errors.bankAccountNumber = 'Bank account number is required.'
     if (!form.bankName) errors.bankName = 'Bank name is required.'
@@ -256,10 +257,10 @@ const handleSubmit = async () => {
     email: form.email.trim(),
     password: form.password.trim(),
     fullname: form.fullname.trim(),
-    userType: props.mode === 'SELLER' ? 'SELLER' : 'BUYER',
+    userType: props.mode === UserRole.SELLER ? UserRole.SELLER : UserRole.BUYER,
   }
 
-  if (props.mode === 'SELLER') {
+  if (props.mode === UserRole.SELLER) {
     Object.assign(data, {
       mobileNumber: form.mobileNumber.trim(),
       bankAccountNumber: form.bankAccountNumber.trim(),
@@ -270,7 +271,7 @@ const handleSubmit = async () => {
 
   formData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }))
 
-  if (props.mode === 'SELLER') {
+  if (props.mode === UserRole.SELLER) {
     formData.append('idCardImageFront', form.nationalIdFrontImage[0].imageFile)
     formData.append('idCardImageBack', form.nationalIdBackImage[0].imageFile)
   }
