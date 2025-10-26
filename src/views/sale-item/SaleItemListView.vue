@@ -83,11 +83,11 @@ const headerButtons = computed(() => [
 const statsData = computed(() => [
   {
     showPulse: true,
-    label: `Total Items: <span class="font-semibold text-slate-900">${searchOptions.totalItems}</span>`,
+    label: `Total Items: ${searchOptions.totalItems}`,
   },
   {
     showPulse: false,
-    label: `Page: <span class="font-semibold text-slate-900">${searchOptions.currentPage}</span>`,
+    label: `Page: ${searchOptions.currentPage}`,
   },
 ])
 
