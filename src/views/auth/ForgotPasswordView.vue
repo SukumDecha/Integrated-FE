@@ -6,13 +6,22 @@ import XButton from '@/components/common/XButton.vue'
 import AuthService from '@/services/auth.service'
 import { useToastStore } from '@/stores/toast.store'
 import { useLoaderStore } from '@/stores/loader.store'
+import { useAuthStore } from '@/stores/auth.store'
 
 const router = useRouter()
 const toastStore = useToastStore()
 const loaderStore = useLoaderStore()
+const { isLoggedIn } = useAuthStore()
+
 const email = ref('')
 
+const backLabel = isLoggedIn ? 'Back to Profile' : 'Back to Sign in'
+
 const goBack = () => {
+  if (isLoggedIn) {
+    router.back()
+    return
+  }
   router.push('/signin')
 }
 
@@ -33,21 +42,35 @@ const handleSubmit = async () => {
 
 <template>
   <div class="max-w-md mx-auto mt-12 p-6">
-    <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Forgot Password</h2>
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">
+      Forgot Password
+    </h2>
 
-    <form class="space-y-4" @submit.prevent="handleSubmit">
-      <XInput v-model="email" label="Email" type="email" required placeholder="Enter your email" />
+    <form
+      class="space-y-4"
+      @submit.prevent="handleSubmit"
+    >
+      <XInput
+        v-model="email"
+        label="Email"
+        type="email"
+        required
+        placeholder="Enter your email"
+      />
 
       <div class="flex justify-between items-center pt-4">
         <XButton
-          label="Back to Sign in"
+          :label="backLabel"
           variant="ghost"
           type="button"
           class="text-gray-500  hover:text-gray-500"
           @click="goBack"
         />
 
-        <XButton label="Send Reset Link" type="submit" />
+        <XButton
+          label="Send Reset Link"
+          type="submit"
+        />
       </div>
     </form>
   </div>

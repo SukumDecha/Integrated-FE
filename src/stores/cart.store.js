@@ -92,6 +92,10 @@ export const useCartStore = defineStore('cart', () => {
     if (existing) {
       if (existing.quantity + item.quantity <= existing.stock) {
         existing.quantity += item.quantity
+        toastStore.add({
+          type: 'success',
+          message: CART_TOAST_MESSAGES.ADD_SUCCESS,
+        })
       } else {
         toastStore.add({
           type: 'warn',
@@ -109,6 +113,10 @@ export const useCartStore = defineStore('cart', () => {
         stock: item.stock,
         storageGb: item.storageGb,
         color: item.color,
+      })
+      toastStore.add({
+        type: 'success',
+        message: CART_TOAST_MESSAGES.ADD_SUCCESS,
       })
     }
   }

@@ -5,4 +5,5 @@ export const CART_TOAST_MESSAGES = {
   MISSING_SELLER_INFO: 'Cannot add this item because seller information is missing',
   QUANTITY_EXCEEDS: 'Cannot add more. Quantity exceeds available stock.',
   OUT_OF_STOCK: 'This product is out of stock.',
+  ADD_SUCCESS: 'Item added to cart successfully!',
 }
