@@ -173,10 +173,10 @@ const handleSubmit = async () => {
   loaderStore.stopLoading()
   loading.value = false
 
-  if (response?.message === 'Password reset successful' || response?.message) {
+  if (response?.message === 'Password reset successful') {
     showSuccessModal.value = true
   } else {
-    toastStore.add({ type: 'error', message: response?.message || 'Failed to reset password' })
+    toastStore.add({ type: 'error', message: 'Failed to reset password' })
   }
 }
 
