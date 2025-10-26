@@ -50,12 +50,12 @@ const headerButtons = computed(() => [
 const statsData = computed(() => [
   {
     showPulse: true,
-    label: `Total Brands: <span class="font-semibold text-slate-900">${totalBrands.value}</span>`,
+    label: `Total Brands: ${totalBrands.value}`,
   },
   {
     showPulse: false,
     icon: Tag,
-    label: '<span class="font-medium">Active Management</span>',
+    label: 'Active Management',
   },
 ])
 
