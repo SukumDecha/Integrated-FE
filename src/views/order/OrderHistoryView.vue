@@ -9,6 +9,7 @@ import { useAuthStore } from '@/stores/auth.store'
 import { OrderService } from '@/services'
 import { loadFromSessionStorage, saveToSessionStorage } from '@/utils/StorageUtils'
 import XTab from '@/components/common/XTab.vue'
+import { OrderStatus } from '@/constants'
 
 const router = useRouter()
 const route = useRoute()
@@ -62,7 +63,7 @@ const initializeState = () => {
 const updateRouteQuery = () => {
   router.replace({ query: { ...searchParams.value, page: searchOptions.currentPage } })
 }
-const activeTab = ref('completed')
+const activeTab = ref(OrderStatus.COMPLETED)
 
 const fetchOrders = async () => {
   const userId = authStore.userInfo.id
