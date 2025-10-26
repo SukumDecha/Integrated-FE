@@ -189,8 +189,12 @@ const goToLogin = () => {
   <div class="max-w-md mx-auto mt-12 p-6 space-y-6">
     <!-- Header -->
     <div class="text-center space-y-1 mb-6">
-      <h2 class="text-2xl font-semibold text-gray-800">Reset Password</h2>
-      <p class="text-sm text-gray-500">Enter your new password below</p>
+      <h2 class="text-2xl font-semibold text-gray-800">
+        Reset Password
+      </h2>
+      <p class="text-sm text-gray-500">
+        Enter your new password below
+      </p>
 
       <div class="flex justify-center mt-7">
         <div
@@ -209,7 +213,10 @@ const goToLogin = () => {
     </div>
 
     <!-- Form -->
-    <form class="space-y-4" @submit.prevent="handleSubmit">
+    <form
+      class="space-y-4"
+      @submit.prevent="handleSubmit"
+    >
       <XInput
         v-model="form.newPassword"
         label="New Password"
@@ -252,8 +259,8 @@ const goToLogin = () => {
     title="Password Reset Successful"
     message="Your password has been successfully updated."
     type="success"
-    :showConfirm="false"
-    cancelLabel="OK"
-    @update:modelValue="goToLogin"
+    :show-confirm="false"
+    cancel-label="OK"
+    @update:model-value="goToLogin"
   />
 </template>

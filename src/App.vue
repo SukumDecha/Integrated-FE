@@ -1,7 +1,7 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import XToast from './components/common/XToast.vue';
-import XSpin from './components/common/XSpin.vue';
+import XToast from './components/common/XToast.vue'
+import XSpin from './components/common/XSpin.vue'
 </script>
 
 <template>

@@ -66,13 +66,13 @@ const authStore = useAuthStore()
 const cartStore = useCartStore()
 
 const handleAddToCart = () => {
-  if (!authStore.isLoggedIn) {
+  if (!authStore.userInfo.isLoggedIn) {
     router.push('/signin')
     return
   }
 
   cartStore.addItem({
-    userid: authStore.userId,
+    userid: authStore.userInfo.isLoggedIn,
     id: props.id,
     brand: props.brand,
     model: props.model,
@@ -94,7 +94,9 @@ const handleAddToCart = () => {
     v-show="isLoading"
     class="w-full bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden h-full flex flex-col"
   >
-    <div class="relative w-full h-64 bg-gradient-to-br from-slate-100 to-slate-200 animate-pulse overflow-hidden">
+    <div
+      class="relative w-full h-64 bg-gradient-to-br from-slate-100 to-slate-200 animate-pulse overflow-hidden"
+    >
       <div class="w-full h-full bg-slate-300 animate-pulse" />
       <span class="absolute top-4 left-4 h-6 w-20 bg-slate-300 rounded-full animate-pulse" />
     </div>
@@ -123,40 +125,54 @@ const handleAddToCart = () => {
     v-show="!isLoading"
     class="itbms-row w-full bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:border-emerald-300 h-full flex flex-col group"
   >
-    <router-link v-if="!isLoading && id" :to="`/sale-items/${id}`" class="flex flex-col flex-grow">
+    <router-link
+      v-if="!isLoading && id"
+      :to="`/sale-items/${id}`"
+      class="flex flex-col flex-grow"
+    >
       <!-- Image Container -->
-      <div class="relative w-full h-64 overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100">
+      <div
+        class="relative w-full h-64 overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100"
+      >
         <img
           :src="imageUrl || fallbackImageUrl"
           :alt="`${brand} ${model} product image`"
           class="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
-        />
+        >
 
         <!-- Stock Badge -->
         <span
           class="absolute top-4 left-4 text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm transition-all duration-300"
-          :class="quantity > 0
-            ? 'bg-emerald-500/90 text-white border border-emerald-300'
-            : 'bg-red-500/90 text-white border border-red-300'"
+          :class="
+            quantity > 0
+              ? 'bg-emerald-500/90 text-white border border-emerald-300'
+              : 'bg-red-500/90 text-white border border-red-300'
+          "
         >
           {{ quantity > 0 ? '✓ In Stock' : '✕ Out of Stock' }}
         </span>
 
         <!-- Hover Overlay -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        />
       </div>
 
       <!-- Content Container -->
       <div class="p-6 flex flex-col justify-between flex-grow">
         <!-- Brand -->
         <div class="flex items-center gap-2 mb-2">
-          <p class="itbms-brand text-emerald-600 text-sm font-semibold uppercase tracking-wide line-clamp-1">
+          <p
+            class="itbms-brand text-emerald-600 text-sm font-semibold uppercase tracking-wide line-clamp-1"
+          >
             {{ brand }}
           </p>
         </div>
 
         <!-- Model -->
-        <h3 class="itbms-model text-xl font-bold text-slate-900 tracking-tight line-clamp-2 mb-4 group-hover:text-emerald-600 transition-colors duration-300">
+        <h3
+          class="itbms-model text-xl font-bold text-slate-900 tracking-tight line-clamp-2 mb-4 group-hover:text-emerald-600 transition-colors duration-300"
+        >
           {{ model }}
         </h3>
 
@@ -169,7 +185,11 @@ const handleAddToCart = () => {
             </div>
             <span class="font-medium text-slate-600">RAM:</span>
             <span class="itbms-ramGb font-semibold text-slate-900">
-              {{ displayOrDash(ramGb) }} <span v-if="ramGb" class="itbms-ramGb-unit text-slate-600">GB</span>
+              {{ displayOrDash(ramGb) }}
+              <span
+                v-if="ramGb"
+                class="itbms-ramGb-unit text-slate-600"
+              >GB</span>
             </span>
           </div>
 
@@ -180,7 +200,11 @@ const handleAddToCart = () => {
             </div>
             <span class="font-medium text-slate-600">Storage:</span>
             <span class="itbms-storageGb font-semibold text-slate-900">
-              {{ displayOrDash(storageGb) }} <span v-if="storageGb" class="itbms-storageGb-unit text-slate-600">GB</span>
+              {{ displayOrDash(storageGb) }}
+              <span
+                v-if="storageGb"
+                class="itbms-storageGb-unit text-slate-600"
+              >GB</span>
             </span>
           </div>
 
@@ -213,8 +237,8 @@ const handleAddToCart = () => {
     <div class="p-6 pt-0">
       <XButton
         class="itbms-add-to-cart-button w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed"
-        @click="handleAddToCart"
         :disabled="quantity <= 0"
+        @click="handleAddToCart"
       >
         <span class="flex items-center justify-center gap-2">
           <ShoppingCart class="h-5 w-5" />

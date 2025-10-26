@@ -26,18 +26,21 @@ const goBack = () => {
 }
 
 const handleSubmit = async () => {
-    loaderStore.startLoading()
-    const response = await AuthService.forgotPassword({ email: email.value })
+  loaderStore.startLoading()
+  const response = await AuthService.forgotPassword({ email: email.value })
 
-    if (response?.message === 'If email exists, a reset link has been sent to your email.') {
-      toastStore.add({ type: 'success', message: 'Reset password link has been sent to your email' })
-      router.push('/signin')
-    } else {
-      toastStore.add({ type: 'error', message: response.message || 'Failed to send reset password link' })
-      router.push('/signin')
-    }
-     loaderStore.stopLoading()
+  if (response?.message === 'If email exists, a reset link has been sent to your email.') {
+    toastStore.add({ type: 'success', message: 'Reset password link has been sent to your email' })
+    router.push('/signin')
+  } else {
+    toastStore.add({
+      type: 'error',
+      message: response.message || 'Failed to send reset password link',
+    })
+    router.push('/signin')
   }
+  loaderStore.stopLoading()
+}
 </script>
 
 <template>
@@ -63,7 +66,7 @@ const handleSubmit = async () => {
           :label="backLabel"
           variant="ghost"
           type="button"
-          class="text-gray-500  hover:text-gray-500"
+          class="text-gray-500 hover:text-gray-500"
           @click="goBack"
         />
 

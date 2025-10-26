@@ -17,26 +17,20 @@ const breadcrumbs = [
 ]
 
 const handleSubmit = async (data) => {
-  try {
-    const res = await SaleItemService.addSaleItem(data)
+  const res = await SaleItemService.addSaleItem(data)
 
-    if (res?.error) {
-      toast.add({ message: res.message || 'Failed to save item', type: 'error' })
-      return
-    }
-
-    router.push({ path: '/sale-items/list', query: { toast: 'created' } })
-
-    const paginationState = loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION)
-    saveToSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {
-      ...paginationState,
-      currentPage: 1,
-    })
-  } catch (err) {
-
-    console.error('🔥 Submit error:', err)
-    toast.add({ message: 'Unexpected error while saving item', type: 'error' })
+  if (res?.error) {
+    toast.add({ message: res.message || 'Failed to save item', type: 'error' })
+    return
   }
+
+  router.push({ path: '/sale-items/list', query: { toast: 'created' } })
+
+  const paginationState = loadFromSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION)
+  saveToSessionStorage(SALE_ITEM_STORAGE_KEYS.PAGINATION, {
+    ...paginationState,
+    currentPage: 1,
+  })
 }
 </script>
 

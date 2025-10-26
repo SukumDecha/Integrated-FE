@@ -4,10 +4,4 @@ import UserService from './user.service.js'
 import AuthService from './auth.service.js'
 import OrderService from './order.service.js'
 
-export {
-  SaleItemService,
-  BrandService,
-  UserService,
-  AuthService,
-  OrderService,
-}
+export { SaleItemService, BrandService, UserService, AuthService, OrderService }

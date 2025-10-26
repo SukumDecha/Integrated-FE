@@ -1,5 +1,8 @@
 <template>
-  <form class="space-y-4" @submit.prevent="handleSubmit">
+  <form
+    class="space-y-4"
+    @submit.prevent="handleSubmit"
+  >
     <div class="flex flex-col space-y-4">
       <XInput
         v-model="form.email"
@@ -64,6 +67,9 @@ import { AuthService } from '@/services'
 import XInput from '@/components/common/form/XInput.vue'
 import XButton from '@/components/common/XButton.vue'
 
+// ────────────────────────────────
+// State
+// ────────────────────────────────
 const form = reactive({
   email: '',
   password: '',
@@ -84,6 +90,9 @@ const router = useRouter()
 const authStore = useAuthStore()
 const toast = useToastStore()
 
+// ────────────────────────────────
+// Validation
+// ────────────────────────────────
 const onBlur = (field) => {
   touched[field] = true
   validateField(field)
@@ -92,7 +101,6 @@ const onBlur = (field) => {
 const validateField = (field) => {
   errors[field] = ''
   const value = form[field]
-
   if (!value) {
     errors[field] = `${field === 'email' ? 'Email' : 'Password'} is required.`
   }
@@ -105,9 +113,12 @@ const validateForm = () => {
 }
 
 const isValid = computed(() => {
-  return form.email.length > 0 && form.password.length > 0 && !errors.email && !errors.password
+  return form.email && form.password && !errors.email && !errors.password
 })
 
+// ────────────────────────────────
+// Submit
+// ────────────────────────────────
 const handleSubmit = async () => {
   touched.email = true
   touched.password = true
@@ -125,41 +136,47 @@ const handleSubmit = async () => {
       password: form.password.trim(),
     })
 
-    if (res.error !== null) {
-      const message =
-        res.message?.trim() || res.error?.trim() || 'There is a problem. Please try again later.'
-      toast.add({ type: 'error', message })
+    if (res.error) {
+      toast.add({
+        type: 'error',
+        message: res.message?.trim() || res.error?.trim() || 'Login failed. Please try again.',
+      })
       return
     }
 
     const accessToken = res.data?.access_token
 
-    if (accessToken) {
-      authStore.login(accessToken)
-      // toast.add({ type: 'success', message: res.message || 'Login successful' })
-      toast.add({ type: 'success', message: 'Login successful' })
+    if (!accessToken) {
+      toast.add({ type: 'error', message: 'Invalid token response.' })
+      return
+    }
 
-      const userRole = authStore.user?.role || res.data?.user?.role
+    // Update store
+    authStore.login(accessToken)
+    toast.add({ type: 'success', message: 'Login successful' })
 
-      if (userRole === 'SELLER' || userRole === 'seller') {
-        router.push('/sale-items/list')
-      } else {
-        router.push('/sale-items') // Other roles go to home
-      }
+    // ดึง role จาก userInfo ที่ authStore decode แล้ว
+    const userRole = authStore.userInfo.role
+
+    // redirect ตาม role
+    if (userRole?.toLowerCase() === 'seller') {
+      router.push('/sale-items/list')
     } else {
-      toast.add({ type: 'error', message: 'Login failed. Invalid token response.' })
+      router.push('/sale-items')
     }
   } catch (err) {
-    console.error('Login error:', err)
-
-    const message = err?.message || 'Unexpected error occurred during login.'
-
-    toast.add({ type: 'error', message })
+    toast.add({
+      type: 'error',
+      message: err?.message || 'Unexpected error occurred during login.',
+    })
   } finally {
     loading.value = false
   }
 }
 
+// ────────────────────────────────
+// Other actions
+// ────────────────────────────────
 const handleCancel = () => {
   form.email = ''
   form.password = ''

@@ -9,7 +9,7 @@
               :key="col.key || col.dataIndex"
               :class="[
                 'px-4 py-2 text-sm font-semibold text-gray-700 uppercase tracking-wider',
-                getAlignmentClass(col.align)
+                getAlignmentClass(col.align),
               ]"
               :style="getWidthStyle(col.width)"
             >
@@ -31,11 +31,7 @@
             <td
               v-for="col in columns"
               :key="col.key || col.dataIndex"
-              :class="[
-                'px-4 py-2 text-sm text-gray-800',
-                getAlignmentClass(col.align),
-                col.key
-              ]"
+              :class="['px-4 py-2 text-sm text-gray-800', getAlignmentClass(col.align), col.key]"
               :style="getWidthStyle(col.width)"
             >
               <slot
@@ -79,57 +75,57 @@
 </template>
 
 <script setup>
-import XPagination from './XPagination.vue';
+import XPagination from './XPagination.vue'
 
 const props = defineProps({
   columns: { type: Array, required: true },
   data: { type: Array, required: true },
   pagination: {
     type: Object,
-    default: null
+    default: null,
   },
   emptyText: {
     type: String,
-    default: 'No data'
+    default: 'No data',
   },
   pageSizeOptions: {
     type: Array,
-    default: () => [10, 20, 50, 100]
+    default: () => [10, 20, 50, 100],
   },
   showSizeChanger: {
     type: Boolean,
-    default: true
+    default: true,
   },
   maxVisiblePages: {
     type: Number,
-    default: 10
-  }
-});
+    default: 10,
+  },
+})
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['change'])
 
 function handlePaginationChange({ currentPage, pageSize }) {
   const newPagination = {
     ...props.pagination,
     currentPage,
-    pageSize
-  };
-  emit('change', newPagination);
+    pageSize,
+  }
+  emit('change', newPagination)
 }
 
 function getAlignmentClass(align) {
   switch (align) {
     case 'right':
-      return 'text-right';
+      return 'text-right'
     case 'center':
-      return 'text-center';
+      return 'text-center'
     case 'left':
     default:
-      return 'text-left';
+      return 'text-left'
   }
 }
 
 function getWidthStyle(width) {
-  return width ? { width } : {};
+  return width ? { width } : {}
 }
 </script>

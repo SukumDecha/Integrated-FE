@@ -88,7 +88,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
-
 </script>
 
 <template>
@@ -142,9 +141,7 @@ onBeforeUnmount(() => {
         @blur="$emit('blur')"
         @change="$emit('change')"
       >
-        <option
-          value=""
-        >
+        <option value="">
           {{ placeholder || 'Select an option' }}
         </option>
         <option

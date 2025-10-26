@@ -2,9 +2,8 @@
 import { ref, computed } from 'vue'
 import { Check, X } from 'lucide-vue-next'
 
-
 const props = defineProps({
-  modelValue: String,
+  modelValue: {type: String, default: ''},
   label: { type: String, default: 'Password' },
   placeholder: {
     type: String,
@@ -58,11 +57,11 @@ const isPasswordValid = computed(() => Object.values(passwordRules.value).every(
         // กรณีผิดพลาด → border แดง
         touched && !isPasswordValid
           ? 'border-red-500 focus:ring-red-300 focus:border-red-500'
-          // กรอกครบถูกต้อง → border ดำ
-          : modelValue && isPasswordValid
-            ? 'border-gray-900 focus:ring-green-300 focus:border-gray-900'
-            // ปกติ → border ดำ
-            : 'border-gray-900 focus:ring-green-300 focus:border-gray-900',
+          : // กรอกครบถูกต้อง → border ดำ
+            modelValue && isPasswordValid
+              ? 'border-gray-900 focus:ring-green-300 focus:border-gray-900'
+              : // ปกติ → border ดำ
+                'border-gray-900 focus:ring-green-300 focus:border-gray-900',
         props.class,
       ]"
       @input="handleInput"
@@ -79,16 +78,22 @@ const isPasswordValid = computed(() => Object.values(passwordRules.value).every(
           // ถ้ากรอกครบ rule → สีเขียว
           valid
             ? 'text-green-600'
-            // ถ้า touched หรือ submit แล้วผิด → สีแดง
-            : touched
-              ? 'text-red-500'
-              // ตอนเปิดหน้า → สีเทา
-              : 'text-gray-500'
+            : // ถ้า touched หรือ submit แล้วผิด → สีแดง
+              touched
+                ? 'text-red-500'
+                : // ตอนเปิดหน้า → สีเทา
+                  'text-gray-500',
         ]"
       >
         <span class="mr-2">
-          <Check v-if="valid" class="h-4 w-4 text-emerald-600" />
-        <X v-else class="h-4 w-4 text-red-500" />
+          <Check
+            v-if="valid"
+            class="h-4 w-4 text-emerald-600"
+          />
+          <X
+            v-else
+            class="h-4 w-4 text-red-500"
+          />
         </span>
         <span>
           {{

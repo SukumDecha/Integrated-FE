@@ -2,12 +2,18 @@
   <div class="relative bg-white overflow-hidden h-screen flex items-center">
     <!-- Background Pattern -->
     <div class="absolute inset-0 opacity-[0.02]">
-      <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, rgb(5 150 105) 1px, transparent 0); background-size: 40px 40px;"></div>
+      <div
+        class="absolute inset-0"
+        style="
+          background-image: radial-gradient(circle at 1px 1px, rgb(5 150 105) 1px, transparent 0);
+          background-size: 40px 40px;
+        "
+      />
     </div>
 
     <!-- Background Image - Right Side -->
     <div class="absolute right-0 top-0 bottom-0 w-full lg:w-1/2">
-      <div class="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent z-10"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent z-10" />
       <img
         class="w-full h-full object-cover"
         :src="backgroundImage"
@@ -21,14 +27,18 @@
         <!-- Left Content -->
         <div class="w-full lg:w-1/2 space-y-5">
           <!-- Badge -->
-          <div class="inline-flex items-center px-4 py-1.5 rounded-full border border-emerald-200 bg-emerald-50">
-            <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></span>
+          <div
+            class="inline-flex items-center px-4 py-1.5 rounded-full border border-emerald-200 bg-emerald-50"
+          >
+            <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2" />
             <span class="text-xs font-semibold text-emerald-700">New Arrival</span>
           </div>
 
           <!-- Title -->
           <div>
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 mb-3 leading-[1.1]">
+            <h1
+              class="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 mb-3 leading-[1.1]"
+            >
               {{ title }}
             </h1>
             <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-emerald-600 leading-[1.1]">
@@ -43,15 +53,21 @@
 
           <!-- Feature Pills -->
           <div class="flex flex-wrap gap-2">
-            <span class="inline-flex items-center px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-xs text-gray-700">
+            <span
+              class="inline-flex items-center px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-xs text-gray-700"
+            >
               <Check class="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
               Free Shipping
             </span>
-            <span class="inline-flex items-center px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-xs text-gray-700">
+            <span
+              class="inline-flex items-center px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-xs text-gray-700"
+            >
               <shield-check class="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
               Warranty Included
             </span>
-            <span class="inline-flex items-center px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-xs text-gray-700">
+            <span
+              class="inline-flex items-center px-3 py-1.5 rounded-full border border-gray-200 bg-gray-50 text-xs text-gray-700"
+            >
               <badge-dollar-sign class="w-3.5 h-3.5 mr-1.5 text-emerald-600" />
               Best Price
             </span>
@@ -86,16 +102,28 @@
           <!-- Stats -->
           <div class="flex gap-8 pt-5 border-t border-gray-200">
             <div>
-              <div class="text-3xl font-black text-gray-900">500+</div>
-              <div class="text-xs text-gray-500 mt-0.5">Models</div>
+              <div class="text-3xl font-black text-gray-900">
+                500+
+              </div>
+              <div class="text-xs text-gray-500 mt-0.5">
+                Models
+              </div>
             </div>
             <div>
-              <div class="text-3xl font-black text-gray-900">50K+</div>
-              <div class="text-xs text-gray-500 mt-0.5">Customers</div>
+              <div class="text-3xl font-black text-gray-900">
+                50K+
+              </div>
+              <div class="text-xs text-gray-500 mt-0.5">
+                Customers
+              </div>
             </div>
             <div>
-              <div class="text-3xl font-black text-emerald-600">4.9★</div>
-              <div class="text-xs text-gray-500 mt-0.5">Rating</div>
+              <div class="text-3xl font-black text-emerald-600">
+                4.9★
+              </div>
+              <div class="text-xs text-gray-500 mt-0.5">
+                Rating
+              </div>
             </div>
           </div>
         </div>
@@ -103,8 +131,8 @@
     </div>
 
     <!-- Decorative Elements -->
-    <div class="absolute top-1/4 right-1/3 w-96 h-96 bg-emerald-100/40 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-1/3 left-1/4 w-80 h-80 bg-emerald-50/60 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/4 right-1/3 w-96 h-96 bg-emerald-100/40 rounded-full blur-3xl" />
+    <div class="absolute bottom-1/3 left-1/4 w-80 h-80 bg-emerald-50/60 rounded-full blur-3xl" />
   </div>
 </template>
 
@@ -112,11 +140,12 @@
 import { defineProps } from 'vue'
 import { useRouter } from 'vue-router'
 import XButton from '@/components/common/XButton.vue'
-import { Check , ShieldCheck , BadgeDollarSign , ArrowRight } from 'lucide-vue-next'
+import { Check, ShieldCheck, BadgeDollarSign, ArrowRight } from 'lucide-vue-next'
 
 const router = useRouter()
 
-const backgroundImage = 'https://images.unsplash.com/photo-1556656793-08538906a9f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+const backgroundImage =
+  'https://images.unsplash.com/photo-1556656793-08538906a9f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
 
 const props = defineProps({
   title: {

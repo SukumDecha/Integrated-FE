@@ -38,11 +38,11 @@ const confirmDelete = () => {
       <input
         type="checkbox"
         :checked="cartStore.isSellerAllSelected(props.seller)"
-        @change="cartStore.toggleSeller(props.seller, $event.target.checked)"
         class="itbms-select-nickname h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600 cursor-pointer"
-      />
+        @change="cartStore.toggleSeller(props.seller, $event.target.checked)"
+      >
       <span class="font-semibold itbms-nickname">{{ props.seller }}</span>
-          <!-- Delete All Button -->
+      <!-- Delete All Button -->
       <XButton
         variant="ghost"
         size="sm"
@@ -53,9 +53,12 @@ const confirmDelete = () => {
       />
     </div>
 
-
     <!-- สินค้าในกลุ่มนี้ -->
-    <CartItemRow v-for="(item, index) in props.items" :key="index" :item="item" />
+    <CartItemRow
+      v-for="(item, index) in props.items"
+      :key="index"
+      :item="item"
+    />
   </div>
 
   <!-- Delete Confirmation Modal -->

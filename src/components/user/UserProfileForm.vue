@@ -20,14 +20,20 @@
         </div>
       </div>
 
-      <XButton v-if="!isEditMode" class="itbms-profile-button ml-55" @click="toggleEditMode">
+      <XButton
+        v-if="!isEditMode"
+        class="itbms-profile-button ml-55"
+        @click="toggleEditMode"
+      >
         Edit Profile
       </XButton>
 
-      <XButton  class="whitespace-nowrap" @click="goToChangePassword">
+      <XButton
+        class="whitespace-nowrap"
+        @click="goToChangePassword"
+      >
         Change Password
       </XButton>
-
     </div>
 
     <!-- Success Message (only in edit mode) -->
@@ -39,8 +45,14 @@
     </div>
 
     <!-- Basic Information -->
-    <div class="grid grid-cols-2 gap-4" :class="isEditMode ? 'p-4 border rounded-lg' : 'p-2'">
-      <h4 v-if="isEditMode" class="col-span-2 font-semibold text-gray-700 mb-2">
+    <div
+      class="grid grid-cols-2 gap-4"
+      :class="isEditMode ? 'p-4 border rounded-lg' : 'p-2'"
+    >
+      <h4
+        v-if="isEditMode"
+        class="col-span-2 font-semibold text-gray-700 mb-2"
+      >
         Basic Information
       </h4>
 
@@ -86,8 +98,14 @@
           readonly
           :class="isEditMode ? 'bg-gray-50' : ''"
         />
-        <div v-if="isEditMode" class="absolute inset-0 bg-gray-100 opacity-50 rounded" />
-        <div v-if="isEditMode" class="absolute top-8 left-3 text-sm text-gray-500">
+        <div
+          v-if="isEditMode"
+          class="absolute inset-0 bg-gray-100 opacity-50 rounded"
+        />
+        <div
+          v-if="isEditMode"
+          class="absolute top-8 left-3 text-sm text-gray-500"
+        >
           Password content hidden
         </div>
       </div>
@@ -95,12 +113,20 @@
 
     <!-- Seller Information (only for sellers) -->
     <div v-if="profile.userType === 'SELLER'">
-      <div v-if="!isEditMode" class="border-b border-slate-400 my-4" />
+      <div
+        v-if="!isEditMode"
+        class="border-b border-slate-400 my-4"
+      />
 
       <div :class="isEditMode ? 'border rounded-lg p-4' : ''">
-        <h4 class="font-semibold text-gray-700 mb-3">Seller Information</h4>
+        <h4 class="font-semibold text-gray-700 mb-3">
+          Seller Information
+        </h4>
 
-        <div class="grid grid-cols-2 gap-4" :class="!isEditMode ? 'p-2' : ''">
+        <div
+          class="grid grid-cols-2 gap-4"
+          :class="!isEditMode ? 'p-2' : ''"
+        >
           <XInput
             v-model="maskedMobileNo"
             label="Mobile Number"
@@ -129,7 +155,10 @@
           />
         </div>
 
-        <div v-if="isEditMode" class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
+        <div
+          v-if="isEditMode"
+          class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded"
+        >
           <p class="text-sm text-blue-700">
             <strong>Note:</strong> Mobile number, bank account number, national ID number, bank
             name, and national ID photo cannot be edited. Contact support if you need to update this
@@ -140,7 +169,10 @@
     </div>
 
     <!-- Action Buttons (only in edit mode) -->
-    <div v-if="isEditMode" class="flex justify-end gap-3 pt-4 border-t">
+    <div
+      v-if="isEditMode"
+      class="flex justify-end gap-3 pt-4 border-t"
+    >
       <XButton
         variant="secondary"
         :disabled="isSaving"
@@ -164,7 +196,9 @@
     <div class="text-center text-sm text-gray-500 pt-2 border-t">
       Account Type:
       <strong class="itbms-type">{{ toPascalCase(profile.userType) || 'Buyer' }}</strong>
-      <div class="text-xs text-gray-400 mt-1">User role cannot be changed</div>
+      <div class="text-xs text-gray-400 mt-1">
+        User role cannot be changed
+      </div>
     </div>
   </div>
 </template>
@@ -296,48 +330,43 @@ const doSave = async () => {
 
   isSaving.value = true
 
-  try {
-    const updateData = {
-      nickname: formData.nickname.trim(),
-      fullname: formData.fullname.trim(),
-    }
-
-    const response = await UserService.updateUser(profile.value.id, updateData)
-
-    if (response.error) {
-      toast.add({ type: 'error', message: response.error })
-      return
-    }
-
-    // Trim form data
-    formData.nickname = formData.nickname.trim()
-    formData.fullname = formData.fullname.trim()
-
-    // Update profile with new values
-    profile.value.nickname = formData.nickname.trim()
-    profile.value.fullname = formData.fullname.trim()
-
-    // Update user store
-    const userProfile = { ...userStore.user }
-    userStore.setUser({
-      ...userProfile,
-      nickname: formData.nickname.trim(),
-      fullname: formData.fullname.trim(),
-    })
-
-    // Show success message and redirect
-    showSuccessMessage.value = true
-
-    setTimeout(() => {
-      isEditMode.value = false
-      router.push('/profile')
-    }, 2000)
-  } catch (error) {
-    console.error('Error saving profile:', error)
-    toast.add({ type: 'error', message: 'An error occurred while saving' })
-  } finally {
-    isSaving.value = false
+  const updateData = {
+    nickname: formData.nickname.trim(),
+    fullname: formData.fullname.trim(),
   }
+
+  const response = await UserService.updateUser(profile.value.id, updateData)
+
+  if (response.error) {
+    toast.add({ type: 'error', message: response.error })
+    return
+  }
+
+  // Trim form data
+  formData.nickname = formData.nickname.trim()
+  formData.fullname = formData.fullname.trim()
+
+  // Update profile with new values
+  profile.value.nickname = formData.nickname.trim()
+  profile.value.fullname = formData.fullname.trim()
+
+  // Update user store
+  const userProfile = { ...userStore.user }
+  userStore.setUser({
+    ...userProfile,
+    nickname: formData.nickname.trim(),
+    fullname: formData.fullname.trim(),
+  })
+
+  // Show success message and redirect
+  showSuccessMessage.value = true
+
+  setTimeout(() => {
+    isEditMode.value = false
+    router.push('/profile')
+  }, 2000)
+
+  isSaving.value = false
 }
 
 const doCancel = () => {

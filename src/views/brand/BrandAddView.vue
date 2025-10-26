@@ -36,13 +36,12 @@ const breadcrumbs = [
 const handleSubmit = async (data) => {
   const res = await BrandService.createBrand(data)
 
-if (res.error) {
-  toast.add({ message: 'Failed to save item', type: 'error' })
-  return
-}
+  if (res.error) {
+    toast.add({ message: 'Failed to save item', type: 'error' })
+    return
+  }
 
-router.push({ path: '/brands', query: { toast: 'created' } })
-
+  router.push({ path: '/brands', query: { toast: 'created' } })
 }
 
 const handleCancel = () => {

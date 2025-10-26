@@ -4,59 +4,20 @@ import { PaginationResponse } from '../models/paginated.response'
 import { useAuthStore } from '@/stores/auth.store'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
+const SESSION_EXPIRED_MSG = 'Session expired'
 
-let isRefreshing = false
-let refreshPromise = null
-const ensureAccessToken = async (authStore) => {
-  if (!authStore.token) {
-    return { error: 'No token' }
-  }
-
-  if (!authStore.isTokenExpired()) {
-    return { success: true }
-  }
-
-  if (!isRefreshing) {
-    isRefreshing = true
-    refreshPromise = authStore
-      .refreshAccessToken()
-      .catch((err) => ({ error: err }))
-      .finally(() => {
-        isRefreshing = false
-        refreshPromise = null
-      })
-  }
-
-  const result = await refreshPromise
-  if (result?.error) {
-    authStore.logout()
-    return { error: result.error }
-  }
-
-  return result
-}
-
+/**
+ * ส่ง request ไปยัง API โดยมีการ handle 401 (access token หมดอายุ)
+ * → refresh → retry 1 ครั้ง
+ * → ถ้า refresh token หมด → logout
+ */
 const request = async (url, method, payload = null, options = { isPaginated: false }) => {
-  const { isPaginated } = options
   const authStore = useAuthStore()
-
-  // Check if token needs refresh
-  if (authStore.token && authStore.isTokenExpired()) {
-    const result = await ensureAccessToken(authStore)
-
-    if (result?.error) {
-      authStore.logout()
-      const ResponseBuilder = isPaginated ? PaginationResponse : BaseResponse
-      return new ResponseBuilder().error('Session expired').build()
-    }
-  }
-
-  // Get token for request
-  const token = authStore.token
+  const { isPaginated } = options
 
   const headers = {
     'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
+    ...(authStore.token && { Authorization: `Bearer ${authStore.token}` }),
   }
 
   const httpOptions = {
@@ -65,10 +26,11 @@ const request = async (url, method, payload = null, options = { isPaginated: fal
     credentials: 'include',
   }
 
+  // handle payload
   if (payload instanceof FormData) {
     delete httpOptions.headers['Content-Type']
     httpOptions.body = payload
-  } else if (payload && headers['Content-Type'] === 'application/json') {
+  } else if (payload) {
     httpOptions.body = JSON.stringify(payload)
   }
 
@@ -77,46 +39,62 @@ const request = async (url, method, payload = null, options = { isPaginated: fal
   try {
     const res = await fetch(`${API_BASE_URL}${url}`, httpOptions)
 
+    // ────────────────────────────────
+    // 401 → Access token หมดอายุ → refresh
+    // ────────────────────────────────
     if (res.status === 401) {
-      let errorMessage = 'Session expired'
+      console.warn('[401] Access token may have expired → trying refresh…')
+      const refreshResult = await authStore.refreshAccessToken()
+
+      if (refreshResult?.success) {
+        console.info('[401] Refresh successful → retrying original request…')
+        return await request(url, method, payload, { ...options })
+      }
+
+      // Refresh token หมดอายุ → logout
+      let errorMessage = SESSION_EXPIRED_MSG
       try {
         const body = await res.json()
-        if (body?.errorMessage || body?.message) {
-          errorMessage = body.errorMessage || body.message
-        }
+        errorMessage = body?.errorMessage || body?.message || errorMessage
       } catch {
-        console.warn('Failed to parse error message')
+        // ignore parse error
       }
-      console.warn('Unauthorized (401):', errorMessage)
-      authStore.logout()
+
+      console.warn('[401] Refresh failed → logout')
+      await authStore.logout()
       return new ResponseBuilder().error(errorMessage).build()
     }
 
+    // ────────────────────────────────
+    // Non-200 response
+    // ────────────────────────────────
     if (!res.ok) {
       let errorMessage = `HTTP error! Status: ${res.status}`
       try {
         const body = await res.json()
-        if (body?.message || body?.errorMessage) {
-          errorMessage = body.message || body.errorMessage || errorMessage
-        }
-      } catch (error) {
-        console.error('Error parsing response body:', error)
+        errorMessage = body?.message || body?.errorMessage || errorMessage
+      } catch {
+        // ignore parse error
       }
 
-      console.error('Request failed:', errorMessage)
       return new ResponseBuilder().error(errorMessage).build()
     }
 
-    if (res.status === 204 || method === 'DELETE') {
+    // ────────────────────────────────
+    // No Content
+    // ────────────────────────────────
+    if (res.status === 204) {
       return new ResponseBuilder().message(BaseResponseMessage.Success).build()
     }
 
+    // ────────────────────────────────
+    // Success Response
+    // ────────────────────────────────
     const item = await res.json()
     const response = new ResponseBuilder()
       .data(isPaginated ? item.content : item)
       .message(item.message || BaseResponseMessage.Success)
 
-    // Pagination info
     if (response instanceof PaginationResponse) {
       response
         .page(item.page)
@@ -132,17 +110,20 @@ const request = async (url, method, payload = null, options = { isPaginated: fal
 
     return response.build()
   } catch (err) {
+    // Network error (เช่น offline, server ตาย)
     const errorMessage = getErrorMessage(err)
-    console.error('Request error:', errorMessage, err)
+    console.error('[Request Error]', errorMessage)
     return new ResponseBuilder().error(errorMessage).status(0).build()
   }
 }
 
+// ────────────────────────────────
 // Method shortcuts
-const get = async (url, options) => request(url, 'GET', null, options)
-const post = async (url, payload, options) => request(url, 'POST', payload, options)
-const patch = async (url, payload, options) => request(url, 'PATCH', payload, options)
-const put = async (url, payload, options) => request(url, 'PUT', payload, options)
-const remove = async (url) => request(url, 'DELETE')
+// ────────────────────────────────
+const get = (url, options) => request(url, 'GET', null, options)
+const post = (url, payload, options) => request(url, 'POST', payload, options)
+const patch = (url, payload, options) => request(url, 'PATCH', payload, options)
+const put = (url, payload, options) => request(url, 'PUT', payload, options)
+const remove = (url) => request(url, 'DELETE')
 
 export { get, post, patch, put, remove }

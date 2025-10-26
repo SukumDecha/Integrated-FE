@@ -256,7 +256,7 @@ const handleSubmit = async () => {
     email: form.email.trim(),
     password: form.password.trim(),
     fullname: form.fullname.trim(),
-    userType: props.mode === "SELLER" ? "SELLER" : "BUYER",
+    userType: props.mode === 'SELLER' ? 'SELLER' : 'BUYER',
   }
 
   if (props.mode === 'SELLER') {

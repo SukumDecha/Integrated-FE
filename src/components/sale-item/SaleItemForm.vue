@@ -1,4 +1,3 @@
-
 <template>
   <form
     class="sale-item-form-container"
@@ -8,10 +7,14 @@
     <div class="form-section">
       <div class="section-header">
         <div class="flex items-center gap-2 mb-3">
-          <div class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center shadow-sm">
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center shadow-sm"
+          >
             <Tag class="w-5 h-5 text-white" />
           </div>
-          <h3 class="section-title">Brand Information</h3>
+          <h3 class="section-title">
+            Brand Information
+          </h3>
         </div>
       </div>
 
@@ -36,10 +39,14 @@
     <div class="form-section">
       <div class="section-header">
         <div class="flex items-center gap-2 mb-3">
-          <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
-         <TabletSmartphone class="w-5 h-5 text-white" />
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm"
+          >
+            <TabletSmartphone class="w-5 h-5 text-white" />
           </div>
-          <h3 class="section-title">Product Details</h3>
+          <h3 class="section-title">
+            Product Details
+          </h3>
         </div>
       </div>
 
@@ -80,10 +87,14 @@
     <div class="form-section">
       <div class="section-header">
         <div class="flex items-center gap-2 mb-3">
-          <div class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center shadow-sm">
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg flex items-center justify-center shadow-sm"
+          >
             <BadgeDollarSign class="w-5 h-5 text-white" />
           </div>
-          <h3 class="section-title">Pricing & Inventory</h3>
+          <h3 class="section-title">
+            Pricing & Inventory
+          </h3>
         </div>
       </div>
 
@@ -116,12 +127,18 @@
     <div class="form-section">
       <div class="section-header">
         <div class="flex items-center gap-2 mb-3">
-          <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center shadow-sm"
+          >
             <CircuitBoard class="w-5 h-5 text-white" />
           </div>
-          <h3 class="section-title">Technical Specifications</h3>
+          <h3 class="section-title">
+            Technical Specifications
+          </h3>
         </div>
-        <p class="text-xs text-slate-600 italic mb-4">Optional fields - leave blank if not applicable</p>
+        <p class="text-xs text-slate-600 italic mb-4">
+          Optional fields - leave blank if not applicable
+        </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -162,12 +179,18 @@
     <div class="form-section">
       <div class="section-header">
         <div class="flex items-center gap-2 mb-3">
-          <div class="w-8 h-8 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg flex items-center justify-center shadow-sm">
-         <Image class="w-5 h-5 text-white" />
+          <div
+            class="w-8 h-8 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg flex items-center justify-center shadow-sm"
+          >
+            <Image class="w-5 h-5 text-white" />
           </div>
-          <h3 class="section-title">Product Images</h3>
+          <h3 class="section-title">
+            Product Images
+          </h3>
         </div>
-        <p class="text-xs text-slate-600 italic mb-4">Upload up to 4 images (max 2MB each)</p>
+        <p class="text-xs text-slate-600 italic mb-4">
+          Upload up to 4 images (max 2MB each)
+        </p>
       </div>
 
       <XUpload
@@ -184,17 +207,26 @@
 
     <!-- Form Status Messages -->
     <div class="form-section">
-      <div v-if="!isFormValid" class="flex items-center gap-3 text-sm text-amber-700 bg-amber-50 px-4 py-3 rounded-xl border border-amber-200">
+      <div
+        v-if="!isFormValid"
+        class="flex items-center gap-3 text-sm text-amber-700 bg-amber-50 px-4 py-3 rounded-xl border border-amber-200"
+      >
         <TriangleAlert class="w-5 h-5 flex-shrink-0" />
         <span class="font-medium">Please fill in all required fields and fix any errors before saving</span>
       </div>
 
-      <div v-else-if="!isImageChanged && !isDetailChanged && isEditMode" class="flex items-center gap-3 text-sm text-slate-600 bg-slate-50 px-4 py-3 rounded-xl border border-slate-200">
+      <div
+        v-else-if="!isImageChanged && !isDetailChanged && isEditMode"
+        class="flex items-center gap-3 text-sm text-slate-600 bg-slate-50 px-4 py-3 rounded-xl border border-slate-200"
+      >
         <Info class="w-5 h-5 flex-shrink-0" />
         <span class="font-medium">No changes detected</span>
       </div>
 
-      <div v-else-if="isFormValid && (isImageChanged || isDetailChanged)" class="flex items-center gap-3 text-sm text-emerald-700 bg-emerald-50 px-4 py-3 rounded-xl border border-emerald-200">
+      <div
+        v-else-if="isFormValid && (isImageChanged || isDetailChanged)"
+        class="flex items-center gap-3 text-sm text-emerald-700 bg-emerald-50 px-4 py-3 rounded-xl border border-emerald-200"
+      >
         <Check class="w-5 h-5 flex-shrink-0" />
         <span class="font-medium">Form is ready to submit</span>
       </div>
@@ -234,7 +266,16 @@ import XButton from '@/components/common/XButton.vue'
 import XUpload from '@/components/common/XUpload.vue'
 import { parseNumber } from '@/utils/NumberUtils'
 import { getImageUrl } from '@/utils'
-import { Tag , TabletSmartphone , BadgeDollarSign, CircuitBoard, Image ,TriangleAlert , Info , Check } from 'lucide-vue-next'
+import {
+  Tag,
+  TabletSmartphone,
+  BadgeDollarSign,
+  CircuitBoard,
+  Image,
+  TriangleAlert,
+  Info,
+  Check,
+} from 'lucide-vue-next'
 
 const props = defineProps({
   initialData: {
@@ -527,7 +568,7 @@ onMounted(fetchBrands)
   border: none;
   border-radius: 1rem;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);  /* ← เพิ่ม shadow เบาๆ */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); /* ← เพิ่ม shadow เบาๆ */
   transition: all 0.2s ease;
 }
 

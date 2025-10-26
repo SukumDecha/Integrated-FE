@@ -27,7 +27,7 @@ onMounted(async () => {
     toast.add({
       title: 'Error',
       message: errorMessage.value,
-      type: 'error'
+      type: 'error',
     })
     return
   }
@@ -35,7 +35,6 @@ onMounted(async () => {
   order.value = response.data
   loading.value = false
 })
-
 
 const breadcrumbs = [
   { text: 'Home', path: '/' },
@@ -50,17 +49,27 @@ const goBackToOrders = () => {
 <template>
   <XBreadcrumb :items="breadcrumbs" />
   <div class="p-6 max-w-5xl mx-auto">
-    <h1 class="text-2xl font-semibold text-green-700 mb-6">Order Details</h1>
+    <h1 class="text-2xl font-semibold text-green-700 mb-6">
+      Order Details
+    </h1>
 
     <XButton
       class="mb-5"
       label=" ← Back to Orders"
       variant="outline"
-      :leftIcon="ArrowLeft"
+      :left-icon="ArrowLeft"
       @click="goBackToOrders"
     />
 
-    <div v-if="error" class="text-red-600 text-center">{{ error }}</div>
-    <OrderDetail v-else-if="order" :order="order" />
+    <div
+      v-if="error"
+      class="text-red-600 text-center"
+    >
+      {{ error }}
+    </div>
+    <OrderDetail
+      v-else-if="order"
+      :order="order"
+    />
   </div>
 </template>

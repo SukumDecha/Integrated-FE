@@ -3,23 +3,23 @@ import { ref, computed } from 'vue'
 import { Info } from 'lucide-vue-next'
 
 const props = defineProps({
-  modelValue: [String, Number],
+  modelValue: {type: [String, Number], default: '',},
   class: { type: String, default: '' },
   label: {
     type: String,
     default: null,
-    required: false
+    required: false,
   },
   placeholder: {
     type: String,
     default: null,
-    required: false
+    required: false,
   },
   required: Boolean,
   disabled: Boolean,
   readonly: Boolean,
   type: { type: String, default: 'text' }, // 'text' | 'number' | 'textarea' | 'password'
-  step: [Number, String],
+  step: {type: [Number, String], default: undefined,},
   rows: { type: Number, default: 3 },
   errorMessage: { type: String, default: '' },
   error: { type: String, default: '' },
@@ -55,18 +55,18 @@ const onFocus = (e) => {
 const inputClasses = computed(() => {
   const baseClasses = [
     'w-full rounded-md border px-3 py-2 text-sm transition-all duration-200',
-    'focus:outline-none'
+    'focus:outline-none',
   ]
 
   if (props.disabled) {
     baseClasses.push(
       'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed',
-      'placeholder-gray-300 shadow-none'
+      'placeholder-gray-300 shadow-none',
     )
   } else if (props.readonly) {
     baseClasses.push(
       'bg-gray-50 text-gray-500 border-gray-200 cursor-default',
-      'placeholder-gray-300'
+      'placeholder-gray-300',
     )
   } else {
     // Normal state styling
@@ -74,19 +74,19 @@ const inputClasses = computed(() => {
       // Error state
       baseClasses.push(
         'bg-white text-gray-900 border-red-400 placeholder-gray-400',
-        'hover:border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
+        'hover:border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500',
       )
     } else if (focused.value) {
       // Focused state
       baseClasses.push(
         'bg-white text-gray-900 border-blue-500 placeholder-gray-400',
-        'ring-1 ring-blue-500'
+        'ring-1 ring-blue-500',
       )
     } else {
       // Default state
       baseClasses.push(
         'bg-white text-gray-900 border-gray-300 placeholder-gray-400',
-        'hover:border-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500'
+        'hover:border-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500',
       )
     }
   }

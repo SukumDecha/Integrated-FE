@@ -85,7 +85,9 @@ onMounted(fetchBrand)
               <NotebookPen class="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 class="text-3xl font-bold text-white mb-1">Edit Brand</h1>
+              <h1 class="text-3xl font-bold text-white mb-1">
+                Edit Brand
+              </h1>
               <p class="text-emerald-100 text-sm">
                 Loading brand information...
               </p>
@@ -97,7 +99,7 @@ onMounted(fetchBrand)
           <div class="inline-block">
             <div
               class="w-16 h-16 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"
-            ></div>
+            />
             <p class="mt-4 text-slate-600 font-medium">
               Loading brand details...
             </p>

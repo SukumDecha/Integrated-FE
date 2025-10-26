@@ -65,7 +65,7 @@ const updateRouteQuery = () => {
 const activeTab = ref('completed')
 
 const fetchOrders = async () => {
-  const userId = authStore.user?.id
+  const userId = authStore.userInfo.id
   if (!userId) return
 
   const requestId = ++latestFetchId.value
@@ -163,7 +163,9 @@ watch(activeTab, async () => {
 <template>
   <XBreadcrumb :items="breadcrumbs" />
   <div class="p-6 max-w-5xl mx-auto">
-    <h1 class="text-2xl font-semibold text-green-700 mb-6">Your Orders</h1>
+    <h1 class="text-2xl font-semibold text-green-700 mb-6">
+      Your Orders
+    </h1>
     <XTab
       v-model="activeTab"
       :tabs="[
@@ -183,7 +185,7 @@ watch(activeTab, async () => {
           v-for="order in sellerOrders"
           :key="order.id"
           :order="order"
-          :isBuyerCard="true"
+          :is-buyer-card="true"
         />
       </div>
     </div>
@@ -206,7 +208,10 @@ watch(activeTab, async () => {
       @change="handlePaginationChange"
     />
 
-    <div v-if="error.orders" class="text-center py-10">
+    <div
+      v-if="error.orders"
+      class="text-center py-10"
+    >
       <p class="text-lg text-red-500">
         {{ error.orders }}
       </p>

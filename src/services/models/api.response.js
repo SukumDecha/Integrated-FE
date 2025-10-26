@@ -34,7 +34,6 @@ export class BaseResponse {
       status: this._status,
     }
   }
-
 }
 
 export const BaseResponseMessage = {

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col ">
+  <div class="flex flex-col">
     <label
       v-if="label"
       class="mb-1 text-sm font-medium text-gray-700"
@@ -62,7 +62,7 @@
         class="mt-4 grid gap-2"
         :class="[
           maxSlots === 1 && occupiedSlots > 0 ? '' : 'mt-4 grid',
-          maxSlots === 1 ? 'w-64 h-64' : gridClass
+          maxSlots === 1 ? 'w-64 h-64' : gridClass,
         ]"
       >
         <div
@@ -309,7 +309,7 @@ import { ref, watch, onBeforeUnmount, computed } from 'vue'
 
 const props = defineProps({
   modelValue: { type: Array, default: () => [] },
-  label: { type: String, default: null},
+  label: { type: String, default: null },
   required: { type: Boolean, default: false },
   accept: { type: String, default: '' },
   multiple: { type: Boolean, default: true },

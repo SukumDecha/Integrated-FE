@@ -13,7 +13,7 @@ export const useCartStore = defineStore('cart', () => {
 
   // Helper: derive a per-user storage key so multiple accounts persist separately
   const storageKey = computed(() => {
-    const uid = authStore.user?.id || 'guest'
+    const uid = authStore.userInfo.id || 'guest'
     return `${STORAGE_KEY}:${uid}`
   })
 
@@ -40,7 +40,7 @@ export const useCartStore = defineStore('cart', () => {
 
   // Re-hydrate cart when logged-in user changes (login/logout/switch account)
   watch(
-    () => authStore.user?.id,
+    () => authStore.userInfo.id,
     () => {
       items.value = loadFromLocalStorage(storageKey.value, [])
     },
@@ -50,7 +50,7 @@ export const useCartStore = defineStore('cart', () => {
   )
 
   const addItem = (item) => {
-    const userId = authStore.user?.id
+    const userId = authStore.userInfo.id
     const sellerId = item.sellerId
 
     //ผู้ใช้ยังไม่ได้ login

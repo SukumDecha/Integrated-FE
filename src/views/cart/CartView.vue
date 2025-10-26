@@ -29,9 +29,9 @@ const sellerGroups = cartStore.getSellerGroups()
           id="select-all"
           type="checkbox"
           :checked="cartStore.isAllSelected"
-          @change="cartStore.toggleSelectAll($event.target.checked)"
           class="itbms-select-all h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500 cursor-pointer"
-        />
+          @change="cartStore.toggleSelectAll($event.target.checked)"
+        >
         <label
           for="select-all"
           class="itbms-select-all text-lg font-semibold text-gray-800 cursor-pointer tracking-wide"

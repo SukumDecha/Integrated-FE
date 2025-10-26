@@ -14,7 +14,7 @@ import { useAuthStore } from '@/stores/auth.store'
 import { useCartStore } from '@/stores/cart.store'
 import { computed } from 'vue'
 import { CART_TOAST_MESSAGES } from '@/constants/cart.constant'
-import { NotebookPen , Box } from 'lucide-vue-next'
+import { NotebookPen, Box } from 'lucide-vue-next'
 
 const imageUrl = new URL('/assets/fallback-image.jpg', import.meta.url).pathname
 
@@ -92,11 +92,11 @@ const decreaseQty = () => {
 }
 
 const isOwner = computed(() => {
-  return authStore.user?.role === 'SELLER' && authStore.user?.id === props.product?.seller?.id
+  return authStore.userInfo.role === 'SELLER' && authStore.userInfo.id === props.product?.seller?.id
 })
 
 const handleAddToCart = () => {
-  const isOwner = authStore.user?.id === props.product?.seller?.id
+  const isOwner = authStore.userInfo.id === props.product?.seller?.id
 
   if (isOwner) {
     toast.add({
@@ -106,7 +106,7 @@ const handleAddToCart = () => {
     return
   }
 
-  if (!authStore.isLoggedIn) {
+  if (!authStore.userInfo.isLoggedIn) {
     router.push('/signin')
     return
   }
@@ -141,7 +141,9 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
           <h1 class="text-3xl font-bold text-slate-900 mb-1">
             {{ modeTitle }}
           </h1>
-          <p class="text-slate-600 text-sm">View detailed product information</p>
+          <p class="text-slate-600 text-sm">
+            View detailed product information
+          </p>
         </div>
         <XButton
           label="Back"
@@ -158,15 +160,19 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
       <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
           <!-- Left: Image Gallery -->
-          <div class="p-8 bg-gradient-to-br from-slate-50 to-white border-b lg:border-b-0 lg:border-r border-slate-200">
-            <div class="aspect-square bg-white rounded-2xl overflow-hidden flex items-center justify-center shadow-lg border border-slate-200 group">
+          <div
+            class="p-8 bg-gradient-to-br from-slate-50 to-white border-b lg:border-b-0 lg:border-r border-slate-200"
+          >
+            <div
+              class="aspect-square bg-white rounded-2xl overflow-hidden flex items-center justify-center shadow-lg border border-slate-200 group"
+            >
               <img
                 :src="
                   currentImage || getImageUrl(product.saleItemImages?.[0]?.imageUrl) || imageUrl
                 "
                 alt="Product image"
                 class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-              />
+              >
             </div>
 
             <!-- Thumbnails -->
@@ -175,7 +181,11 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
                 v-for="i in 4"
                 :key="i"
                 class="aspect-square bg-white border-2 border-slate-200 rounded-xl overflow-hidden cursor-pointer hover:border-emerald-500 hover:shadow-md transition-all duration-200"
-                :class="currentImage === getImageUrl(product.saleItemImages?.[i - 1]?.imageUrl) ? 'border-emerald-500 ring-2 ring-emerald-200' : ''"
+                :class="
+                  currentImage === getImageUrl(product.saleItemImages?.[i - 1]?.imageUrl)
+                    ? 'border-emerald-500 ring-2 ring-emerald-200'
+                    : ''
+                "
               >
                 <img
                   :src="getImageUrl(product.saleItemImages?.[i - 1]?.imageUrl) || imageUrl"
@@ -186,7 +196,7 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
                       getImageUrl(product.saleItemImages[i - 1]?.imageUrl) || imageUrl,
                     )
                   "
-                />
+                >
               </div>
             </div>
           </div>
@@ -201,12 +211,17 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
               @cancel="$emit('cancel')"
             />
 
-            <div v-else class="space-y-6">
+            <div
+              v-else
+              class="space-y-6"
+            >
               <!-- Product title section -->
               <div class="space-y-2 pb-6 border-b border-slate-200">
                 <!-- Brand Badge -->
                 <div class="flex items-center gap-2 mb-3">
-                  <span class="text-emerald-600 text-sm font-bold uppercase tracking-wide itbms-brand">
+                  <span
+                    class="text-emerald-600 text-sm font-bold uppercase tracking-wide itbms-brand"
+                  >
                     {{ product.brandName }}
                   </span>
                 </div>
@@ -217,7 +232,9 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
               </div>
 
               <!-- Price section -->
-              <div class="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-6 border border-emerald-200 shadow-sm">
+              <div
+                class="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-6 border border-emerald-200 shadow-sm"
+              >
                 <div class="flex items-baseline gap-2">
                   <span class="text-sm text-emerald-700 font-medium itbms-price-unit">฿</span>
                   <span class="text-4xl font-bold text-emerald-600 itbms-price">{{
@@ -229,11 +246,19 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
                 <!-- Stock display -->
                 <div class="mt-4 flex items-center gap-2">
                   <Package class="h-5 w-5 text-emerald-600" />
-                  <span v-if="product.quantity > 0" class="text-sm text-slate-700 font-medium">
-                    <span class="font-bold text-emerald-600 itbms-quantity">{{ product.quantity }}</span>
+                  <span
+                    v-if="product.quantity > 0"
+                    class="text-sm text-slate-700 font-medium"
+                  >
+                    <span class="font-bold text-emerald-600 itbms-quantity">{{
+                      product.quantity
+                    }}</span>
                     <span class="itbms-quantity-unit"> units in stock</span>
                   </span>
-                  <span v-else class="text-sm text-red-600 font-bold itbms-outofstock">
+                  <span
+                    v-else
+                    class="text-sm text-red-600 font-bold itbms-outofstock"
+                  >
                     Out of Stock
                   </span>
                 </div>
@@ -257,28 +282,36 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
                   Technical Specifications
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div class="flex justify-between items-center bg-white p-4 rounded-lg border border-slate-200">
+                  <div
+                    class="flex justify-between items-center bg-white p-4 rounded-lg border border-slate-200"
+                  >
                     <span class="text-slate-600 font-medium">RAM</span>
                     <span class="font-bold text-slate-900">
                       <span class="itbms-ramGb">{{ product.ramGb ?? '-' }}</span>
                       <span class="itbms-ramGb-unit text-slate-600"> GB</span>
                     </span>
                   </div>
-                  <div class="flex justify-between items-center bg-white p-4 rounded-lg border border-slate-200">
+                  <div
+                    class="flex justify-between items-center bg-white p-4 rounded-lg border border-slate-200"
+                  >
                     <span class="text-slate-600 font-medium">Screen Size</span>
                     <span class="font-bold text-slate-900">
                       <span class="itbms-screenSizeInch">{{ product.screenSizeInch ?? '-' }}</span>
                       <span class="itbms-screenSizeInch-unit text-slate-600"> inch</span>
                     </span>
                   </div>
-                  <div class="flex justify-between items-center bg-white p-4 rounded-lg border border-slate-200">
+                  <div
+                    class="flex justify-between items-center bg-white p-4 rounded-lg border border-slate-200"
+                  >
                     <span class="text-slate-600 font-medium">Storage</span>
                     <span class="font-bold text-slate-900">
                       <span class="itbms-storageGb">{{ product.storageGb ?? '-' }}</span>
                       <span class="itbms-storageGb-unit text-slate-600"> GB</span>
                     </span>
                   </div>
-                  <div class="flex justify-between items-center bg-white p-4 rounded-lg border border-slate-200">
+                  <div
+                    class="flex justify-between items-center bg-white p-4 rounded-lg border border-slate-200"
+                  >
                     <span class="text-slate-600 font-medium">Color</span>
                     <span class="font-bold text-slate-900 itbms-color capitalize">{{
                       product.color ?? '-'
@@ -288,20 +321,31 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
               </div>
 
               <!-- Seller Info -->
-              <div class="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-5 border border-slate-200">
+              <div
+                class="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-5 border border-slate-200"
+              >
                 <div class="flex items-center gap-3">
-                  <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-md">
+                  <div
+                    class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-md"
+                  >
                     <User class="h-6 w-6 text-white" />
                   </div>
                   <div>
-                    <p class="text-xs text-slate-600 font-medium uppercase tracking-wide">Sold by</p>
-                    <p class="text-lg font-bold text-slate-900">{{ product.seller?.nickname || 'Unknown' }}</p>
+                    <p class="text-xs text-slate-600 font-medium uppercase tracking-wide">
+                      Sold by
+                    </p>
+                    <p class="text-lg font-bold text-slate-900">
+                      {{ product.seller?.nickname || 'Unknown' }}
+                    </p>
                   </div>
                 </div>
               </div>
 
               <!-- Owner Actions (Edit/Delete) -->
-              <div v-if="isOwner" class="pt-6 border-t border-slate-200">
+              <div
+                v-if="isOwner"
+                class="pt-6 border-t border-slate-200"
+              >
                 <div class="flex gap-3">
                   <XButton
                     label="Edit Product"
@@ -319,31 +363,40 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
               </div>
 
               <!-- Buyer Actions (Quantity + Add to Cart) -->
-              <div v-else class="pt-6 border-t border-slate-200">
+              <div
+                v-else
+                class="pt-6 border-t border-slate-200"
+              >
                 <div class="bg-white rounded-xl border-2 border-emerald-200 p-6 shadow-sm">
-                  <h4 class="text-sm font-bold text-slate-800 mb-4">Select Quantity</h4>
+                  <h4 class="text-sm font-bold text-slate-800 mb-4">
+                    Select Quantity
+                  </h4>
 
                   <div class="flex items-center gap-4 mb-6">
                     <!-- Quantity Controls -->
-                    <div class="flex items-center gap-3 bg-slate-50 rounded-lg p-2 border border-slate-200">
+                    <div
+                      class="flex items-center gap-3 bg-slate-50 rounded-lg p-2 border border-slate-200"
+                    >
                       <XButton
                         variant="outline"
                         size="sm"
-                        @click="decreaseQty"
                         :disabled="isMinusDisabled"
                         class="itbms-dec-qty-button w-10 h-10 flex items-center justify-center font-bold text-lg hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-600 transition-all duration-200"
+                        @click="decreaseQty"
                       >
                         −
                       </XButton>
 
-                      <span class="itbms-add-to-cart-quantity text-2xl font-bold text-slate-900 min-w-[3rem] text-center">{{ quantity }}</span>
+                      <span
+                        class="itbms-add-to-cart-quantity text-2xl font-bold text-slate-900 min-w-[3rem] text-center"
+                      >{{ quantity }}</span>
 
                       <XButton
                         variant="outline"
                         size="sm"
-                        @click="increaseQty"
                         :disabled="isPlusDisabled"
                         class="itbms-inc-qty-button w-10 h-10 flex items-center justify-center font-bold text-lg hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-600 transition-all duration-200"
+                        @click="increaseQty"
                       >
                         +
                       </XButton>
@@ -353,9 +406,9 @@ const isOutOfStock = computed(() => props.product?.quantity <= 0)
                     <XButton
                       variant="primary"
                       size="md"
-                      @click="handleAddToCart"
                       :disabled="isOutOfStock"
                       class="itbms-add-to-cart-button flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:from-slate-300 disabled:to-slate-400"
+                      @click="handleAddToCart"
                     >
                       <span class="flex items-center justify-center gap-2">
                         <ShoppingCart class="h-5 w-5" />

@@ -1,8 +1,7 @@
-
 <script setup>
-import { ArrowLeft, ArrowRight } from 'lucide-vue-next';
-import XButton from './XButton.vue';
-import { computed, ref, watch } from 'vue';
+import { ArrowLeft, ArrowRight } from 'lucide-vue-next'
+import XButton from './XButton.vue'
+import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
   pagination: {
@@ -10,75 +9,75 @@ const props = defineProps({
     default: () => ({
       currentPage: 1,
       pageSize: 10,
-      total: 0
-    })
+      total: 0,
+    }),
   },
   pageSizeOptions: {
     type: Array,
-    default: () => [5, 10, 20, 50, 100]
+    default: () => [5, 10, 20, 50, 100],
   },
   showSizeChanger: {
     type: Boolean,
-    default: true
+    default: true,
   },
   maxVisiblePages: {
     type: Number,
-    default: 10
-  }
-});
+    default: 10,
+  },
+})
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['change'])
 
-const currentPage = ref(props.pagination.currentPage);
-const currentPageSize = ref(props.pagination.pageSize);
+const currentPage = ref(props.pagination.currentPage)
+const currentPageSize = ref(props.pagination.pageSize)
 
 watch(
   () => props.pagination.currentPage,
   (newVal) => {
     if (newVal !== currentPage.value) {
-      currentPage.value = newVal;
+      currentPage.value = newVal
     }
   },
   {
-    immediate: true
-  }
-);
+    immediate: true,
+  },
+)
 
 watch(
   () => props.pagination.pageSize,
   (newVal) => {
     if (newVal !== currentPageSize.value) {
-      currentPageSize.value = newVal;
+      currentPageSize.value = newVal
     }
   },
-    {
-    immediate: true
-  }
-);
+  {
+    immediate: true,
+  },
+)
 
 const totalPages = computed(() => {
-  return Math.ceil(props.pagination.total / currentPageSize.value);
-});
+  return Math.ceil(props.pagination.total / currentPageSize.value)
+})
 
 const visiblePages = computed(() => {
-  const total = totalPages.value;
-  const current = currentPage.value;
-  const maxVisible = props.maxVisiblePages;
+  const total = totalPages.value
+  const current = currentPage.value
+  const maxVisible = props.maxVisiblePages
 
   if (total <= maxVisible) {
-    return Array.from({ length: total }, (_, i) => i + 1);
+    return Array.from({ length: total }, (_, i) => i + 1)
   }
 
-  const pages = [];
+  const pages = []
 
   if (current <= maxVisible) {
     for (let i = 1; i <= maxVisible; i++) {
-      pages.push(i);
+      pages.push(i)
     }
   } else if (current >= maxVisible) {
     const offSet = current - maxVisible + 1
     for (let i = offSet; i <= maxVisible + offSet - 1; i++) {
-      pages.push(i);
+      pages.push(i)
     }
   }
 
@@ -109,32 +108,30 @@ const visiblePages = computed(() => {
   //   pages.push(total);
   // }
 
-  return pages;
-});
+  return pages
+})
 
 const paginationInfo = computed(() => {
-  const total = props.pagination.total;
-  const start = (currentPage.value - 1) * currentPageSize.value + 1;
-  const end = Math.min(currentPage.value * currentPageSize.value, total);
-  return `${start}-${end} of ${total}`;
-});
+  const total = props.pagination.total
+  const start = (currentPage.value - 1) * currentPageSize.value + 1
+  const end = Math.min(currentPage.value * currentPageSize.value, total)
+  return `${start}-${end} of ${total}`
+})
 
 function changePage(page) {
-  if ( page < 1 || page > totalPages.value) return;
-  currentPage.value = page;
-  emit('change', { currentPage: page, pageSize: currentPageSize.value });
+  if (page < 1 || page > totalPages.value) return
+  currentPage.value = page
+  emit('change', { currentPage: page, pageSize: currentPageSize.value })
 }
 
 function handlePageSizeChange() {
-  currentPage.value = 1;
-  emit('change', { currentPage: 1, pageSize: currentPageSize.value });
+  currentPage.value = 1
+  emit('change', { currentPage: 1, pageSize: currentPageSize.value })
 }
 </script>
 
 <template>
-  <div
-    class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-4"
-  >
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 gap-4">
     <!-- Size Changer -->
     <div
       v-show="showSizeChanger"
@@ -197,7 +194,7 @@ function handlePageSizeChange() {
               :class="[
                 `itbms-page-${index}`,
                 'flex-shrink-0',
-                currentPage === page ? '!font-bold' : ''
+                currentPage === page ? '!font-bold' : '',
               ]"
               :variant="currentPage === page ? 'primary' : 'outline'"
               @click="changePage(page)"

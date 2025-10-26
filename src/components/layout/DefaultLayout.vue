@@ -14,13 +14,13 @@
 </template>
 
 <script setup>
-  import XNavbar from '@/components/layout/XNavbar.vue'
-  import XFooter from '@/components/layout/XFooter.vue'
+import XNavbar from '@/components/layout/XNavbar.vue'
+import XFooter from '@/components/layout/XFooter.vue'
 
-  defineProps({
-    className: {
-      type: String,
-      default: '',
-    },
-  })
+defineProps({
+  className: {
+    type: String,
+    default: '',
+  },
+})
 </script>

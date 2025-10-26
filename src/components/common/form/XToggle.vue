@@ -1,6 +1,6 @@
 <template>
-  <input 
-    type="checkbox" 
+  <input
+    type="checkbox"
     class="toggle appearance-none w-11 h-6 bg-gray-300 rounded-full relative cursor-pointer transition-all duration-300 ease-in-out checked:bg-emerald-600 disabled:opacity-60 disabled:cursor-not-allowed"
     :checked="modelValue"
     :disabled="disabled"
@@ -13,12 +13,12 @@
 defineProps({
   modelValue: {
     type: Boolean,
-    default: false
+    default: false,
   },
   disabled: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 })
 
 defineEmits(['update:modelValue'])
@@ -30,7 +30,7 @@ defineEmits(['update:modelValue'])
 }
 
 .toggle:before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0.25rem;
   left: 0.25rem;

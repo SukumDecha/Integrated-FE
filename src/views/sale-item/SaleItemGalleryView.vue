@@ -430,10 +430,12 @@ watch(
     <div class="max-w-7xl mx-auto py-8 px-4 space-y-6">
       <XBreadcrumb :items="breadcrumbs" />
 
-       <!-- Search Bar with Sort Controls -->
+      <!-- Search Bar with Sort Controls -->
       <div class="bg-white rounded-lg border border-gray-200 p-5 mb-4">
         <div class="flex items-center gap-4">
-            <h3 class="text-lg font-semibold text-gray-700 uppercase tracking-wide">Search</h3>
+          <h3 class="text-lg font-semibold text-gray-700 uppercase tracking-wide">
+            Search
+          </h3>
           <div class="flex-1 max-w-2xl relative">
             <XInput
               v-model="searchOptions.filterSearch"
@@ -442,15 +444,26 @@ watch(
               @keydown.enter="onSearch"
             />
           </div>
-          <XButton color="primary" size="sm" @click="onSearch">
-            <template #default>Search</template>
+          <XButton
+            color="primary"
+            size="sm"
+            @click="onSearch"
+          >
+            <template #default>
+              Search
+            </template>
           </XButton>
-          <XButton variant="outline" size="sm" class="itbms-search-clear-button" @click="clearSearch">
+          <XButton
+            variant="outline"
+            size="sm"
+            class="itbms-search-clear-button"
+            @click="clearSearch"
+          >
             Clear
           </XButton>
 
           <!-- Spacer -->
-          <div class="flex-1"></div>
+          <div class="flex-1" />
 
           <!-- Sort Controls -->
           <div class="flex items-center gap-2">
@@ -477,7 +490,9 @@ watch(
               class-name="itbms-brand-desc"
               variant="info"
               size="sm"
-              :disabled="searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'desc'"
+              :disabled="
+                searchOptions.sortBy === 'brand.name' && searchOptions.sortOrder === 'desc'
+              "
               @click="sortDescByName"
             >
               <ArrowDownWideNarrow class="w-5 h-5" />
@@ -489,7 +504,9 @@ watch(
       <!-- Filters Section -->
       <div class="bg-white rounded-lg border border-gray-200 p-5 mb-6">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-gray-700 uppercase tracking-wide">Filters</h3>
+          <h3 class="text-lg font-semibold text-gray-700 uppercase tracking-wide">
+            Filters
+          </h3>
           <XButton
             variant="outline"
             size="sm"
@@ -533,7 +550,7 @@ watch(
 
           <!-- Storage Filter -->
           <div>
-            <label class="block text-sm  font-medium text-gray-600 mb-2">Storage Size</label>
+            <label class="block text-sm font-medium text-gray-600 mb-2">Storage Size</label>
             <XSelector
               v-model="searchOptions.filteredStorages"
               :options="storageOptions"
@@ -575,8 +592,12 @@ watch(
       </div>
 
       <div class="space-y-2">
-        <h2 class="text-3xl font-extrabold tracking-tight text-gray-900">Featured Products</h2>
-        <p class="text-gray-500">Check out our most popular items this season.</p>
+        <h2 class="text-3xl font-extrabold tracking-tight text-gray-900">
+          Featured Products
+        </h2>
+        <p class="text-gray-500">
+          Check out our most popular items this season.
+        </p>
       </div>
 
       <div class="mt-10">
@@ -614,7 +635,9 @@ watch(
         v-if="!loading.items && saleItems.length === 0 && !error.items"
         class="text-center py-10 itbms-row"
       >
-        <p class="text-lg text-gray-500">no sale item</p>
+        <p class="text-lg text-gray-500">
+          no sale item
+        </p>
       </div>
     </div>
   </div>

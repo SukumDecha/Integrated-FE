@@ -1,48 +1,47 @@
 <script setup>
 import { NAVBAR_MENU } from '@/constants/navbar.constant'
 import { Menu, ShoppingBag, ShoppingCart, X, ChevronDown } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.store'
-import { nextTick } from 'vue'
 import { useCartStore } from '@/stores/cart.store'
-import { computed, onMounted, watch } from 'vue'
 import { OrderService } from '@/services'
 import { UserRole } from '@/constants/role.constant.js'
 
+// ────────────────────────────────
+// Store & Router
+// ────────────────────────────────
 const route = useRoute()
 const router = useRouter()
-const isOpen = ref(false)
 const authStore = useAuthStore()
-const isDropdownOpen = ref(false)
 const cartStore = useCartStore()
 const { totalItems } = storeToRefs(cartStore)
 
+// ────────────────────────────────
+// UI State
+// ────────────────────────────────
+const isOpen = ref(false)
+const isDropdownOpen = ref(false)
+const newOrderCount = ref(0)
+
+// ────────────────────────────────
+// Route helpers
+// ────────────────────────────────
 const isActiveRoute = (navItem) => {
-  if (navItem.exact) {
-    return route.path === navItem.to
-  } else {
-    return route.path.startsWith(navItem.to)
-  }
+  return navItem.exact ? route.path === navItem.to : route.path.startsWith(navItem.to)
 }
 
-const toggleMobileMenu = () => {
-  isOpen.value = !isOpen.value
-}
+const toggleMobileMenu = () => (isOpen.value = !isOpen.value)
+const closeMobileMenu = () => (isOpen.value = false)
+const toggleDropdown = () => (isDropdownOpen.value = !isDropdownOpen.value)
 
-const closeMobileMenu = () => {
-  isOpen.value = false
-}
-
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value
-}
-
+// ────────────────────────────────
+// Logout
+// ────────────────────────────────
 const handleClearStorage = () => {
   localStorage.removeItem('auth')
   localStorage.removeItem('cart')
-  // ถ้ามี session อื่นค้างอยู่ค่อยเคลียร์ได้
   sessionStorage.clear()
 }
 
@@ -50,52 +49,53 @@ const handleLogout = async () => {
   authStore.logout()
   cartStore.clearCart()
   isDropdownOpen.value = false
-
   closeMobileMenu()
   handleClearStorage()
-
   await nextTick()
   router.push('/sale-items?logout=true')
 }
-//ตรวจสอบว่าตะกร้าว่างมั้ย
+
+// ────────────────────────────────
+// Cart
+// ────────────────────────────────
 const cartIsEmpty = computed(() => cartStore.items.length === 0)
 
-const newOrderCount = ref(0)
+// ────────────────────────────────
+// Seller notification count
+// ────────────────────────────────
 const updateNewOrderCount = async () => {
-  const user = authStore.user
-  if (user?.role === UserRole.SELLER) {
-    const newRes = await OrderService.getOrdersBySellerId(user.id, {
+  const { id, role } = authStore.userInfo
+  if (role === UserRole.SELLER && id) {
+    const newRes = await OrderService.getOrdersBySellerId(id, {
       page: 0,
       size: 1,
       sortBy: 'createdOn',
       sortDirection: 'DESC',
       tab: 'NEW',
     })
-
     newOrderCount.value = newRes?.pagination?.totalItems || 0
   }
 }
 
 onMounted(updateNewOrderCount)
+
 watch(
   () => route.fullPath,
   (newPath) => {
-    //ถ้ากลับมาหน้า sale-orders ให้ refresh ตัวเลขใหม่
     if (newPath.includes('/sale-orders')) {
       updateNewOrderCount()
     }
   },
 )
 
+// ────────────────────────────────
+// Filter menu by role
+// ────────────────────────────────
 const filteredMenu = computed(() => {
-  const userRole = authStore.user?.role
-  if (userRole === UserRole.SELLER) {
-    // Seller เห็นทุกเมนู
-    return NAVBAR_MENU
-  } else {
-    // Buyer หรือ Guest เห็นเฉพาะ Home กับ Shop
-    return NAVBAR_MENU.filter((item) => ['Home', 'Shop'].includes(item.name))
-  }
+  const userRole = authStore.userInfo.role
+  return userRole === UserRole.SELLER
+    ? NAVBAR_MENU
+    : NAVBAR_MENU.filter((item) => ['Home', 'Shop'].includes(item.name))
 })
 </script>
 
@@ -105,7 +105,10 @@ const filteredMenu = computed(() => {
       <div class="flex justify-between h-16">
         <!-- Logo -->
         <div class="flex items-center">
-          <router-link to="/" class="flex-shrink-0 flex items-center">
+          <router-link
+            to="/"
+            class="flex-shrink-0 flex items-center"
+          >
             <ShoppingBag class="h-8 w-8 text-emerald-600" />
             <span class="ml-2 text-xl font-bold text-emerald-800">Green Cart</span>
           </router-link>
@@ -130,18 +133,17 @@ const filteredMenu = computed(() => {
         <!-- Action (Desktop) -->
         <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-3">
           <!-- Authenticated -->
-          <template v-if="authStore.isLoggedIn">
+          <template v-if="authStore.userInfo.isLoggedIn">
             <!-- 👤 User Dropdown -->
             <div class="relative">
               <button
                 class="flex items-center space-x-1 px-3 py-2 rounded-md text-large font-medium text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition"
                 @click="toggleDropdown"
               >
-                <span>{{ authStore.user?.nickname }}</span>
+                <span>{{ authStore.userInfo.nickname }}</span>
                 <ChevronDown class="h-4 w-4" />
               </button>
 
-              <!-- Dropdown menu -->
               <transition name="fade">
                 <div
                   v-show="isDropdownOpen"
@@ -162,7 +164,7 @@ const filteredMenu = computed(() => {
                     Your Orders
                   </router-link>
                   <router-link
-                    v-if="authStore.user?.role === UserRole.SELLER"
+                    v-if="authStore.userInfo.role === UserRole.SELLER"
                     to="/sale-orders"
                     class="itbms-sale-orders-button block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 flex justify-between items-center"
                     @click="isDropdownOpen = false"
@@ -205,15 +207,14 @@ const filteredMenu = computed(() => {
 
           <!-- Cart -->
           <button
-            to="/cart"
             class="itbms-cart-quantity relative p-1 rounded-full transition disabled:opacity-50 disabled:cursor-not-allowed text-gray-500 hover:text-gray-600"
             :disabled="cartIsEmpty"
+            aria-label="Shopping Cart"
             @click="
               () => {
                 if (!cartIsEmpty) router.push('/cart')
               }
             "
-            aria-label="Shopping Cart"
           >
             <ShoppingCart class="h-6 w-6" />
             <span
@@ -223,11 +224,12 @@ const filteredMenu = computed(() => {
               {{ totalItems }}
             </span>
           </button>
+
           <!-- Seller only -->
           <button
-            v-if="authStore.user?.role === UserRole.SELLER"
-            @click="router.push('/sale-orders')"
+            v-if="authStore.userInfo.role === UserRole.SELLER"
             class="relative flex items-center p-2 rounded-md hover:bg-emerald-50 transition"
+            @click="router.push('/sale-orders')"
           >
             <ShoppingBag class="itbms-bag-button h-6 w-6 text-emerald-700" />
             <span
@@ -248,8 +250,14 @@ const filteredMenu = computed(() => {
             @click="toggleMobileMenu"
           >
             <span class="sr-only">{{ isOpen ? 'Close' : 'Open' }} main menu</span>
-            <Menu v-if="!isOpen" class="block h-6 w-6" />
-            <X v-else class="block h-6 w-6" />
+            <Menu
+              v-if="!isOpen"
+              class="block h-6 w-6"
+            />
+            <X
+              v-else
+              class="block h-6 w-6"
+            />
           </button>
         </div>
       </div>
@@ -257,7 +265,10 @@ const filteredMenu = computed(() => {
 
     <!-- Mobile Menu -->
     <transition name="slide-down">
-      <div v-show="isOpen" class="sm:hidden">
+      <div
+        v-show="isOpen"
+        class="sm:hidden"
+      >
         <div class="pt-2 pb-3 space-y-1">
           <router-link
             v-for="item in filteredMenu"
@@ -277,9 +288,9 @@ const filteredMenu = computed(() => {
 
         <!-- Auth buttons -->
         <div class="pt-4 pb-3 border-t border-gray-200 px-4 space-y-2">
-          <template v-if="authStore.isLoggedIn">
+          <template v-if="authStore.userInfo.isLoggedIn">
             <span class="text-gray-700 font-medium">
-              {{ authStore.user?.nickname }}
+              {{ authStore.userInfo.nickname }}
             </span>
             <router-link
               to="/profile"
@@ -296,7 +307,7 @@ const filteredMenu = computed(() => {
               Your Orders
             </router-link>
             <router-link
-              v-if="authStore.user?.role === UserRole.SELLER"
+              v-if="authStore.userInfo.role === UserRole.SELLER"
               to="/sale-orders"
               class="itbms-sale-orders-button block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 flex justify-between items-center"
               @click="isDropdownOpen = false"
@@ -310,7 +321,6 @@ const filteredMenu = computed(() => {
               </span>
             </router-link>
 
-            <!-- ✅ Use button instead of router-link for mobile too -->
             <button
               class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
               @click="handleLogout"
@@ -358,11 +368,12 @@ const filteredMenu = computed(() => {
               {{ totalItems }}
             </span>
           </button>
+
           <!-- Seller only -->
           <button
-            v-if="authStore.user?.role === UserRole.SELLER"
-            @click="router.push('/sale-orders')"
+            v-if="authStore.userInfo.role === UserRole.SELLER"
             class="relative flex items-center p-2 rounded-md hover:bg-emerald-50 transition"
+            @click="router.push('/sale-orders')"
           >
             <ShoppingBag class="h-6 w-6 text-emerald-700" />
             <span

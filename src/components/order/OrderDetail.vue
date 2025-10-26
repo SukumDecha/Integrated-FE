@@ -2,12 +2,17 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  order: { type: Object, required: true }
+  order: { type: Object, required: true },
 })
 
-const formatDate = d => d ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : '-'
-const formatCurrency = n => n?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || '0'
-const calculateTotalPrice = computed(() => props.order?.orderItems?.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 0), 0))
+const formatDate = (d) =>
+  d
+    ? new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+    : '-'
+const formatCurrency = (n) => n?.toLocaleString('en-US', { minimumFractionDigits: 0 }) || '0'
+const calculateTotalPrice = computed(() =>
+  props.order?.orderItems?.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 0), 0),
+)
 
 const statusConfig = computed(() => {
   const status = props.order?.orderStatus?.toUpperCase()
@@ -28,8 +33,12 @@ const statusConfig = computed(() => {
     <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
       <div class="flex items-center justify-between">
         <div>
-          <h2 class="text-xl font-bold text-gray-900">Order Details</h2>
-          <p class="text-sm text-gray-500 mt-0.5">Order #{{ order.id }}</p>
+          <h2 class="text-xl font-bold text-gray-900">
+            Order Details
+          </h2>
+          <p class="text-sm text-gray-500 mt-0.5">
+            Order #{{ order.id }}
+          </p>
         </div>
         <div
           :class="[
@@ -37,7 +46,7 @@ const statusConfig = computed(() => {
             statusConfig.bg,
             statusConfig.text,
             statusConfig.border,
-            'border'
+            'border',
           ]"
         >
           {{ order.orderStatus }}
@@ -52,46 +61,94 @@ const statusConfig = computed(() => {
         <!-- Left Column -->
         <div class="space-y-4">
           <div>
-            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-order-id">Order Number</p>
-            <p class="text-base font-semibold text-gray-900">#{{ order.id }}</p>
+            <p
+              class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-order-id"
+            >
+              Order Number
+            </p>
+            <p class="text-base font-semibold text-gray-900">
+              #{{ order.id }}
+            </p>
           </div>
 
           <div>
-            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-order-date">Order Date</p>
-            <p class="text-base font-semibold text-gray-900">{{ formatDate(order.orderDate) }}</p>
+            <p
+              class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-order-date"
+            >
+              Order Date
+            </p>
+            <p class="text-base font-semibold text-gray-900">
+              {{ formatDate(order.orderDate) }}
+            </p>
           </div>
 
           <div>
-            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-payment-date">Payment Date</p>
-            <p class="text-base font-semibold text-gray-900">{{ formatDate(order.orderDate) }}</p>
+            <p
+              class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-payment-date"
+            >
+              Payment Date
+            </p>
+            <p class="text-base font-semibold text-gray-900">
+              {{ formatDate(order.orderDate) }}
+            </p>
           </div>
 
           <div>
-            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-shipping-address">Shipping Address</p>
-            <p class="text-sm font-medium text-gray-700 leading-relaxed">{{ order.shippingAddress }}</p>
+            <p
+              class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-shipping-address"
+            >
+              Shipping Address
+            </p>
+            <p class="text-sm font-medium text-gray-700 leading-relaxed">
+              {{ order.shippingAddress }}
+            </p>
           </div>
         </div>
 
         <!-- Right Column -->
         <div class="space-y-4">
           <div>
-            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-nickname">Seller</p>
-            <p class="text-base font-semibold text-gray-900">{{ order.seller?.nickname || 'Unknown' }}</p>
+            <p
+              class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-nickname"
+            >
+              Seller
+            </p>
+            <p class="text-base font-semibold text-gray-900">
+              {{ order.seller?.nickname || 'Unknown' }}
+            </p>
           </div>
 
           <div>
-            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-order-status">Status</p>
-            <p :class="['text-base font-semibold', statusConfig.text]">{{ order.orderStatus }}</p>
+            <p
+              class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-order-status"
+            >
+              Status
+            </p>
+            <p :class="['text-base font-semibold', statusConfig.text]">
+              {{ order.orderStatus }}
+            </p>
           </div>
 
           <div v-if="order.orderNote">
-            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-order-note">Note</p>
-            <p class="text-sm font-medium text-gray-700 leading-relaxed">{{ order.orderNote }}</p>
+            <p
+              class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-order-note"
+            >
+              Note
+            </p>
+            <p class="text-sm font-medium text-gray-700 leading-relaxed">
+              {{ order.orderNote }}
+            </p>
           </div>
 
           <div class="pt-2">
-            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-item-total-price">Total Amount</p>
-            <p class="text-2xl font-bold text-gray-900">฿{{ formatCurrency(calculateTotalPrice) }}</p>
+            <p
+              class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1 itbms-item-total-price"
+            >
+              Total Amount
+            </p>
+            <p class="text-2xl font-bold text-gray-900">
+              ฿{{ formatCurrency(calculateTotalPrice) }}
+            </p>
           </div>
         </div>
       </div>
@@ -118,7 +175,9 @@ const statusConfig = computed(() => {
               </div>
             </div>
             <div class="text-right">
-              <p class="text-xs text-gray-500 mb-1">Subtotal</p>
+              <p class="text-xs text-gray-500 mb-1">
+                Subtotal
+              </p>
               <p class="itbms-item-total-price text-base font-bold text-gray-900">
                 ฿{{ formatCurrency(item.price * item.quantity) }}
               </p>
@@ -130,8 +189,12 @@ const statusConfig = computed(() => {
       <!-- Grand Total -->
       <div class="mt-6 pt-6 border-t border-gray-200 flex justify-end">
         <div class="text-right">
-          <p class="text-sm text-gray-500 mb-1">Grand Total</p>
-          <p class="text-3xl font-bold text-gray-900">฿{{ formatCurrency(calculateTotalPrice) }}</p>
+          <p class="text-sm text-gray-500 mb-1">
+            Grand Total
+          </p>
+          <p class="text-3xl font-bold text-gray-900">
+            ฿{{ formatCurrency(calculateTotalPrice) }}
+          </p>
         </div>
       </div>
     </div>

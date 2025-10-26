@@ -5,7 +5,17 @@ import XInput from '@/components/common/form/XInput.vue'
 import XButton from '@/components/common/XButton.vue'
 import XToggle from '@/components/common/form/XToggle.vue'
 import XCard from '@/components/common/XCard.vue'
-import { Tag, Globe, Earth, Info, ShieldCheck, BadgeAlert, Plus, NotebookPen, CircleAlert } from 'lucide-vue-next'
+import {
+  Tag,
+  Globe,
+  Earth,
+  Info,
+  ShieldCheck,
+  BadgeAlert,
+  Plus,
+  NotebookPen,
+  CircleAlert,
+} from 'lucide-vue-next'
 
 const props = defineProps({
   initialData: {
@@ -16,8 +26,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  onSubmit: Function,
-  onCancel: Function,
+  onSubmit: {
+    type: Function,
+    default: () => {},
+  },
+  onCancel: {
+    type: Function,
+    default: () => {},
+  },
   brandId: {
     type: [String, Number],
     default: null,
@@ -168,8 +184,14 @@ const handleSave = async () => {
           <div
             class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg"
           >
-            <Plus v-if="!isEditMode" class="w-8 h-8 text-white" />
-            <NotebookPen v-else class="w-8 h-8 text-white" />
+            <Plus
+              v-if="!isEditMode"
+              class="w-8 h-8 text-white"
+            />
+            <NotebookPen
+              v-else
+              class="w-8 h-8 text-white"
+            />
           </div>
           <div>
             <h1 class="text-3xl font-bold text-white mb-1">
@@ -197,7 +219,13 @@ const handleSave = async () => {
             <Info :class="isEditMode ? 'w-5 h-5 text-amber-600' : 'w-5 h-5 text-emerald-600'" />
           </div>
           <div>
-            <p :class="isEditMode ? 'text-sm text-amber-800 font-medium' : 'text-sm text-emerald-800 font-medium'">
+            <p
+              :class="
+                isEditMode
+                  ? 'text-sm text-amber-800 font-medium'
+                  : 'text-sm text-emerald-800 font-medium'
+              "
+            >
               <template v-if="isEditMode">
                 Make changes carefully - updating this brand will affect all associated products
               </template>
@@ -214,7 +242,10 @@ const handleSave = async () => {
         <!-- Brand Name Field -->
         <div class="form-field-wrapper">
           <div class="flex items-center gap-2 mb-2">
-            <Tag class="w-5 h-5 text-emerald-600" name="brand" />
+            <Tag
+              class="w-5 h-5 text-emerald-600"
+              name="brand"
+            />
             <span class="form-label-enhanced">Brand Name <span class="text-red-500">*</span></span>
           </div>
           <XInput
@@ -224,7 +255,9 @@ const handleSave = async () => {
             :error-message="touchedFields.name ? fieldErrors.name : ''"
             @blur="onBlur('name')"
           />
-          <p class="form-hint">Must be between 1-30 characters</p>
+          <p class="form-hint">
+            Must be between 1-30 characters
+          </p>
         </div>
 
         <!-- Website URL Field -->
@@ -240,12 +273,16 @@ const handleSave = async () => {
             :error-message="touchedFields.websiteUrl ? fieldErrors.websiteUrl : ''"
             @blur="onBlur('websiteUrl')"
           />
-          <p class="form-hint">Optional - Enter the brand's official website</p>
+          <p class="form-hint">
+            Optional - Enter the brand's official website
+          </p>
         </div>
 
         <!-- Active Status Toggle -->
         <div class="form-field-wrapper">
-          <div class="bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg p-4 border border-emerald-200">
+          <div
+            class="bg-gradient-to-r from-emerald-50 to-green-50 rounded-lg p-4 border border-emerald-200"
+          >
             <div class="flex items-center justify-between">
               <div class="flex items-start gap-3">
                 <div class="flex-shrink-0 mt-1">
@@ -285,7 +322,9 @@ const handleSave = async () => {
             :error-message="touchedFields.countryOfOrigin ? fieldErrors.countryOfOrigin : ''"
             @blur="onBlur('countryOfOrigin')"
           />
-          <p class="form-hint">Optional - Maximum 80 characters</p>
+          <p class="form-hint">
+            Optional - Maximum 80 characters
+          </p>
         </div>
 
         <!-- Action Buttons -->
@@ -310,17 +349,26 @@ const handleSave = async () => {
 
           <!-- Form Status Messages -->
           <div class="mt-4 space-y-2">
-            <div v-if="!isFormValid" class="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
+            <div
+              v-if="!isFormValid"
+              class="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200"
+            >
               <BadgeAlert class="w-4 h-4 flex-shrink-0" />
               <span>Please fix the errors before saving</span>
             </div>
 
-            <div v-else-if="!isChanged && isEditMode" class="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
+            <div
+              v-else-if="!isChanged && isEditMode"
+              class="flex items-center gap-2 text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200"
+            >
               <Info class="w-4 h-4 flex-shrink-0" />
               <span>No changes detected</span>
             </div>
 
-            <div v-else-if="isFormValid && isChanged" class="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200">
+            <div
+              v-else-if="isFormValid && isChanged"
+              class="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200"
+            >
               <ShieldCheck class="w-4 h-4 flex-shrink-0" />
               <span>Form is ready to submit</span>
             </div>
@@ -330,7 +378,10 @@ const handleSave = async () => {
     </XCard>
 
     <!-- Help Card -->
-    <XCard :show-header="false" :show-stats="false">
+    <XCard
+      :show-header="false"
+      :show-stats="false"
+    >
       <div class="flex items-start gap-4">
         <div class="flex-shrink-0">
           <div

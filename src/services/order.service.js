@@ -22,15 +22,13 @@ const OrderService = {
   async getOrderById(id) {
     return await get(`${BASE_ORDER_URL_V2}/${id}`)
   },
-  
+
   async getOrdersBySellerId(sellerId, paginationParams = {}) {
     const queryString = buildSearchParams(paginationParams)
     const url = `${BASE_SALE_ORDERS_V2}/${sellerId}/orders?${queryString}`
     const res = await get(url, { isPaginated: true })
     return res
   },
-
-
 }
 
 export default OrderService

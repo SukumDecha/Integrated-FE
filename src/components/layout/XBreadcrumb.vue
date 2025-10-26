@@ -19,7 +19,6 @@ defineProps({
     default: 'chevron',
   },
 })
-
 </script>
 
 <template>

@@ -37,7 +37,7 @@ const router = createRouter({
           name: 'forgot-password',
           component: () => import('../views/auth/ForgotPasswordView.vue'),
         },
-          {
+        {
           path: '/reset-password',
           name: 'reset-password',
           component: () => import('../views/auth/ResetPasswordView.vue'),
@@ -51,26 +51,19 @@ const router = createRouter({
         {
           path: 'profile',
           component: () => import('../views/user/UserProfileView.vue'),
-          meta: {
-            requiresAuth: true,
-          },
+          meta: { requiresAuth: true },
         },
         {
           path: 'profile/edit',
           component: () => import('../views/user/UserEditProfileView.vue'),
-          meta: {
-            requiresAuth: true,
-          },
+          meta: { requiresAuth: true },
         },
         {
           path: 'profile/change-password',
           name: 'change-password',
           component: () => import('../views/user/UserChangePasswordView.vue'),
-          meta: {
-            requiresAuth: true,
-          },
+          meta: { requiresAuth: true },
         },
-
         {
           path: 'sale-items',
           children: [
@@ -135,51 +128,44 @@ const router = createRouter({
               path: '',
               name: 'YourOrders',
               component: () => import('../views/order/OrderHistoryView.vue'),
-              meta: {
-                requiresAuth: true,
-              },
+              meta: { requiresAuth: true },
             },
             {
               path: ':id',
               name: 'OrderDetail',
               component: () => import('../views/order/OrderDetailView.vue'),
+              meta: { requiresAuth: true },
+            },
+          ],
+        },
+        {
+          path: 'sale-orders',
+          children: [
+            {
+              path: '',
+              name: 'SaleOrders',
+              component: () => import('../views/order/OrderSellerView.vue'),
               meta: {
                 requiresAuth: true,
+                roles: [UserRole.SELLER],
+              },
+            },
+            {
+              path: ':id',
+              name: 'SaleOrderDetail',
+              component: () => import('../views/order/OrderSellerDetailView.vue'),
+              meta: {
+                requiresAuth: true,
+                roles: [UserRole.SELLER],
               },
             },
           ],
         },
         {
-  path: 'sale-orders',
-  children: [
-    {
-      path: '',
-      name: 'SaleOrders',
-      component: () => import('../views/order/OrderSellerView.vue'),
-      meta: {
-        requiresAuth: true,
-        roles: [UserRole.SELLER],
-      },
-    },
-    {
-      path: ':id',
-      name: 'SaleOrderDetail',
-      component: () => import('../views/order/OrderSellerDetailView.vue'),
-      meta: {
-        requiresAuth: true,
-       roles: [UserRole.SELLER],
-      },
-    },
-  ],
-},
-
-        {
           path: 'cart',
           name: 'Cart',
           component: () => import('../views/cart/CartView.vue'),
-          meta: {
-            requiresAuth: true,
-          },
+          meta: { requiresAuth: true },
         },
       ],
     },
@@ -191,23 +177,27 @@ const router = createRouter({
   ],
 })
 
+// ────────────────────────────────
+// Route Guard
+// ────────────────────────────────
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
-  const user = authStore.user
+  const userInfo = authStore.userInfo
 
   if (to.meta.requiresAuth && to.meta.roles) {
-    if (!user) {
+    if (!userInfo.isLoggedIn) {
       return next({ name: 'user-login' })
     }
-    if (!to.meta.roles.includes(user.role)) {
-      if (user.role === 'BUYER') {
+
+    if (!to.meta.roles.includes(userInfo.role)) {
+      if (userInfo.role === UserRole.BUYER) {
         return next({ name: 'sale-items-gallery' })
       }
       return next({ name: 'home' })
     }
   }
 
-  if (to.meta.requiresAuth && !user) {
+  if (to.meta.requiresAuth && !userInfo.isLoggedIn) {
     return next({ name: 'user-login' })
   }
 

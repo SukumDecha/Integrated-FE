@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen flex flex-col bg-white">
-
     <!-- Hero Section -->
     <HeroSection
       title="Discover Your Perfect"

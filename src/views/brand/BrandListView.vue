@@ -62,7 +62,6 @@ const fetchBrands = async () => {
   loading.value = true
   const response = await BrandService.getAllBrands()
   if (response.error) {
-    console.error('Error fetching Brands:', response.error)
     loading.value = false
     return
   }
@@ -144,7 +143,7 @@ async function confirmDeleteBrand() {
 }
 
 onMounted(() => {
-  if (authStore.user?.role !== 'SELLER') {
+  if (authStore.userInfo.role !== 'SELLER') {
     toast.add({ type: 'error', message: 'Unauthorized access.' })
     router.push('/sale-items')
   }
@@ -230,7 +229,9 @@ onMounted(() => {
             </div>
           </div>
           <div>
-            <h3 class="text-sm font-semibold text-slate-800 mb-1">Brand Management Tips</h3>
+            <h3 class="text-sm font-semibold text-slate-800 mb-1">
+              Brand Management Tips
+            </h3>
             <p class="text-sm text-slate-600">
               Brands with associated sale items cannot be deleted. Please remove all sale items
               before deleting a brand.

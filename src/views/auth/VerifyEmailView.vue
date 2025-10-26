@@ -92,9 +92,7 @@
             </svg>
             Sending...
           </span>
-          <span v-else-if="resendCooldown > 0">
-            Resend in {{ resendCooldown }}s
-          </span>
+          <span v-else-if="resendCooldown > 0"> Resend in {{ resendCooldown }}s </span>
           <span v-else>Resend Verification Email</span>
         </button>
         <p
@@ -154,7 +152,7 @@ const verifyEmail = async () => {
     toast.add({
       title: 'Error',
       message: errorMessage.value,
-      type: 'error'
+      type: 'error',
     })
     return
   }
@@ -163,7 +161,7 @@ const verifyEmail = async () => {
   toast.add({
     title: 'Success',
     message: 'Your email has been verified successfully!',
-    type: 'success'
+    type: 'success',
   })
   setTimeout(() => {
     router.push('/')
@@ -182,7 +180,7 @@ const resendVerification = async () => {
     toast.add({
       title: 'Success',
       message: 'New verification email sent!',
-      type: 'success'
+      type: 'success',
     })
 
     // Start 30 second cooldown
@@ -191,7 +189,7 @@ const resendVerification = async () => {
     toast.add({
       title: 'Error',
       message: err.response?.data?.message || 'Failed to resend verification email.',
-      type: 'error'
+      type: 'error',
     })
   } finally {
     resendLoading.value = false

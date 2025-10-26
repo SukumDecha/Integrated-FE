@@ -11,10 +11,8 @@ const parseToken = (jwt) => {
       id: decoded.id,
       nickname: decoded.nickname,
       role: decoded.role,
-      exp: decoded.exp,
     }
-  } catch (e) {
-    console.error('Invalid token:', e)
+  } catch {
     return null
   }
 }
@@ -25,20 +23,22 @@ export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('token') || null)
   const user = ref(token.value ? parseToken(token.value) : null)
 
-  const isLoggedIn = computed(() => !!user.value)
-  const userId = computed(() => user.value?.id || null)
-  const userNickname = computed(() => user.value?.nickname || '')
-  const userRole = computed(() => user.value?.role || '')
-  const isTokenExpired = () => {
-    if (!token.value) {
-      return true
+  // ────────────────────────────────
+  // Computed
+  // ────────────────────────────────
+  const userInfo = computed(() => {
+    const u = user.value
+    return {
+      isLoggedIn: Boolean(u),
+      id: u?.id ?? null,
+      nickname: u?.nickname ?? '',
+      role: u?.role ?? '',
     }
-    const now = Math.floor(Date.now() / 1000)
-    const expired = user.value?.exp <= now
+  })
 
-    return expired
-  }
-
+  // ────────────────────────────────
+  // Actions
+  // ────────────────────────────────
   const login = (jwt) => {
     token.value = jwt
     localStorage.setItem('token', jwt)
@@ -52,7 +52,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       await AuthService.logout()
     } catch (e) {
-      console.warn('Logout failed:', e)
+      console.warn('Logout request failed:', e)
     } finally {
       token.value = null
       user.value = null
@@ -67,6 +67,9 @@ export const useAuthStore = defineStore('auth', () => {
     if (savedToken) {
       token.value = savedToken
       user.value = parseToken(savedToken)
+    } else {
+      token.value = null
+      user.value = null
     }
   }
 
@@ -75,45 +78,30 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const refreshAccessToken = async () => {
-    try {
-      const res = await AuthService.refresh()
-
-      if (res.error) {
-        console.warn('Refresh token failed:', res.error)
-        logout()
-        return { error: res.error }
-      }
-
-      // Check different possible response structures
-      const newToken = res.data?.access_token || res.access_token || res.data?.token || res.token
-
-      if (newToken) {
-        login(newToken)
-        return { success: true }
-      } else {
-        console.error('No access token found in response')
-        logout()
-        return { error: 'No access token received' }
-      }
-    } catch (err) {
-      console.error('Refresh error:', err)
-      logout()
-      return { error: err.message }
+    const res = await AuthService.refresh()
+    if (res.error) {
+      console.warn('Refresh token failed:', res.error)
+      return { error: res.error }
     }
+
+    const newToken = res.data?.access_token || res.access_token || res.data?.token || res.token
+    if (!newToken) {
+      console.error('No access token found in refresh response')
+      return { error: 'No access token received' }
+    }
+
+    login(newToken)
+    return { success: true }
   }
 
   return {
     token,
     user,
-    isLoggedIn,
-    userId,
-    userNickname,
-    userRole,
+    userInfo,
     login,
     logout,
     setUserFromToken,
     setUser,
     refreshAccessToken,
-    isTokenExpired,
   }
 })

@@ -14,7 +14,7 @@ const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 const toast = useToastStore()
-const sellerId = authStore.user?.id
+const sellerId = authStore.userInfo.id
 
 const pagination = reactive({
   currentPage: 1,
@@ -87,9 +87,7 @@ const fetchAllTabsCounts = async () => {
       new: newRes?.pagination.totalItems || 0,
       canceled: canceledRes?.pagination.totalItems || 0,
     }
-
-  } catch (err) {
-    console.error('Error fetching order counts:', err)
+  } catch {
     toast.add({
       title: 'Error',
       message: 'Failed to load order counts.',
@@ -141,7 +139,7 @@ const handlePaginationChange = async ({ currentPage, pageSize }) => {
       ...route.query,
       page: currentPage,
       size: pageSize,
-      sortBy: 'orderDate', 
+      sortBy: 'orderDate',
       sortDirection: 'DESC',
     },
   })
@@ -163,8 +161,7 @@ watch(activeTab, () => {
 
 watch(
   () => route.fullPath,
-  async (newPath) => {
-    console.log('🔄 Route changed to', newPath)
+  async () => {
     const q = route.query
     pagination.currentPage = parseInt(q.page) || 1
     pagination.pageSize = parseInt(q.size) || pagination.pageSize

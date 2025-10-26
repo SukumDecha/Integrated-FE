@@ -35,16 +35,16 @@ const confirmDelete = () => {
     <input
       type="checkbox"
       :checked="props.item.selected"
-      @change="cartStore.toggleItem(props.item.id, $event.target.checked)"
       :class="itbms - item"
-    />
+      @change="cartStore.toggleItem(props.item.id, $event.target.checked)"
+    >
 
     <!-- รูป -->
     <img
       :src="props.item.imageUrl || fallbackImageUrl"
       :alt="`${props.item.brand} ${props.item.model} product image`"
       class="w-20 h-20 object-cover rounded"
-    />
+    >
 
     <!-- รายละเอียด -->
     <div class="flex-1 itbms-item-description">
@@ -55,26 +55,31 @@ const confirmDelete = () => {
       <p class="font-medium itbms-item-total-price text-emerald-600 font-extrabold">
         Price :
         <span class="itbms-item-total-price text-emerald-600 font-extrabold">
-          {{ (props.item.price * props.item.quantity).toLocaleString() }}</span
-        >
+          {{ (props.item.price * props.item.quantity).toLocaleString() }}</span>
         <span class="text-emerald-600"> Baht</span>
       </p>
     </div>
 
     <!-- ปุ่มจำนวน -->
     <div class="flex items-center space-x-2">
-      <XButton size="sm" variant="outline" class="itbms-dec-qty-button" @click="handleDecrease"
-        >-</XButton
+      <XButton
+        size="sm"
+        variant="outline"
+        class="itbms-dec-qty-button"
+        @click="handleDecrease"
       >
+        -
+      </XButton>
       <span class="px-2 itbms-item-quantity">{{ props.item.quantity }}</span>
       <XButton
         size="sm"
         variant="outline"
         class="itbms-inc-qty-button"
-        @click="cartStore.increaseQty(props.item.id)"
         :disabled="props.item.quantity >= props.item.stock"
-        >+</XButton
+        @click="cartStore.increaseQty(props.item.id)"
       >
+        +
+      </XButton>
       <XButton
         size="sm"
         variant="destructive"

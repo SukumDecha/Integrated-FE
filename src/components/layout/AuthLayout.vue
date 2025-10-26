@@ -51,28 +51,24 @@ const pageContent = computed(() => {
     <!-- Background Layer with Emerald Theme and Cloud Effects -->
     <div class="absolute inset-0 bg-gradient-to-br from-emerald-50 via-teal-50 to-green-100">
       <!-- Large Cloud Blobs -->
-      <div class="absolute top-10 left-20 w-96 h-96 bg-white/60 rounded-full blur-3xl"></div>
-      <div class="absolute top-32 left-10 w-80 h-80 bg-emerald-100/50 rounded-full blur-3xl"></div>
-      <div
-        class="absolute top-20 right-32 w-[500px] h-[500px] bg-white/50 rounded-full blur-3xl"
-      ></div>
+      <div class="absolute top-10 left-20 w-96 h-96 bg-white/60 rounded-full blur-3xl" />
+      <div class="absolute top-32 left-10 w-80 h-80 bg-emerald-100/50 rounded-full blur-3xl" />
+      <div class="absolute top-20 right-32 w-[500px] h-[500px] bg-white/50 rounded-full blur-3xl" />
 
       <!-- Medium Cloud Blobs -->
-      <div class="absolute bottom-20 right-20 w-96 h-96 bg-teal-100/40 rounded-full blur-3xl"></div>
-      <div class="absolute bottom-32 left-40 w-72 h-72 bg-white/70 rounded-full blur-2xl"></div>
-      <div class="absolute top-1/2 right-10 w-64 h-64 bg-emerald-50/60 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-20 right-20 w-96 h-96 bg-teal-100/40 rounded-full blur-3xl" />
+      <div class="absolute bottom-32 left-40 w-72 h-72 bg-white/70 rounded-full blur-2xl" />
+      <div class="absolute top-1/2 right-10 w-64 h-64 bg-emerald-50/60 rounded-full blur-3xl" />
 
       <!-- Small Accent Clouds -->
-      <div class="absolute top-40 left-1/3 w-48 h-48 bg-white/40 rounded-full blur-2xl"></div>
-      <div
-        class="absolute bottom-40 right-1/3 w-56 h-56 bg-green-50/50 rounded-full blur-2xl"
-      ></div>
-      <div class="absolute top-1/3 left-1/4 w-40 h-40 bg-teal-50/60 rounded-full blur-xl"></div>
+      <div class="absolute top-40 left-1/3 w-48 h-48 bg-white/40 rounded-full blur-2xl" />
+      <div class="absolute bottom-40 right-1/3 w-56 h-56 bg-green-50/50 rounded-full blur-2xl" />
+      <div class="absolute top-1/3 left-1/4 w-40 h-40 bg-teal-50/60 rounded-full blur-xl" />
 
       <!-- Center Large Cloud -->
       <div
         class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-white/30 rounded-full blur-3xl"
-      ></div>
+      />
     </div>
 
     <!-- Left Panel - Only on Desktop -->
@@ -81,13 +77,11 @@ const pageContent = computed(() => {
     >
       <!-- Decorative Pattern -->
       <div class="absolute inset-0 opacity-10">
-        <div class="absolute top-1/4 left-1/4 w-64 h-64 border-2 border-white rounded-full"></div>
-        <div
-          class="absolute bottom-1/4 right-1/4 w-48 h-48 border-2 border-white rounded-full"
-        ></div>
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 border-2 border-white rounded-full" />
+        <div class="absolute bottom-1/4 right-1/4 w-48 h-48 border-2 border-white rounded-full" />
         <div
           class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-white rounded-full"
-        ></div>
+        />
       </div>
 
       <!-- Content on Left Panel -->
@@ -99,9 +93,14 @@ const pageContent = computed(() => {
             <div
               class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center"
             >
-              <component :is="pageContent.icon" class="w-6 h-6 text-white" />
+              <component
+                :is="pageContent.icon"
+                class="w-6 h-6 text-white"
+              />
             </div>
-            <h1 class="text-2xl font-bold">Green Cart</h1>
+            <h1 class="text-2xl font-bold">
+              Green Cart
+            </h1>
           </div>
 
           <h2 class="text-4xl font-bold leading-tight transition-all duration-300">
@@ -113,9 +112,9 @@ const pageContent = computed(() => {
 
           <div class="flex items-center space-x-2 text-sm text-emerald-100">
             <div class="flex space-x-1">
-              <div class="w-2 h-2 bg-white rounded-full"></div>
-              <div class="w-2 h-2 bg-white/50 rounded-full"></div>
-              <div class="w-2 h-2 bg-white/30 rounded-full"></div>
+              <div class="w-2 h-2 bg-white rounded-full" />
+              <div class="w-2 h-2 bg-white/50 rounded-full" />
+              <div class="w-2 h-2 bg-white/30 rounded-full" />
             </div>
           </div>
         </div>

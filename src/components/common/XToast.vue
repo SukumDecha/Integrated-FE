@@ -1,6 +1,10 @@
 <template>
   <div class="fixed top-6 right-6 z-50 space-y-3 w-96">
-    <transition-group name="toast" tag="div" class="space-y-3">
+    <transition-group
+      name="toast"
+      tag="div"
+      class="space-y-3"
+    >
       <div
         v-for="toast in toasts"
         :key="toast.id"
@@ -68,8 +72,8 @@
         <!-- Close Button -->
         <button
           class="flex-shrink-0 w-7 h-7 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors duration-200 group -mr-1 -mt-1"
-          @click="remove(toast.id)"
           aria-label="Close notification"
+          @click="remove(toast.id)"
         >
           <X class="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
         </button>
@@ -81,7 +85,7 @@
 <script setup>
 import { storeToRefs } from 'pinia'
 import { useToastStore } from '@/stores/toast.store'
-import { Check, Info, XCircle, CircleAlert} from 'lucide-vue-next'
+import { Check, Info, XCircle, CircleAlert, X } from 'lucide-vue-next'
 
 const toastStore = useToastStore()
 const { toasts } = storeToRefs(toastStore)

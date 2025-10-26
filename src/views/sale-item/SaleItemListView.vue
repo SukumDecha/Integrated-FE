@@ -68,14 +68,16 @@ const headerButtons = computed(() => [
     label: 'Add Sale Item',
     variant: 'outline',
     size: 'md',
-    className: 'itbms-sale-item-add bg-emerald-500 text-white border-white hover:bg-emerald-700 transition-all duration-200',
+    className:
+      'itbms-sale-item-add bg-emerald-500 text-white border-white hover:bg-emerald-700 transition-all duration-200',
     onClick: onAdd,
   },
   {
     label: 'Manage Brand',
     variant: 'outline',
     size: 'md',
-    className: 'itbms-manage-brand bg-emerald-500 text-white border-white hover:bg-emerald-700 transition-all duration-200',
+    className:
+      'itbms-manage-brand bg-emerald-500 text-white border-white hover:bg-emerald-700 transition-all duration-200',
     onClick: onManage,
   },
 ])
@@ -131,7 +133,7 @@ const updateRouteQuery = () => {
 }
 
 const fetchSaleItems = async () => {
-  const sellerId = authStore.user?.id
+  const sellerId = authStore.userInfo.id
   if (!sellerId) return
 
   loading.items = true

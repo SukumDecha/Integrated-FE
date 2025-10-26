@@ -32,7 +32,6 @@ const getTabClass = (value) => {
     <button
       v-for="tab in tabs"
       :key="tab.value"
-      @click="$emit('update:modelValue', tab.value)"
       class="relative py-2 px-4 text-sm font-medium rounded-t-md transition-all duration-200"
       :class="[
         tab.value === modelValue
@@ -40,6 +39,7 @@ const getTabClass = (value) => {
           : 'text-gray-500 hover:text-green-700',
         getTabClass(tab.value),
       ]"
+      @click="$emit('update:modelValue', tab.value)"
     >
       {{ tab.label }}
     </button>
