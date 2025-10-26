@@ -2,6 +2,7 @@ export class BaseResponse {
   constructor() {
     this._message = ''
     this._data = null
+    this._status = null
     this._error = null
   }
 
@@ -15,6 +16,11 @@ export class BaseResponse {
     return this
   }
 
+  status(status) {
+    this._status = status
+    return this
+  }
+
   error(message) {
     this._error = message
     return this
@@ -25,8 +31,10 @@ export class BaseResponse {
       message: this._message,
       data: this._data,
       error: this._error,
+      status: this._status,
     }
   }
+
 }
 
 export const BaseResponseMessage = {

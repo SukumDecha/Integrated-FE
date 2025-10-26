@@ -28,7 +28,27 @@ const AuthService = {
   },
 
   async refresh() {
-    return await post(`${BASE_URL}/refresh`)
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}${BASE_URL}/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+      })
+
+      if (res.status === 401) {
+        const errData = await res.json().catch(() => ({}))
+        return { error: errData?.errorMessage || 'Refresh token expired' }
+      }
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        return { error: errData?.errorMessage || `Failed to refresh (${res.status})` }
+      }
+
+      const data = await res.json()
+      return { data }
+    } catch (e) {
+      return { error: e.message }
+    }
   },
 
   async logout() {

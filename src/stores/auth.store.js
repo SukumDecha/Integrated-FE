@@ -19,6 +19,8 @@ const parseToken = (jwt) => {
   }
 }
 
+const isLoggingOut = ref(false)
+
 export const useAuthStore = defineStore('auth', () => {
   const token = ref(localStorage.getItem('token') || null)
   const user = ref(token.value ? parseToken(token.value) : null)
@@ -44,11 +46,20 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const logout = async () => {
-    token.value = null
-    user.value = null
-    localStorage.removeItem('token')
-    router.push('/signin')
-    await AuthService.logout()
+    if (isLoggingOut.value) return
+    isLoggingOut.value = true
+
+    try {
+      await AuthService.logout()
+    } catch (e) {
+      console.warn('Logout failed:', e)
+    } finally {
+      token.value = null
+      user.value = null
+      localStorage.removeItem('token')
+      router.push('/signin')
+      isLoggingOut.value = false
+    }
   }
 
   const setUserFromToken = () => {

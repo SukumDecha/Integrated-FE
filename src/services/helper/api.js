@@ -7,7 +7,6 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 let isRefreshing = false
 let refreshPromise = null
-
 const ensureAccessToken = async (authStore) => {
   if (!authStore.token) {
     return { error: 'No token' }
@@ -19,13 +18,22 @@ const ensureAccessToken = async (authStore) => {
 
   if (!isRefreshing) {
     isRefreshing = true
-    refreshPromise = authStore.refreshAccessToken().finally(() => {
-      isRefreshing = false
-      refreshPromise = null
-    })
+    refreshPromise = authStore
+      .refreshAccessToken()
+      .catch((err) => ({ error: err }))
+      .finally(() => {
+        isRefreshing = false
+        refreshPromise = null
+      })
   }
 
-  return refreshPromise
+  const result = await refreshPromise
+  if (result?.error) {
+    authStore.logout()
+    return { error: result.error }
+  }
+
+  return result
 }
 
 const request = async (url, method, payload = null, options = { isPaginated: false }) => {
@@ -67,7 +75,22 @@ const request = async (url, method, payload = null, options = { isPaginated: fal
   const ResponseBuilder = isPaginated ? PaginationResponse : BaseResponse
 
   try {
-    let res = await fetch(`${API_BASE_URL}${url}`, httpOptions)
+    const res = await fetch(`${API_BASE_URL}${url}`, httpOptions)
+
+    if (res.status === 401) {
+      let errorMessage = 'Session expired'
+      try {
+        const body = await res.json()
+        if (body?.errorMessage || body?.message) {
+          errorMessage = body.errorMessage || body.message
+        }
+      } catch {
+        console.warn('Failed to parse error message')
+      }
+      console.warn('Unauthorized (401):', errorMessage)
+      authStore.logout()
+      return new ResponseBuilder().error(errorMessage).build()
+    }
 
     if (!res.ok) {
       let errorMessage = `HTTP error! Status: ${res.status}`
@@ -80,7 +103,7 @@ const request = async (url, method, payload = null, options = { isPaginated: fal
         console.error('Error parsing response body:', error)
       }
 
-      console.error('❌ Request failed:', errorMessage)
+      console.error('Request failed:', errorMessage)
       return new ResponseBuilder().error(errorMessage).build()
     }
 
